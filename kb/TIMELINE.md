@@ -843,3 +843,11 @@ cluster, data assets, endpoint, monitor; lab 05's RGs shown idle); the full
 loop flowchart with every human decision; and sequence diagrams for PR →
 train-dev, `/train-prod`, `/deploy-prod` and traffic → monitoring. Linked
 from the README and the lab 07 file.
+
+**03:52 · me → Claude · "Some diagrams seem corrupted"**
+Cause: **semicolons in the `/deploy-prod` sequence diagram** (`;` ends a
+statement in Mermaid sequence syntax). Replaced them with commas. Also
+normalized every edge label to the `-->|label|` form. Validated **all 6
+blocks with the official Mermaid CLI** (`@mermaid-js/mermaid-cli` 11, using
+the local Chrome): all render, with no error SVGs. Viewed the architecture and
+`/deploy-prod` PNGs.

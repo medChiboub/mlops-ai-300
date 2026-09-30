@@ -195,13 +195,13 @@ sequenceDiagram
   GH->>R: start job
   R->>R: checkout PR code, Python 3.10, pip install azure-ai-ml azure-identity
   R->>ID: azure/login with prod AZURE_CREDENTIALS
-  R->>AML: detect RG/workspace; endpoint name = diabetes-endpoint- + first 8 chars of suffix
+  R->>AML: detect RG/workspace, endpoint name = diabetes-endpoint- + first 8 chars of suffix
   R->>AML: python src/deploy_to_online_endpoint.py (SDK, DefaultAzureCredential)
   AML->>EP: create endpoint if missing (auth: key)
   AML->>EP: create/update deployment blue: Model(path=./model) MLflow, Standard_D2as_v4 x1, DataCollector(model_inputs, model_outputs)
-  Note over AML,EP: builds an image for the 2023 model (Python 3.8, MLflow 1.30, sklearn 0.24.1); can take 10+ min
+  Note over AML,EP: builds an image for the 2023 model (Python 3.8, MLflow 1.30, sklearn 0.24.1), can take 10+ min
   AML->>EP: traffic blue = 100
-  R-->>GH: print scoring URI; comment endpoint + deployment name
+  R-->>GH: print scoring URI, then comment endpoint + deployment name
   GH-->>Me: comment "Deployment workflow completed"
 ```
 
