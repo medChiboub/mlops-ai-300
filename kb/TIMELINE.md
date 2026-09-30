@@ -597,3 +597,19 @@ the comparison with my project, and an 8-question quiz. Coverage: pipelines
 ✅, components ⚠ (loaded, not registered).
 *Context:* the lab's one section is done. Left: my Studio look at the
 graph, the optional schedule step, then stopping the compute instance.
+
+**22:19 · me → Claude · "The schedule should be pipeline know-how, well documented; no need to run it"**
+Wrote a full **Scheduling** section in `mechanics/components-and-pipelines.md`,
+from verified sources: the SDK signatures (`RecurrenceTrigger`, `CronTrigger`,
+`RecurrencePattern`, `JobSchedule`, inspected locally), the `az ml schedule`
+CLI help (create/list/show/update/trigger/disable/enable/delete; a delete keeps
+past jobs), the module, and my production project's live
+`train_schedule.yml` (weekly, Sundays 04:00 UTC).
+*Context:* the module's exercise says "schedule"; the lab doesn't do it.
+Documented rather than run.
+
+**22:19 · Claude · Lab 04 closed; stopped the compute instance**
+`az ml compute stop -n ci0533925c724d4c839e` → **Stopping**. The cluster's
+last node is releasing after its idle time.
+*Context:* labs 05–07 don't need the compute instance. Stopping it ends its
+per-minute billing (its disk and the file share are kept).

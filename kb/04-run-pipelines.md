@@ -68,7 +68,11 @@ The pipeline itself ran cleanly. Things to know:
   stayed 0.774; only AUC moved in the 4th decimal.
 - **The module's exercise mentions scheduling, the lab doesn't:** the
   exercise unit says "build, run, and **schedule** a pipeline", but neither
-  the lab doc nor the notebook creates a schedule.
+  the lab doc nor the notebook creates a schedule. **Decision:** not run
+  (my call). Documented instead, in full, in
+  [mechanics/components-and-pipelines.md → Scheduling](mechanics/components-and-pipelines.md#scheduling-automatic-retraining):
+  real SDK signatures, CLI commands, and my production project's live
+  `train_schedule.yml`.
 
 ## 4. Exam mapping
 

@@ -76,22 +76,119 @@ prep = ml_client.components.create_or_update(loaded_component_prep)   # register
 - **Registered:** named and versioned in the workspace, so other people and
   pipelines can reuse it (and it can be shared to a registry).
 
-## Scheduling (in the module, not in the lab notebook)
+## Scheduling: automatic retraining
 
-```python
-from azure.ai.ml.entities import RecurrenceTrigger, JobSchedule
-trigger  = RecurrenceTrigger(frequency="week", interval=1)          # minute | hour | day | week | month
-schedule = JobSchedule(name="weekly_retrain", trigger=trigger, create_job=pipeline_job)
-ml_client.schedules.begin_create_or_update(schedule=schedule).result()
-# delete = disable first, then delete
-ml_client.schedules.begin_disable(name="weekly_retrain").result()
-ml_client.schedules.begin_delete(name="weekly_retrain").result()
+The Microsoft Learn module teaches it; the lab notebook doesn't do it. Not
+run here on purpose: this section is the reference. Everything below comes
+from the SDK's own class signatures (azure-ai-ml, inspected locally), the
+`az ml schedule` CLI help, the module (unit 4), and my production project's
+working `ml/pipelines/train_schedule.yml`.
+
+### The idea
+
+A **schedule** is a workspace object that says *"submit this job
+definition on this timetable."* Each time it fires, it creates a **new
+job**, exactly as if you'd submitted it yourself. It's how pipelines become
+automatic retraining. The schedule itself runs nothing on your compute; the
+jobs it creates do.
+
+```
+JobSchedule(name, trigger, create_job)
+             │        │         └─ WHAT to submit: a pipeline (or any) job definition,
+             │        │            or the name of an existing job to copy
+             │        └─ WHEN: RecurrenceTrigger (every N units) or CronTrigger (cron expression)
+             └─ unique name; triggered jobs get it as their display-name prefix
 ```
 
-Jobs started by a schedule get the schedule name as a display-name prefix.
-`CronTrigger` is the cron-expression alternative. Module assessment: the
-simple weekly schedule uses **`RecurrenceTrigger`** (with `JobSchedule` to
-attach it).
+### The four classes (real signatures)
+
+```python
+RecurrenceTrigger(frequency, interval, schedule=None, start_time=None, end_time=None, time_zone="UTC")
+#   frequency: "minute" | "hour" | "day" | "week" | "month"      interval: int (every N units)
+RecurrencePattern(hours, minutes, week_days=None, month_days=None)
+#   the "at what time" inside a recurrence: e.g. Sundays at 04:00. NOT a trigger by itself
+CronTrigger(expression, start_time=None, end_time=None, time_zone="UTC")
+#   standard 5-field cron: "0 4 * * 0" = 04:00 every Sunday
+JobSchedule(name, trigger, create_job, display_name=None, description=None, tags=None, properties=None)
+#   create_job: a Job object (e.g. the pipeline job) or a string (an existing job's name)
+```
+
+- `start_time` / `end_time`: the window in which the schedule is active.
+  Time zone defaults to **UTC**.
+- **`RecurrenceTrigger` vs. `RecurrencePattern`** (the assessment's
+  distractor): the *trigger* is the schedule's clock; the *pattern* only
+  refines the exact hours, minutes and days inside a recurrence.
+
+### SDK: create, check, run now, stop, delete
+
+```python
+from azure.ai.ml.entities import RecurrenceTrigger, RecurrencePattern, JobSchedule
+
+trigger = RecurrenceTrigger(
+    frequency="week", interval=1,
+    schedule=RecurrencePattern(week_days=["sunday"], hours=4, minutes=0),   # Sundays 04:00 UTC
+)
+schedule = JobSchedule(name="diabetes_weekly", trigger=trigger, create_job=pipeline_job)  # the @pipeline() job
+ml_client.schedules.begin_create_or_update(schedule=schedule).result()
+
+ml_client.schedules.list()                          # all schedules in the workspace
+ml_client.schedules.get("diabetes_weekly")          # its trigger, is_enabled, …
+ml_client.schedules.trigger("diabetes_weekly")      # fire once right now (testing)
+ml_client.schedules.begin_disable("diabetes_weekly").result()   # pause: stops creating jobs
+ml_client.schedules.begin_enable("diabetes_weekly").result()    # resume
+ml_client.schedules.begin_disable("diabetes_weekly").result()   # delete = disable FIRST…
+ml_client.schedules.begin_delete("diabetes_weekly").result()    # …then delete
+```
+
+### CLI + YAML: the same thing (my production project, live)
+
+```yaml
+# ml/pipelines/train_schedule.yml  (MLOps_Project_Azure_ML)
+$schema: http://azureml/sdk-2-0/Schedule.json
+name: diabetes_classifier_weekly_training
+display_name: Diabetes classifier weekly training
+trigger:
+  type: recurrence            # or: type: cron  +  expression: "0 4 * * 0"
+  frequency: week
+  interval: 1
+  schedule:
+    week_days: Sunday
+    hours: 4
+    minutes: 0
+create_job: ./train_pipeline.yml    # the pipeline YAML to submit each time
+```
+
+```bash
+az ml schedule create  -f train_schedule.yml
+az ml schedule list | show -n <name> | update -f … | trigger -n <name>
+az ml schedule disable -n <name>    # stop firing
+az ml schedule enable  -n <name>
+az ml schedule delete  -n <name>    # disable first; jobs it already triggered are NOT deleted
+```
+
+In my project this runs for real: `diabetes_classifier_weekly_training`,
+`provisioning_state: Succeeded`, `is_enabled: true`, Sundays 04:00 UTC. A
+scheduled run only retrains and evaluates; it **doesn't auto-promote**. A
+new version still needs the human deploy step.
+
+### Things to know
+
+- **Jobs from a schedule are normal jobs**, with the schedule name as their
+  display-name prefix. They appear under Jobs, and Studio also lists the
+  schedule under **Jobs → Schedules**.
+- **Deleting a schedule keeps its past jobs.** Delete is only allowed once
+  it's **disabled**.
+- **Inputs resolve on every run.** A `@latest` data asset in the scheduled
+  pipeline picks up new data each time; a pinned `:1` retrains on the same
+  data every time.
+- **Retraining ≠ deploying.** A schedule makes new models; registering or
+  deploying them is a separate decision (a gate, an approval).
+- **The same mechanism drives monitoring.** Lab 07's model monitor is also an
+  `az ml schedule`, with `create_monitor:` instead of `create_job:` (my
+  project's `endpoints/monitor.dev.yml`).
+- **Exam cues:** "run every week, simplest way" → **`RecurrenceTrigger`**
+  (inside a `JobSchedule`); "run at a cron-style time" → **`CronTrigger`**;
+  "stop and remove" → **disable, then delete**.
 
 ## Troubleshooting (module unit 4)
 
