@@ -349,3 +349,112 @@ retrieval specifications, restricting network access, and automated
 retraining or alert triggers. Domains 3–5 (GenAIOps) aren't in these labs.
 *Context:* one place to see exam coverage across all labs, updated at the end
 of each lab.
+
+---
+
+## Lab 02: Optimize model training
+
+### 2026-09-29
+
+**21:07 · Claude · Prepared lab 02**
+Read the lab doc, `Run script as a command job.ipynb` and
+`src/train-model-parameters.py`, and the live Microsoft Learn module *Run
+training scripts and track models with MLflow* (units 2–6 plus the
+assessment). Checked the compute instance is Running and the cluster is at 0.
+Created `kb/02-optimize-model-training.md`.
+*Context:* the lab's provision and clone sections are skipped (lab 01's
+workspace and clone are reused). Three sections remain: convert a notebook to
+a script, test in the terminal, run as a command job.
+
+**21:10 · me · Section 1: converted a notebook to a script** (Studio)
+Ran `Train classification model.ipynb`, then **Export as → Python** →
+`train-classification-model.py`, then **▷▷** ran it in the terminal:
+Accuracy 0.7737, AUC 0.8484. `which python` →
+`/anaconda/envs/azureml_py38/bin/python`, **Python 3.10.0**.
+*Context:* the first step from notebook toward a production script.
+
+**21:12 · Claude · Checked the export**
+Downloaded the `.py` from the share. It's a straight paste of the cells
+(`# In[n]:` markers, hardcoded path and `C`, no functions). `df.head()` and
+the ROC plot run but show nothing. The share's `ROC-Curve.png` (00:35:48 UTC)
+is lab 01 run 5's saved-but-unlogged image.
+*Context:* an export alone doesn't make production code. Section 2's script
+shows the refactored version.
+
+**21:20 · me → Claude · "How did the exported script turn into src/ with .py and .yml files?"**
+It didn't. `src/` was written by Microsoft and has been in the repo all
+along. The lab uses my export (`experimentation/train-classification-model.py`,
+a raw copy of the cells) and `src/train-model-parameters.py` (the same logic
+refactored: functions, `argparse`, MLflow logging) as a before and after.
+`job.yml` belongs to labs 06–07. Documented at the start of section 2.2 of the
+lab 02 file.
+*Context:* the lab jumps from "export" to "test the refactored script"
+without saying where that script came from.
+
+**21:21 · me · Section 2: tested the script in the terminal** (Studio)
+**▷▷** with no arguments → `TypeError: stat: path should be string… not
+NoneType` (intended). The lab's `cd mslearn-mlops/src/` → no such directory
+(already in `src/`). Then `python train-model-parameters.py --training_data
+../data/diabetes-data/diabetes.csv` → Accuracy 0.774, AUC 0.8485.
+*Context:* testing the parameterised script before running it as a job.
+
+**21:24 · Claude · Checked what the terminal run left behind**
+MLflow API: the run `epic_floor_prhg1jbc` landed in experiment **`Default`**
+(param `Regularization rate=0.01`, Accuracy/AUC, artifact `ROC-Curve.png`).
+MLflow started the run automatically on the first `log_*` call. File share:
+a new `src/ROC-Curve.png`, which will go into the next job's code snapshot.
+*Context:* even a terminal test on a compute instance is tracked in the
+workspace.
+
+**21:24 · me · Section 3: ran the command-job notebook** (all cells)
+`Run script as a command job.ipynb` submitted two jobs to `aml-cluster`,
+experiment `diabetes-training`:
+- **`musing_reggae_mnbbwkylvf`** (`diabetes-train-script`)
+- **`lime_train_h5fzjbwn0n`** (`diabetes-train-mlflow`, the optional autolog
+  run)
+
+Both passed submission with the curated environment
+`AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest`.
+*Context:* the same script as section 2, now run by Azure ML.
+**Note:** the optional step says to add `mlflow.autolog()` to the script
+first. The script on the share has no `autolog` line, so the second job
+runs identical code under a different name.
+
+**21:30 · Claude · Both command jobs Completed**
+Queued 01:24 → nodes up about 3 min later (**2 nodes**, one per job, 6/6
+quota cores) → finished 01:29:14 / 01:29:38 UTC. Both logged Accuracy 0.774,
+AUC 0.84828, param `Regularization rate 0.01`, `ROC-Curve.png`.
+- **Code snapshot:** the whole `src/` folder, including the terminal test's
+  PNG, `job.yml` and the deploy script. One code asset shared by both jobs.
+- **Input:** reused lab 01's `LocalUpload/03f6bb5b…` upload.
+- **Environment:** the curated environment ran fine
+  (`/azureml-envs/sklearn-1.0`).
+- **AUC:** differs from the terminal (0.84849), most likely the scikit-learn
+  version.
+
+Wrote `mechanics/command-jobs.md`.
+*Context:* the jobs keep code, data, environment and logs together, which
+the terminal run didn't.
+
+**21:35 · me · Optional autolog step, done properly**
+Added `mlflow.autolog()` as the first line of `main()` in
+`src/train-model-parameters.py`, saved, and reran only the last cell → job
+**`epic_king_fhy758f6cn`** (queued 01:35:46 → started 01:37:52 → done
+01:40:14 UTC; another cold start, since the nodes had scaled to 0).
+*Context:* see what autolog adds on top of custom logging.
+
+**21:43 · Claude · Compared the two jobs; closed lab 02**
+- **Autolog job:** 16 params vs. 1, 9 metrics vs. 2 (7 `training_*`:
+  training accuracy 0.7914 vs. test 0.774), plus a `model/` folder,
+  `estimator.html` and 3 charts. A new code snapshot (`504b4a23…`) because
+  the script changed.
+- **AUC difference explained:** autolog logged `multi_class: auto` in the job
+  (scikit-learn 1.0) vs. `deprecated` on the compute instance in lab 01, so
+  the library versions really differ.
+
+Wrote exam mapping (with the Microsoft Learn module comparison and its
+4-question assessment), the comparison table, and the 8-question quiz.
+Updated the README line and coverage table: *Run model training scripts* ✅,
+MLflow ✅, compare ✅, environments 👀.
+*Context:* all lab 02 sections done. "Delete resources" skipped (the
+workspace is reused).

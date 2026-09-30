@@ -18,7 +18,7 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | Lab | File | What I learned |
 |---|---|---|
 | 01 | [Experiment and evaluate models](01-experiment-evaluate-models.md) | AutoML found a VotingEnsemble at 0.953 accuracy (vs. 0.774 for hand-made LogisticRegression) in about 11 min on 1 node, but kept `PatientID` as a feature with every guardrail green. MLflow autolog reports *training* metrics, and saving a file isn't logging it |
-| 02 | Optimize model training | _not started_ |
+| 02 | [Optimize model training](02-optimize-model-training.md) | A Studio export is just the cells pasted into one file; the refactored script takes arguments. A command job records code snapshot + data + environment + logs, which a terminal run doesn't (that one went to `Default`). The same code gave a different AUC in the job because the environment pins scikit-learn 1.0. Autolog adds 15 params, `training_*` metrics and the `model/` folder |
 | 03 | Hyperparameter tuning | _not started_ |
 | 04 | Run pipelines | _not started_ |
 | 05 | Plan and prepare | _not started_ |
@@ -47,7 +47,7 @@ Status: ✅ done · 👀 seen but not done · ⚠ partial or failed · ⏳ plann
 | Create and manage compute targets | 01 | ✅ 01 | ✅ |
 | Configure identity and access for workspaces | 06 (service principal, RG scope), 07 (environment secrets) | ⏳ | ✅ |
 | Create and manage data assets | 01 (uri_file, MLTable), 07 (uri_folder dev/prod) | ✅ 01 | ✅ |
-| Create and manage environments | 02/03 *use* a curated one; none creates one | ⏳ | ✅ |
+| Create and manage environments | 02/03 *use* a curated one; none creates one | 👀 02: used curated `sklearn-1.0` (and saw it change results) | ✅ |
 | Create and manage components | 04 | ⏳ | ✅ |
 | Share assets across workspaces with registries | 05 (design; optional create) | ⏳ | ✅ |
 | Configure GitHub integration for secure access | 06, 07 | ⏳ | ✅ (OIDC) |
@@ -60,14 +60,14 @@ Status: ✅ done · 👀 seen but not done · ⚠ partial or failed · ⏳ plann
 
 | Skill | Labs | Status | Prod |
 |---|---|---|---|
-| Configure experiment tracking with MLflow | 01, 02 | ✅ 01 | ✅ |
+| Configure experiment tracking with MLflow | 01, 02 | ✅ 01, 02 | ✅ |
 | Use AutoML to explore optimal models | 01 | ✅ 01 | ✅ |
 | Use notebooks for experimentation | 01 | ✅ 01 | ✅ |
 | Automate hyperparameter tuning | 03 | ⏳ | ✅ |
-| Run model training scripts | 02, 06 | ⏳ | ✅ |
+| Run model training scripts | 02, 06 | ✅ 02 | ✅ |
 | Manage distributed training | ❌ | ❌ | ❌ |
 | Implement training pipelines | 04 | ⏳ | ✅ |
-| Compare model performance across jobs | 01, 07 (dev vs. prod metrics) | ✅ 01 | ✅ |
+| Compare model performance across jobs | 01, 02, 07 (dev vs. prod metrics) | ✅ 01, 02 | ✅ |
 | Package a feature retrieval specification with the model | ❌ | ❌ | ❌ |
 | Register an MLflow model | 07 (only *implicitly*, through deployment) | ⏳ | ✅ |
 | Evaluate a model with responsible AI principles | 01 (module text only); optional notebook `Create Responsible AI dashboard.ipynb` | ⚠ 01: automatic `_RAI` run failed | ⚠ |

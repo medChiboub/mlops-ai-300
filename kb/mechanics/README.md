@@ -16,3 +16,4 @@ gets ticked or corrected once we see it.
 | [data-assets.md](data-assets.md) | `uri_file` vs. `uri_folder` vs. `mltable`, what `az ml data create` uploads, versioning | Lab 01 §1 |
 | [automl.md](automl.md) | An AutoML job from submission to best model: featurization, guardrails, trials, CV, ensembles | Lab 01 §3 |
 | [mlflow-tracking.md](mlflow-tracking.md) | MLflow ↔ Azure ML mapping, tracking vs. submitting, autolog vs. custom logging, params vs. metrics vs. artifacts | Lab 01 §4 |
+| [command-jobs.md](command-jobs.md) | A command job's pieces, code snapshot and `.amlignore`, input upload reuse, environment, logs, job vs. terminal run | Lab 02 §3 |
