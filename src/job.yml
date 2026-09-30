@@ -5,6 +5,7 @@ command: >-
   --training_data ${{inputs.training_data}}
   --reg_rate ${{inputs.reg_rate}}
   --metrics_output ${{outputs.metrics_output}}
+  --model_output ${{outputs.model_output}}
 inputs:
   training_data:
     type: uri_folder
@@ -13,6 +14,8 @@ inputs:
 outputs:
   metrics_output:
     type: uri_folder
+  model_output:
+    type: mlflow_model
 environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest
 compute: azureml:aml-cluster
 experiment_name: diabetes-training
