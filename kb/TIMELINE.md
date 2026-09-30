@@ -796,3 +796,25 @@ Wrote the exam mapping (module comparison plus the 5-question assessment),
 the comparison table (client secret vs. OIDC, unpinned tools…), and an 8-question
 quiz. Coverage: IAM ✅, GitHub integration ✅, Git ✅, network 👀, training
 scripts from CI ✅.
+
+---
+
+## Lab 07: Deploy and monitor
+
+### 2026-09-30
+
+**03:25 · Claude · Prepared lab 07; data assets; environments**
+Read the live module *Deploy and monitor a model in Azure ML* (units 2–5 +
+the 5-question assessment); its exercise links to this lab. The module's way
+differs from the lab: register the model, blue/green at 0% → 10%, OIDC, a
+protected `production` environment. The lab deploys an unregistered folder
+at 100%, with a client secret and an optional reviewer.
+- Added `diabetes-dev-folder` and `diabetes-prod-folder` (uri_folder, v1)
+  to the **lab 01 workspace**. All three CSVs have the same MD5.
+- Created GitHub environments `dev` and **`prod` with me as required
+  reviewer**.
+- Put `AZURE_CREDENTIALS` into both from a **new client secret**
+  (`gh-environments-lab07`) on the same service principal, never printed.
+
+*Context:* the setup lab 07's workflows need. The reviewer gate matters
+because the repo is public.

@@ -32,7 +32,7 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 04 | [Run pipelines](04-run-pipelines.md) | Component = metadata + interface + command/code/environment; the pipeline wires output → input, so order comes from the data dependency (train didn't exist until prep finished). Loaded components stay anonymous (`az ml component list` was empty). Outputs land in `workspaceblobstore/azureml/<run>/<output>/`. The lab never schedules, although the module does |
 | 05 | [Plan and prepare](05-plan-and-prepare.md) | Dev and prod workspaces + a shared registry. The lab's literal design script would have created a second `rg-ai300-l*` group (breaking labs 06–07), and Microsoft's reference script can't create its registry (a 35-character name, over the limit) yet reports success (no `set -e`). A registry's Premium ACR costs $1.67/day. It carries models (pattern A) or components + environments (pattern B, retrain in prod) |
 | 06 | [Automate model training](06-automate-model-training.md) | `create-for-rbac` = app registration + service principal + role; its JSON → `AZURE_CREDENTIALS`, and the job's `created_by` is the SP. A `pull_request` trigger + branch protection make the PR the gate. The workflow went red while training succeeded: an unpinned `ml` 2.45.0 `--stream` bug, reproduced twice, fixed by pinning 2.44.1. OIDC is the recommended answer over the lab's client secret |
-| 07 | Deploy and monitor | _not started_ |
+| 07 | [Deploy and monitor](07-deploy-monitor.md) | _in progress_ |
 
 ## What's original vs. what we changed
 
