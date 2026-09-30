@@ -6,6 +6,15 @@ what I actually ran, what broke, how it maps to the AI-300 skills measured,
 and how my production project (`../MLOps_Project_Azure_ML`) does the same
 thing differently.
 
+**Versions checked (2026-09-29):**
+- Lab code and docs: identical to upstream `MicrosoftLearning/mslearn-mlops`
+  commit [`87482bc`](https://github.com/MicrosoftLearning/mslearn-mlops/tree/87482bc76b9ffa665e6ce6b76746d31e7a164b01)
+  (2026-06-30, still the latest).
+- Theory: the Microsoft Learn learning path *Operationalize machine learning
+  models (MLOps)*, modules dated **2026-08-27**. Each module's exercise unit
+  links to the same `microsoftlearning.github.io/mslearn-mlops/docs/0N-….html`
+  page these docs build. Re-check before each lab.
+
 **Environment:** one workspace provisioned in lab 01 (canadaeast, `rg-ai300-l*` /
 `mlw-ai300-l*`), reused for every lab, deleted after lab 07.
 

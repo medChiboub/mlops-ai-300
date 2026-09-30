@@ -458,3 +458,20 @@ Updated the README line and coverage table: *Run model training scripts* ✅,
 MLflow ✅, compare ✅, environments 👀.
 *Context:* all lab 02 sections done. "Delete resources" skipped (the
 workspace is reused).
+
+**21:47 · me → Claude · "Is the Microsoft Learn documentation for these labs up to date with what we have?"**
+Pushed lab 02, then checked three things:
+- **Lab repo:** our copy is byte-identical to upstream `87482bc`
+  (2026-06-30, still the latest commit). Diffed against a fresh download.
+- **Microsoft Learn exercise units** (module *Experiment…* unit 8, module *Run
+  training scripts…* unit 7, both updated 2026-08-27) link through
+  `go.microsoft.com` to `microsoftlearning.github.io/mslearn-mlops/docs/01-…`
+  and `02-….html`. The published pages match our `docs/` (spot-checked,
+  including the `Run script as command job` filename typo).
+- **Theory:** the module units read live today (2026-08-27 versions) are what
+  sections 4 of the lab 01 and 02 files compare against.
+
+Added a "Versions checked" line to the kb README.
+*Context:* confirms the labs and theory we're following are the current ones.
+My production project's `CERT_NOTES.md` predates the 2026-08-27
+restructure, so its module numbering differs.
