@@ -49,4 +49,11 @@ prints YAML, and `load_component` / `load_job` read YAML into SDK objects.
 - **Studio:** exploring, reviewing results, and a few UI-first tasks
   (monitoring setup, traffic updates).
 
+**The CLI isn't "for GitHub Actions", and GitHub Actions isn't CLI-only.**
+The CLI runs anywhere: my terminal, Cloud Shell, scripts like `setup.sh`,
+any CI/CD. A workflow can run SDK code too: lab 07's `deploy-prod.yml`
+installs `azure-ai-ml` and runs `python src/deploy_to_online_endpoint.py`.
+CLI + YAML is simply the **usual** choice in CI (a reviewable YAML in Git, a
+one-line step, no Python to maintain).
+
 **Exam:** expect code snippets in both forms, and know how they correspond.
