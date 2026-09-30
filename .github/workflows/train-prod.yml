@@ -106,6 +106,17 @@ jobs:
           echo "prod_accuracy=$ACC" >> "$GITHUB_OUTPUT"
           echo "prod_auc=$AUC" >> "$GITHUB_OUTPUT"
 
+      - name: Quality gate before registration
+        env:
+          MIN_AUC: "0.80"
+        run: |
+          AUC="${{ steps.parse-metrics.outputs.prod_auc }}"
+          echo "Prod AUC: $AUC (minimum to register: $MIN_AUC)"
+          if ! python -c "import sys; sys.exit(0 if float('$AUC') >= float('$MIN_AUC') else 1)"; then
+            echo "::error::Prod AUC $AUC is below $MIN_AUC, so the model is not registered."
+            exit 1
+          fi
+
       - name: Register prod model
         id: register
         run: |
@@ -144,6 +155,7 @@ jobs:
 
             body += '\n\n**Registered model**';
             body += `\n- diabetes-model:${modelVersion} (deploy it with /deploy-prod)`;
+            body += `\n- Quality gate passed: AUC ≥ 0.80`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
