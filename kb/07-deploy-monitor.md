@@ -185,6 +185,19 @@ the module teaches and what makes the loop real). This goes beyond the lab.
    `diabetes-model` version. Only `/train-prod` registers deliberately.
    ("Approved" here means I approved *running* prod training; there's no
    metric gate before registration yet.)
+6. **Quality gate added** (my decision: "we keep a standard before
+   registration"), commit `e15a2f8` on PR #4: a new `train-prod.yml` step,
+   **"Quality gate before registration"** (`MIN_AUC: "0.80"`), between "Extract
+   prod metrics" and "Register prod model". If prod AUC < 0.80 → `::error::…
+   the model is not registered`, exit 1, so registration and the comment are
+   skipped. Tested the comparison locally: 0.8483 → pass, 0.79 → fail. The PR
+   comment now says "Quality gate passed: AUC ≥ 0.80".
+   - Registration now means **"from a prod run I approved *and* it met the
+     standard"**. A champion/challenger version would compare with the
+     latest version's `auc` tag instead of a fixed bar.
+   - GitHub nuance seen here: this commit only changed `train-prod.yml`, yet
+     **`train-dev` re-ran**. For `pull_request` events, the `paths` filter looks
+     at the **whole PR diff vs. the base**, not just the new commit.
 
 ### How dev and prod share one job definition
 

@@ -897,3 +897,11 @@ deployments at 0%. A **local test** caught a signature bug (all-`double`
 types rejected the lab's integer payload) before pushing.
 *Context:* makes retraining actually change what's served. This goes
 beyond the lab, by my choice.
+
+**04:27 · me → Claude · "Keep a standard before registration"**
+Added **"Quality gate before registration"** to `train-prod.yml` on PR #4
+(`e15a2f8`): prod AUC ≥ 0.80 or fail, with nothing registered. Tested the
+comparison locally (0.8483 pass, 0.79 fail). The new commit re-ran
+`train-dev` too: the `paths` filter uses the whole PR diff.
+*Context:* registration now means an approved prod run *and* a metric
+standard.
