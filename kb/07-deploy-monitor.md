@@ -7,7 +7,7 @@ Microsoft Learn module: [Deploy and monitor a model in Azure Machine Learning](h
 Its exercise (`go.microsoft.com/fwlink/?LinkId=2378100`) links to this lab.
 Units 2–5 and the 5-question assessment were read before starting.
 
-Mechanics: [GitHub Actions ↔ Azure ML](mechanics/github-actions-azureml.md) · [registries and environments](mechanics/registries-and-environments.md) · [job types](mechanics/job-types.md)
+Mechanics: **[end-to-end flow: architecture, flowchart, sequence diagrams](mechanics/end-to-end-flow.md)** · [GitHub Actions ↔ Azure ML](mechanics/github-actions-azureml.md) · [registries and environments](mechanics/registries-and-environments.md) · [job types](mechanics/job-types.md)
 
 ## 1. What this lab does
 

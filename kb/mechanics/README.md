@@ -23,3 +23,4 @@ gets ticked or corrected once we see it.
 | [registries-and-environments.md](registries-and-environments.md) | Assets vs. resources, dev/prod workspaces, two promotion patterns, what a registry provisions (managed RG, Premium ACR, storage), naming rules, RBAC | Lab 05 |
 | [github-actions-azureml.md](github-actions-azureml.md) | The workflow → Azure chain, secrets vs. variables, service-principal secret vs. OIDC, triggers, branch protection vs. workflows, network | Lab 06 |
 | [job-types.md](job-types.md) | The 5 job types (command, sweep, automl, pipeline, spark), "is a pipeline a set of commands?" nuances, non-job `az ml` actions (register, deploy, schedule) | Labs 01–07 |
+| [end-to-end-flow.md](end-to-end-flow.md) | **Diagrams**: architecture (GitHub ↔ Entra ↔ Azure), the whole dev → prod → monitor loop (flowchart), sequence diagrams for PR → train-dev, `/train-prod`, `/deploy-prod`, monitoring; where the humans decide | Labs 06–07 |

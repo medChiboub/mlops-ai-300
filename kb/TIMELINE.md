@@ -834,3 +834,12 @@ Pinned ml 2.44.1 in `train-dev`, `train-prod` and `deploy-prod` via PR #2
 `train-prod.yml` and `deploy-prod.yml` (`gh workflow enable`).
 *Context:* `issue_comment` workflows run from `main`, so the pin had to land
 first. Re-enabling is safe with the interaction limits + the prod reviewer.
+
+**03:47 · me → Claude · "This deserves a holistic flowchart, a Mermaid architecture and sequence diagrams"**
+Wrote `mechanics/end-to-end-flow.md` (6 Mermaid diagrams, built from the
+actual workflow steps and resources): the architecture (GitHub repo,
+workflows, secrets, environments ↔ Entra app/SP ↔ Azure RG: workspace,
+cluster, data assets, endpoint, monitor; lab 05's RGs shown idle); the full
+loop flowchart with every human decision; and sequence diagrams for PR →
+train-dev, `/train-prod`, `/deploy-prod` and traffic → monitoring. Linked
+from the README and the lab 07 file.
