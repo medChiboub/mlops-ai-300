@@ -101,6 +101,22 @@ Afterwards Claude:
 - confirmed **no new `rg-ai300-l*` group**, so labs 06–07's workspace
   discovery is unaffected
 
+### Careful: labs 06–07 don't use this design
+
+The labs use "dev" and "prod" for two different things:
+
+| | Lab 05's dev/prod | Lab 07's dev/prod |
+|---|---|---|
+| What it is | Separate workspaces `mlw-ai300-dev-…`, `mlw-ai300-prod-…` + a registry | Labels inside **the lab 01 workspace**: GitHub Environments `dev`/`prod` + data assets `diabetes-dev-folder`/`diabetes-prod-folder` |
+| Used by a workflow? | **No**, it's design only | Yes: `train-dev.yml` and `train-prod.yml` (both find the lab 01 workspace by the `rg-ai300-l` prefix) |
+
+Lab 07's text: *"For this lab, you can use a single workspace and separate
+data assets to represent development and production data."* So lab 05's
+workspaces and registry sit idle (about $1.67/day for the registry) until
+the final cleanup. The single-workspace version is a 🧪 lab shortcut; the 📘
+design is lab 05's: separate workspaces or subscriptions, a registry, and a
+separate identity per environment.
+
 ### Why a registry, if prod retrains anyway?
 
 The labs create the registry but never use it: lab 07 retrains in prod and

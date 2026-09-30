@@ -721,3 +721,9 @@ credentials), a **service principal** (objectId `15b1f7f7-…`), and a
 uses the JSON, and why cleanup must delete the app registration.
 *Context:* section 1 of lab 06 was done by me while I was away; this makes
 the mechanics explicit.
+
+**00:29 · me → Claude · "What about dev and prod?"**
+Clarified: lab 05's dev/prod are real separate workspaces that **no workflow
+uses**. Lab 07's dev/prod are GitHub Environments + data assets **inside the
+lab 01 workspace** (the lab says so). Lab 06 has no dev/prod. Added a
+"Careful: labs 06–07 don't use this design" section to the lab 05 file.
