@@ -1,5 +1,7 @@
 # Registries and dev/prod environments
 
+> The lab 05 resources described below were **deleted on 2026-09-30** (unused by labs 06–07; the registry cost about $1.67/day). Everything here is the verified record of what they were; `infra/setup-prod-design.sh` recreates them.
+
 ## The one idea
 
 **Workspaces are per environment; assets can be shared.** Microsoft's docs

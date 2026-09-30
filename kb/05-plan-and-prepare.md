@@ -160,7 +160,20 @@ fi
 - My project's version: **one Bicep template + one `.bicepparam` per
   environment**, the same idea, declarative.
 
-### 2.6 Clean up (the lab's last step): skipped on purpose
+### 2.6 Clean up (the lab's last step): done later, during lab 07
+
+**2026-09-30 (during lab 07): deleted** all three lab 05 resource groups
+(`rg-ai300-dev-5ae342744a834c9880`, `rg-ai300-prod-…`, `rg-ai300-reg-…`); the
+registry's Azure-managed group `azureml-rg-mlr-ai300-shared-…` went with it.
+Reason: no workflow used them (lab 07 simulates dev/prod inside the lab 01
+workspace), and the registry cost about $1.67/day. **The separation is still
+documented and reproducible:** this file (the design and why),
+[mechanics/registries-and-environments.md](mechanics/registries-and-environments.md)
+(what each resource was), and `infra/setup-prod-design.sh` (re-running it
+recreates the same layout). Lab 07's working separation (GitHub environments
+`dev`/`prod` + the dev/prod data assets in the lab 01 workspace) is unaffected.
+
+Originally:
 
 The lab says to delete the extra resource groups. **I chose to keep all
 three** (`rg-ai300-dev-…`, `rg-ai300-prod-…`, `rg-ai300-reg-…`). Ongoing cost:

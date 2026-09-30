@@ -867,3 +867,14 @@ reviewer → **approved through the API** (recorded as me) → job
 dev (the same file).
 *Context:* retrain in prod, gated by a human. The CLI pin made the stream,
 download and parse all work.
+
+**04:01 · me → Claude · "Delete them, we don't use them anyway. But keep the record of the separation"**
+Deleted lab 05's `rg-ai300-dev-…`, `rg-ai300-prod-…` and `rg-ai300-reg-…`
+(`az group delete --no-wait`, after listing their contents: 2 workspaces
+with storage, key vault, App Insights and Log Analytics, the dev compute
+instance and cluster, the registry). Its managed group
+`azureml-rg-mlr-ai300-shared-…` is deleting with it. **Lab 01's group is
+untouched.** The separation stays documented (lab 05 file, registries
+mechanics, `infra/setup-prod-design.sh`), and lab 07's working dev/prod
+(GitHub environments + data assets) is unaffected.
+*Context:* stops the registry's .67/day; nothing used them.
