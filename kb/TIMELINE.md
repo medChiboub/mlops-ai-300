@@ -766,3 +766,33 @@ output → input wiring gives ordering, data passing, reuse and per-step child
 jobs. Plus the non-job `az ml` actions a workflow may run (register,
 deploy, schedule). New `mechanics/job-types.md`, and a nuance section in
 `components-and-pipelines.md`.
+
+**04:40–04:50 UTC · me + Claude · Section: PR trigger + branch protection**
+Claude (on my "do it for me") added `pull_request: branches: [main]` to
+`manual-trigger-job.yml` (`db64fbf`). I created a **classic branch protection
+rule** on `main` in the UI: require PR, **approvals unticked** (the dropdown only
+goes 1–6). The API read-back: approvals 0, no required checks, admins not
+enforced, force push and deletion blocked.
+*Context:* the PR becomes the only way into `main`.
+
+**04:54–05:00 UTC · Claude + me · Feature branch → PR #1**
+Claude: branch `feature/update-parameters`, `reg_rate 0.01 → 0.1` (`f281c9e`).
+I opened **PR #1** → the `pull_request` trigger ran automatically (run
+`36671001563`). Job `ashy_holiday_qxk8djl5xk` Completed (acc 0.774, AUC
+0.8483), but the **same `--stream` binascii error** → check FAILURE, PR
+"unstable" but mergeable.
+
+**07:05–07:18 UTC · me → Claude · Option B: pin the CLI, re-test, merge**
+Pinned `az extension add -n ml --version 2.44.1 -y` on the PR branch
+(`99c37b8`). The PR re-ran (`36681715090`): **✅ green**, and the stream printed
+`Accuracy: 0.774` / `AUC: 0.8483`. PR state CLEAN. Claude merged PR #1 on my
+"ok go" (07:18:32, `7afe772`) and deleted the branch; local switched back to
+`main`.
+*Context:* confirms the 2.45.0 streaming bug and the fix. Lab 07's workflows
+need the same pin (`train-dev.yml` parses metrics from the streamed log).
+
+**03:20 · Claude · Lab 06 closed**
+Wrote the exam mapping (module comparison plus the 5-question assessment),
+the comparison table (client secret vs. OIDC, unpinned tools…), and an 8-question
+quiz. Coverage: IAM ✅, GitHub integration ✅, Git ✅, network 👀, training
+scripts from CI ✅.
