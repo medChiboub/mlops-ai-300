@@ -1,0 +1,43 @@
+name: Send monitor traffic (lab 07 helper)
+
+# Not part of the Microsoft lab. Sends the one-time "shifted" batch for the
+# drift demo, unattended: after monitor run 1 (2026-10-01 04:00 UTC) and
+# before run 2 (2026-10-02 04:00 UTC). See kb/mechanics/monitoring.md.
+# Uses the repo secret (not the prod environment): it only sends test traffic,
+# it doesn't train or deploy. Delete this file at cleanup.
+
+on:
+  schedule:
+    - cron: '17 18 1 10 *'   # Oct 1, 18:17 UTC
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: baseline or shifted
+        type: choice
+        options: [baseline, shifted]
+        default: baseline
+      n:
+        description: number of requests
+        default: '3'
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Only in 2026 (the lab's resources are deleted afterwards)
+      id: guard
+      run: echo "go=$([ "$(date -u +%Y)" = "2026" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+    - name: Check out repo
+      if: steps.guard.outputs.go == 'true'
+      uses: actions/checkout@main
+    - name: Install az ml extension
+      if: steps.guard.outputs.go == 'true'
+      run: az extension add -n ml --version 2.44.1 -y   # pinned: 2.45.0 --stream crashes (binascii.Error)
+    - name: Azure login
+      if: steps.guard.outputs.go == 'true'
+      uses: azure/login@v2
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: Send traffic
+      if: steps.guard.outputs.go == 'true'
+      run: python infra/send-traffic.py "${{ inputs.mode || 'shifted' }}" --n "${{ inputs.n || '300' }}"
