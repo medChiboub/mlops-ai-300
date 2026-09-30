@@ -102,6 +102,25 @@ byte-identical to dev, so the metrics will match; the model it trains is
 credentials (the pwn-request risk, mitigated here by the interaction limits
 + the reviewer gate).
 
+### What PR-triggered dev training does, and doesn't, prove
+
+- **Runs only when a PR changes the training code** (`paths:` =
+  `src/train-model-parameters.py`, `src/job.yml`). Lab 06's workflow has no
+  filter and runs on every PR.
+- **Proves:** the changed code runs **end to end** on real compute, with the
+  real environment and data (the check fails if the job fails), and **shows**
+  the new Accuracy/AUC on the PR.
+- **Doesn't prove it improved:** there's no baseline and no threshold. The
+  comment has only the new numbers, and the check is green even if accuracy
+  drops. Proper versions:
+  - an **absolute gate**: fail below a bar (my project: AUC < 0.95 fails the pipeline)
+  - **champion vs. challenger**: promote only if it beats the current best
+    (`MLOPS_CICD_CT.md` pattern B)
+  - a **required status check**, so a failing PR can't merge
+- Exam: PR training on dev data = **validation before merge**; "only merge if
+  the model is at least as good" = **an evaluation gate + a required status
+  check**.
+
 ## 3. What broke and how we fixed it
 
 ## 4. Exam mapping
