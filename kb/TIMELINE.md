@@ -734,3 +734,17 @@ template only in `src/job.yml` and `manual-trigger-job.yml` (mine, lab 06),
 plus `infra/setup-prod-design.sh` and `kb/` (Claude). **The workspace file
 share clone** has the notebook-generated files and the lab 02 `autolog` edit,
 which isn't in GitHub. Added the map to the kb README.
+
+**04:30–04:35 UTC · me · Ran the workflow by hand** (run `36669089137`)
+Login ✅. The job **`plucky_yogurt_9rv71w234s`** Completed (Accuracy 0.774,
+AUC 0.8483, **`created_by` = the service principal**). But the **step
+failed**: `--stream` crashed with `binascii.Error: Invalid base64-encoded
+string` 4 s before the job ended.
+
+**00:38 · Claude · Diagnosed the false failure**
+The runner installs the unpinned **ml 2.45.0**. Streaming the finished job
+works with both 2.44.1 and 2.45.0 (isolated `AZURE_EXTENSION_DIR`), so it's
+the **live** streaming path. The next PR-triggered run will show whether it
+repeats.
+*Context:* the training is fine; the GitHub check is red only because of
+the CLI.

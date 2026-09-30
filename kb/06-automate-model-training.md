@@ -77,7 +77,52 @@ plus RBAC, to control who can submit jobs and from where. That's the
 exam's *Restrict network access to Machine Learning workspaces*, and this
 read-only review is the only place these labs touch it.
 
+### 2.3 Train with a manually triggered workflow (VS Code + GitHub, me)
+
+1. `src/job.yml`: filled the two placeholders → `type: uri_file`,
+   `path: azureml:diabetes-data@latest`.
+2. `.github/workflows/manual-trigger-job.yml`: appended, with **spaces** (the
+   lab's snippet uses tabs):
+   ```yaml
+       - name: Run Azure Machine Learning training job
+         run: az ml job create -f src/job.yml --stream --resource-group ${{vars.AZURE_RESOURCE_GROUP}} --workspace-name ${{vars.AZURE_WORKSPACE_NAME}}
+   ```
+   Claude checked both edits (diff, no tabs, valid YAML) before the push.
+3. Committed and pushed to `main` (`443a39b`). Pushing doesn't run it: this
+   workflow only has `workflow_dispatch`.
+4. **Actions → "Manually trigger an Azure Machine Learning job" → Run
+   workflow** → run `36669089137` (04:29:44 UTC).
+
+| Step | Result |
+|---|---|
+| Set up job, Check out repo, Install az ml extension | ✅ |
+| **Azure login** (`AZURE_CREDENTIALS`) | ✅ the service principal works |
+| Run Azure Machine Learning training job | ❌ the job **Completed**, but the step failed (see section 3) |
+
+The Azure ML job **`plucky_yogurt_9rv71w234s`** (`diabetes-train-command`,
+experiment `diabetes-training`) ran 04:33:17 → 04:35:37 UTC on `aml-cluster`:
+input `diabetes-data:1` (`@latest` resolved), `Regularization rate 0.01`,
+Accuracy **0.774**, AUC **0.8483**, `ROC-Curve.png`. Its
+**`created_by` = `a9bd6f2c-…`, the service principal's appId**: Azure
+recorded GitHub, not me, as the submitter.
+
 ## 3. What broke and how we fixed it
+
+- **The workflow failed even though training succeeded: an Azure CLI bug in
+  `--stream`.** The step uploaded `src/` and submitted the job, then at
+  04:35:33 (4 s before the job finished) crashed with
+  `ERROR: Met error <class 'binascii.Error'>:Invalid base64-encoded string:
+  number of data characters (97) cannot be 1 more than a multiple of 4`,
+  exit code 1, having streamed none of the job's log lines. The runner
+  installs **the latest `ml` extension, 2.45.0** (`az extension add -n ml -y`,
+  unpinned). Checks:
+  - `az ml job stream` on the **finished** job works with both **2.44.1** (my
+    Mac) and **2.45.0** (installed into an isolated `AZURE_EXTENSION_DIR`).
+  - So the bug is in **live** streaming of a running job, likely new in
+    2.45.0 or intermittent. Not yet reproduced on demand.
+  - Lesson: **an unpinned tool version in CI can break a workflow overnight.**
+    A workflow that fails after the Azure job succeeds is a *false* failure;
+    read the log before rerunning training.
 
 ## 4. Exam mapping
 
