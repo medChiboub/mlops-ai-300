@@ -108,6 +108,33 @@ of PR #2's pin.
    plus the job name and Studio link. **Identical to dev**, as expected: the
    two CSVs are byte-identical.
 
+### Which model does `/deploy-prod` deploy? (verified)
+
+**The committed `model/` folder**, untouched since the template's initial
+commit: an MLflow model created **2023-02-15** (run `calm_garden_gzd94mfzcr`,
+in a Microsoft workspace), scikit-learn **0.24.1** (cloudpickle), MLflow
+**1.30**, Python **3.8**, signature 8 inputs → a boolean.
+
+- `deploy_to_online_endpoint.py` passes an **unregistered**
+  `Model(path="./model", type=mlflow_model)`, so Azure **registers it
+  implicitly** while deploying, under a **content-hash name**:
+  `c68e03c630c5…fc8f96:1` (`created_by` = the service principal, 08:08:29 UTC,
+  description "MLflow diabetes classification model"). Deployment `blue` →
+  `…/models/c68e03c6…/versions/1`.
+- **None of our trained models could be deployed anyway:** the repo's
+  `train-model-parameters.py` saves no model (no `autolog`/`log_model`; the lab
+  02 `autolog` edit only exists on the Studio copy). `train-dev`/`train-prod`
+  produce only metrics.
+- **The workspace's model list** also shows **auto-generated entries from
+  earlier jobs' MLflow outputs**: `azureml_coral_drawer_c6770sv3k6_<n>_output_mlflow_log_model_…`
+  (AutoML, lab 01), `azureml_a84deb22…` (lab 01 autolog),
+  `azureml_epic_king_…` (lab 02 autolog), `azureml_aa0f7853…_output_model_output`
+  (lab 04 pipeline). None were deliberately registered with a real name.
+- Why it matters: the lab's rollback ("Models → previous version → deploy")
+  meets hash and auto names, not `diabetes-model:1/:2`. The 📘 answer (module
+  unit 2): **register the MLflow model explicitly** from the job output,
+  with a name and version, and deploy by `name:version`.
+
 ### How dev and prod share one job definition
 
 Both workflows submit **the same `src/job.yml`**; only submit-time settings
