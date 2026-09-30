@@ -930,3 +930,12 @@ Then `/deploy-prod` **the lab's way on PR #3** (run `36692329751`,
 approved) → deployment `blue` with the committed `model/`.
 *Context:* the labs teach the concepts; the better design stays documented
 in the kb.
+
+**04:59 · GitHub Actions + Azure ML · `/deploy-prod` (the lab's way) finished**
+Run `36692329751` succeeded in **about 8.5 min** (08:51 → 08:59 UTC).
+Deployment `blue` is **Succeeded**, traffic **`{"blue": 100}`**, scoring URI
+`https://diabetes-endpoint-0533925c.canadaeast.inference.ml.azure.com/score`.
+The 2023 model image (Python 3.8, sklearn 0.24.1) built without errors. The bot
+commented the endpoint and deployment on PR #3.
+*Context:* data collection is on, but nothing is collected until the first
+request arrives. Next: a test from the Studio Test tab.
