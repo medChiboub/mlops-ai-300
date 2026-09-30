@@ -913,3 +913,20 @@ another PR's model, (2) a fixed 0.80 bar, (3) an instant 100% cutover, (4) 0%
 deployments still cost. I chose to fix #1: `/deploy-prod` now deploys the
 version tagged `pr=<this PR>` (`14c56a9`), unit-tested 5/5 with a fake
 client. #2–#4 are documented as known limits.
+
+**08:47–09:00 UTC · Claude · PR #4 merged, `/train-prod` registered `diabetes-model:1`**
+Merged PR #4 (`6f4168d`) → `/train-prod` on PR #4, approved → quality gate
+passed → **`diabetes-model:1`** (tags `pr=4`, acc 0.774, AUC 0.8483). Our
+design worked end to end.
+
+**04:51 · me → Claude · "Is this really a good approach?" → "Too complicated; keep the lab's original approach"**
+Claude's honest view: good for learning, not what you'd build for real. The
+deepest flaw is **prod running unmerged PR code**, and retraining in prod buys
+nothing with identical data. The real design: merge → train from `main`
+in dev with a gate → register → registry → prod deploys the same version,
+own identity, gradual rollout. I chose to go back to the lab: **PR #5
+reverted PR #4** (`429c033`), and `main` equals the pre-PR-4 lab state.
+Then `/deploy-prod` **the lab's way on PR #3** (run `36692329751`,
+approved) → deployment `blue` with the committed `model/`.
+*Context:* the labs teach the concepts; the better design stays documented
+in the kb.

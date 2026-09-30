@@ -209,6 +209,18 @@ the module teaches and what makes the loop real). This goes beyond the lab.
    Why: with "latest", two PRs running `/train-prod` could make one PR deploy
    the other's model.
 
+8. **It worked end to end:** merged PR #4 (`6f4168d`), then `/train-prod` on
+   PR #4 (run `36691974475`, approved) → job `diabetes-train-prod-36691974475`
+   → **Quality gate passed** → **registered `diabetes-model:1`** with tags
+   `pr=4`, `accuracy=0.774`, `auc=0.8483…`, `data=diabetes-prod-folder`,
+   `training_job=…`.
+9. **Then I reverted to the lab's original flow** ("this is getting too
+   complicated; keeping the lab's original approach doesn't hurt"). **PR #5**
+   reverted PR #4's merge (`429c033`); `main`'s code is identical to before PR #4
+   (the lab's PR #3 changes + the CLI pins). `diabetes-model:1` stays
+   registered (harmless; a candidate for the lab's final "archive" step). The
+   design and its review below remain the documented "better way".
+
 **Review of our approach (known limits, documented rather than fixed):**
 - a **fixed AUC bar** (0.80) lets a regression from 0.848 to 0.81 pass;
   **champion vs. challenger** (compare with the latest version's `auc` tag)
@@ -223,6 +235,18 @@ the module teaches and what makes the loop real). This goes beyond the lab.
 - vs. my project: pattern A (train once in dev, promote the same artifact) vs.
   ours, pattern B (retrain in prod behind human gates). Both are valid; B
   fits when prod data can't leave prod.
+- **The deepest flaw (in the lab and in ours): prod runs *unmerged* PR code.**
+  `/train-prod` and `/deploy-prod` check out `refs/pull/<N>/head`, so a model can
+  reach users before its code is merged or reviewed. And retraining in prod
+  buys nothing here (same workspace, same file).
+
+**How I'd build it for real (📘):** merge first → train from `main` in a
+**dev** workspace with an **evaluation gate** → **register** the model (tagged
+with the commit) → publish it to a **registry** → the **prod** workspace, with
+its **own OIDC identity**, deploys **that same version** behind an
+**environment approval** → **gradual rollout** (0% → smoke test → 10% →
+monitor → 100%) → rollback = a traffic change. Never PR code with prod
+credentials. This is essentially my production project's design.
 
 ### How dev and prod share one job definition
 
