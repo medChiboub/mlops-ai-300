@@ -280,3 +280,24 @@ Checks run just before, for the record:
   either. The older `AzureML-sklearn-0.24-…` gave the same error, so this may
   be how the API handles curated environments rather than proof that one
   environment is gone. Lab 02's first command job will settle it.
+
+**20:56 · me · Made the repo public**
+*Context:* on a private repo on the free plan, branch protection returns a
+403 "Upgrade to GitHub Pro" error, and environment required reviewers aren't
+available either. On a public repo both are free, so labs 06/07 can do them
+properly.
+
+**20:57 · Claude · Hardening the public repo**
+- **Interaction limits:** `gh api -X PUT repos/medChiboub/mlops-ai-300/interaction-limits
+  -f limit=contributors_only -f expiry=six_months` → only prior contributors
+  (me) can comment or open issues and PRs, until **2027-03-30**.
+- **Disabling `train-prod.yml` / `deploy-prod.yml`:** Claude's permission
+  system blocked this (it counts as bypassing CI), so I do it myself.
+- **Current exposure: none.** No secrets and no environments exist yet
+  (`gh secret list` and `…/environments` are both empty).
+
+*Context:* the two comment-triggered workflows check out a PR's code and run
+it with `AZURE_CREDENTIALS`, and they don't check who commented. Once lab 06
+adds a repo-level secret, that's the "pwn request" hole on a public repo.
+Plan: keep them disabled until lab 07, where `prod` gets me as required
+reviewer *before* they're re-enabled.
