@@ -955,3 +955,17 @@ and both share a `correlationid`. The agent is `azureml-ai-monitoring/1.0.0`
 *Context:* this proves layer ② of monitoring (collection) before a
 monitor is created. The data collector started with the container
 (`mdc | INFO | data collector ready`), with no scoring script of ours.
+
+**05:15 · Claude · `kb/mechanics/monitoring.md` + baseline traffic**
+Wrote the monitoring mechanics file: 4 layers, the verified collection
+record, out-of-box vs. advanced reference data, the 1-day window, and the
+traps (sources: the MS Learn how-to, my production project's MONITORING.md,
+this run). Then sent **200 single-row requests** sampled from
+`data/test-data/diabetes-test.csv` (held-out rows, the same distribution as
+the training data; seed 42) straight to the scoring URI with the endpoint
+key: **200 × HTTP 200** in 33 s, predictions 150 × `[0]` and 50 × `[1]`. The
+collector **appended** them to the same hourly file (`…/2026/09/30/09/…jsonl`,
+now 201 lines, 171 KB), which confirms "one file per hour, one line per
+request".
+*Context:* a realistic **baseline**. Tomorrow's data drift run should show
+near-zero drift against `diabetes-training`.
