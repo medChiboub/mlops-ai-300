@@ -827,3 +827,10 @@ Both workflows submit the same `src/job.yml`; `--set` swaps only the data
 path at submit time, and the GitHub environment supplies the credentials and
 the gate. `/train-prod` runs the workflow from `main` against the PR's
 code, after my approval.
+
+**07:35–03:42 · Claude · PR #2 (CLI pin), comment workflows re-enabled**
+Pinned ml 2.44.1 in `train-dev`, `train-prod` and `deploy-prod` via PR #2
+(its check was green). Merged on my "merge it" (`7adbdf0`). Re-enabled
+`train-prod.yml` and `deploy-prod.yml` (`gh workflow enable`).
+*Context:* `issue_comment` workflows run from `main`, so the pin had to land
+first. Re-enabling is safe with the interaction limits + the prod reviewer.

@@ -59,6 +59,19 @@ upload folders still differ, because the hash covers the file name.
   never printed. The lab 06 repo secret (`rbac`) still works. Environment
   secrets take precedence for jobs that declare `environment:`.
 
+### 2.3 Pin the CLI in the lab 07 workflows (PR #2), re-enable the comment workflows (Claude)
+
+- PR #2 (`fix/pin-azure-ml-cli`): `az extension add -n ml --version 2.44.1 -y` in
+  `train-dev.yml`, `train-prod.yml`, `deploy-prod.yml` (the same 2.45.0
+  `--stream` bug as lab 06). It had to be **merged before** using
+  `/train-prod` and `/deploy-prod`, because `issue_comment` workflows run from
+  `main`. Its check (the lab 06 workflow runs on every PR) was green: Accuracy
+  0.774, AUC 0.8483 in the streamed log. Merged at 07:41:50 UTC (`7adbdf0`) on
+  my "merge it".
+- `gh workflow enable train-prod.yml` / `deploy-prod.yml`: both **active**
+  again (disabled since the repo went public). Now safe: interaction limits
+  (only I can comment) + the `prod` reviewer gate.
+
 ### How dev and prod share one job definition
 
 Both workflows submit **the same `src/job.yml`**; only submit-time settings
