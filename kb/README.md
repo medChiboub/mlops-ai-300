@@ -30,7 +30,7 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 02 | [Optimize model training](02-optimize-model-training.md) | A Studio export is just the cells pasted into one file; the refactored script takes arguments. A command job records code snapshot + data + environment + logs, which a terminal run doesn't (that one went to `Default`). The same code gave a different AUC in the job because the environment pins scikit-learn 1.0. Autolog adds 15 params, `training_*` metrics and the `model/` folder |
 | 03 | [Hyperparameter tuning](03-hyperparameter-tuning.md) | A sweep = the same command job once per value (3 trials for 3 grid values, even with a limit of 4). The script must log the metric under the exact `primary_metric` name, and a name like `training_accuracy_score` can hide a test metric. 0.01 and 0.1 tied at 0.774, so the metric choice decides the winner. Warm nodes run trials in about 17 s vs. about 2 min cold |
 | 04 | [Run pipelines](04-run-pipelines.md) | Component = metadata + interface + command/code/environment; the pipeline wires output → input, so order comes from the data dependency (train didn't exist until prep finished). Loaded components stay anonymous (`az ml component list` was empty). Outputs land in `workspaceblobstore/azureml/<run>/<output>/`. The lab never schedules, although the module does |
-| 05 | Plan and prepare | _not started_ |
+| 05 | [Plan and prepare](05-plan-and-prepare.md) | _in progress_ |
 | 06 | Automate model training | _not started_ |
 | 07 | Deploy and monitor | _not started_ |
 

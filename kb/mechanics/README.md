@@ -20,3 +20,4 @@ gets ticked or corrected once we see it.
 | [sweep-jobs.md](sweep-jobs.md) | Sweep = one command job run per hyperparameter combination: script requirements, search space, sampling, early termination, limits | Lab 03 |
 | [components-and-pipelines.md](components-and-pipelines.md) | Component vs. pipeline vs. pipeline job, component YAML, `@pipeline()` wiring, loaded vs. registered, scheduling | Lab 04 |
 | [interfaces.md](interfaces.md) | Script vs. SDK vs. CLI + YAML vs. Studio: four layers over one REST API, the same job both ways | All labs |
+| [registries-and-environments.md](registries-and-environments.md) | Assets vs. resources, dev/prod workspaces, two promotion patterns, what a registry provisions (managed RG, Premium ACR, storage), naming rules, RBAC | Lab 05 |

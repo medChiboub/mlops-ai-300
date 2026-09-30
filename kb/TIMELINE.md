@@ -613,3 +613,53 @@ Documented rather than run.
 last node is releasing after its idle time.
 *Context:* labs 05–07 don't need the compute instance. Stopping it ends its
 per-minute billing (its disk and the file share are kept).
+
+---
+
+## Lab 05: Plan and prepare an MLOps solution
+
+### 2026-09-29
+
+**22:30 · me → Claude · "Run lab 05 fully"** (including the optional script)
+Claude looked for lab 05's theory: **no module in the current learning
+path** (modules 6 and 7 link to labs 06 and 07), so it read the product docs
+*Machine Learning registries* and *Create and manage registries* instead.
+Read the reference `infra/setup-mlops-envs.sh`: dev RG + workspace + **a
+running compute instance** + cluster + 3 data assets; prod RG + workspace +
+1 data asset; registry RG + registry.
+Quota check: DSv2 **2/6** with the lab 01 compute instance *Stopped*, so a
+stopped instance still counts.
+
+**22:24 · Claude · Built `infra/setup-prod-design.sh` the lab's way, then diffed it**
+Following the lab literally (copy `setup.sh`, add the variables, append the
+commands) produces a script that **still creates `rg-ai300-l<suffix>`** and
+**never creates the dev RG or workspace**. It would fail halfway and leave a
+second `rg-ai300-l*` group, breaking the lab 06/07 workflows. Following the
+lab's "diff against the reference, then update" step, the final
+`setup-prod-design.sh` = the reference. Ran a scratchpad copy (`uuidgen`,
+`canadaeast`) from `infra/`.
+*Context:* the lab's optional run. It creates 3 resource groups, 2
+workspaces, a compute instance, a cluster, 4 data assets and a registry.
+
+**22:35 · Claude · Design script run: dev ✅, prod ✅, registry ❌ → fixed**
+Suffix `5ae342744a834c9880`, canadaeast.
+- **Dev:** RG + workspace + compute instance + cluster + 3 data assets.
+- **Prod:** RG + workspace + `diabetes-prod-folder`.
+- **Registry:** failed: `Registry Name … is invalid. Names must be between 3
+  and 33 in length`. The reference script's `mlr-ai300-shared-<18 chars>` is
+  35 characters. The script still exited 0 and printed "Provisioning
+  complete" (no `set -e`).
+
+Then:
+- Stopped the dev compute instance.
+- **Restored the `az` defaults** (the script left them on prod).
+- Recreated only the registry as `mlr-ai300-shared-5ae342744a834c9`
+  (32 characters, 45 s). It built the managed RG
+  `azureml-rg-mlr-ai300-shared-…` with a **Premium ACR** + Standard_LRS
+  storage.
+- Fixed `REGISTRY_NAME` in my `setup-prod-design.sh`
+  (`${suffix:0:15}`).
+- Wrote `mechanics/registries-and-environments.md`.
+
+*Context:* lab 05's optional run done. Left: the "extend the script" design
+question, then cleanup of the 3 extra RGs.

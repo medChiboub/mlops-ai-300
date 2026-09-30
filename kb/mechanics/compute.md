@@ -60,7 +60,9 @@ they're on the file share (see [workspace-and-storage.md](workspace-and-storage.
   the wrong pool. It even showed 0 used while the instance was running. Azure
   ML compute is counted by **`az ml compute list-usage -l <region>`**
   (`standardDSv2Family 4 / 6` during the AutoML run). Monitoring's serverless
-  Spark uses yet another pool. When a job sits in *Queued* forever, the cause
+  Spark uses yet another pool.
+  **A *stopped* compute instance still counts:** with ours Stopped and the
+  cluster at 0, usage still read DSv2 2/6. Stopping saves money, not quota. When a job sits in *Queued* forever, the cause
   is usually quota or `max_instances`.
 
 ## What happens when a job is submitted to the cluster
