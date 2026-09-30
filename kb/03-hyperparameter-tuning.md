@@ -77,6 +77,13 @@ Nothing failed. Things that surprised us:
 Domain 2: *Automate hyperparameter tuning*; also *Run model training
 scripts* and *Compare model performance across jobs*.
 
+- **Parameter vs. hyperparameter** (module unit 1): *parameters* are values
+  the model **learns from the training data** (LogisticRegression's
+  coefficients); *hyperparameters* **configure how training runs** and aren't
+  learned from the data (regularization rate; learning rate and batch size
+  for neural networks). Tuning = training the same algorithm on the same
+  data with different hyperparameter values, then picking the best by one
+  metric. A **sweep job** runs one **trial** per combination.
 - **The script must** take each hyperparameter as an argument and **log the
   target metric with `mlflow.log_metric`** under the exact `primary_metric`
   name (module assessment: not `print`, not `logging.info`).
@@ -107,6 +114,10 @@ scripts* and *Compare model performance across jobs*.
 | The example logs `Accuracy` and sweeps on `primary_metric="Accuracy"` | The lab logs **test** accuracy under the name `training_accuracy_score` | The name must *match*; it doesn't have to *describe* the metric. Check what's actually computed |
 | Early termination is unnecessary for a small grid (the example: 6 trials) | 3-trial grid, no policy | Matches |
 | Grid tries every combination | 3 trials for 3 values, even with `max_total_trials=4`. Studio shows *Grid*; the CLI/REST read-back says `Random` | Behaviour matches the module; the API field is wrong |
+
+*All 8 module units read (1–5 theory, 6 exercise → links to the same
+published `03-hyperparameter-tuning.html` our `docs/` builds, 7 assessment,
+8 summary), versions dated 2026-08-27.*
 
 **Module assessment (unit 7)**, two questions:
 1. Try every combination of specified discrete values → **grid sampling**.

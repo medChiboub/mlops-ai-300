@@ -532,3 +532,11 @@ Claude then queried the jobs REST API with 6 versions (2023-10-01 →
 2025-09-01): all return `Random`.
 *Context:* settles the anomaly. The sweep ran as a grid; the API/CLI read-back
 of `sampling_algorithm` is wrong. Lab 03 closed ("Delete resources" skipped).
+
+**22:06 · me → Claude · Checked the Microsoft Learn theory for lab 03 before moving on**
+Read the remaining units (1 introduction, 6 exercise, 8 summary). The
+exercise links through `go.microsoft.com/fwlink/?LinkId=2377900` to the
+published `03-hyperparameter-tuning.html`, which matches our `docs/`. The only
+gap in the kb was the **parameter vs. hyperparameter** definition (unit 1),
+now added to section 4 of the lab 03 file.
+*Context:* confirm the kb covers the whole module before starting lab 04.
