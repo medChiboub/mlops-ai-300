@@ -673,3 +673,41 @@ the coverage (workspace ✅, data assets ✅, registries ⚠: created but
 nothing shared).
 *Context:* ongoing cost is about $1.67/day (the registry's Premium ACR); the
 dev compute instance is stopped.
+
+---
+
+## Lab 06: Automate model training with GitHub Actions
+
+### 2026-09-29
+
+**22:40 · Claude · Prepared lab 06**
+Read the live module *Automate model training with GitHub Actions*: units
+2–6 (what goes in Git; trunk-based development; required status checks;
+secrets vs. variables; **OIDC preferred over service-principal secrets**;
+trigger types incl. `repository_dispatch` via Logic Apps/Functions) and the
+5-question assessment. Upstream lab repo still `87482bc`.
+Checks: I'm **Owner** on the subscription. GitHub has no secrets, variables
+or environments; `main` returns "Branch not protected" (404, not the old
+403), so protection is available now the repo is public. Two old app
+registrations (`sp-ai300-prod`, `sp-ai300-github-actions`) exist from
+earlier work and are left untouched.
+
+**22:41 · Claude · Section: configure GitHub integration**
+Created the service principal `sp-mslearn-mlops-github` (appId `a9bd6f2c-…`),
+**Contributor on the lab 01 RG only**, with `--json-auth` piped straight into
+`gh secret set AZURE_CREDENTIALS` (never printed). Set the repo variables
+`AZURE_RESOURCE_GROUP` and `AZURE_WORKSPACE_NAME`. Verified: client secret
+valid until 2027-09-30, no subscription-level role. The CLI warned that
+`--sdk-auth`/`--json-auth` is deprecated.
+*Context:* this is what lets GitHub-hosted runners sign in to Azure. The two
+comment-triggered workflows stay disabled, so the new secret can't be reached
+through a PR comment.
+
+### 2026-09-30
+
+**00:18 · me · Section: reviewed workspace network access** (portal, read only)
+Public access enabled from all networks, no private endpoints. Claude
+confirmed from the CLI (`public_network_access: Enabled`, default Allow, no
+IP rules, 0 private endpoints). Wrote `mechanics/github-actions-azureml.md`.
+*Context:* GitHub-hosted runners need public access; private workspaces need
+self-hosted runners.

@@ -21,3 +21,4 @@ gets ticked or corrected once we see it.
 | [components-and-pipelines.md](components-and-pipelines.md) | Component vs. pipeline vs. pipeline job, component YAML, `@pipeline()` wiring, loaded vs. registered, scheduling | Lab 04 |
 | [interfaces.md](interfaces.md) | Script vs. SDK vs. CLI + YAML vs. Studio: four layers over one REST API, the same job both ways | All labs |
 | [registries-and-environments.md](registries-and-environments.md) | Assets vs. resources, dev/prod workspaces, two promotion patterns, what a registry provisions (managed RG, Premium ACR, storage), naming rules, RBAC | Lab 05 |
+| [github-actions-azureml.md](github-actions-azureml.md) | The workflow → Azure chain, secrets vs. variables, service-principal secret vs. OIDC, triggers, branch protection vs. workflows, network | Lab 06 |

@@ -31,7 +31,7 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 03 | [Hyperparameter tuning](03-hyperparameter-tuning.md) | A sweep = the same command job once per value (3 trials for 3 grid values, even with a limit of 4). The script must log the metric under the exact `primary_metric` name, and a name like `training_accuracy_score` can hide a test metric. 0.01 and 0.1 tied at 0.774, so the metric choice decides the winner. Warm nodes run trials in about 17 s vs. about 2 min cold |
 | 04 | [Run pipelines](04-run-pipelines.md) | Component = metadata + interface + command/code/environment; the pipeline wires output → input, so order comes from the data dependency (train didn't exist until prep finished). Loaded components stay anonymous (`az ml component list` was empty). Outputs land in `workspaceblobstore/azureml/<run>/<output>/`. The lab never schedules, although the module does |
 | 05 | [Plan and prepare](05-plan-and-prepare.md) | Dev and prod workspaces + a shared registry. The lab's literal design script would have created a second `rg-ai300-l*` group (breaking labs 06–07), and Microsoft's reference script can't create its registry (a 35-character name, over the limit) yet reports success (no `set -e`). A registry's Premium ACR costs $1.67/day. It carries models (pattern A) or components + environments (pattern B, retrain in prod) |
-| 06 | Automate model training | _not started_ |
+| 06 | [Automate model training](06-automate-model-training.md) | _in progress_ |
 | 07 | Deploy and monitor | _not started_ |
 
 ## AI-300 coverage (MLOps domains)
