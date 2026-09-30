@@ -40,7 +40,7 @@ jobs:
 
       - name: Install Azure ML CLI
         run: |
-          az extension add -n ml -y
+          az extension add -n ml --version 2.44.1 -y   # pinned: 2.45.0 --stream crashes (binascii.Error)
 
       - name: Detect Azure ML workspace
         id: detect
