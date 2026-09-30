@@ -176,6 +176,15 @@ the module teaches and what makes the loop real). This goes beyond the lab.
    int64 to float64`. Fixed by inferring from `df[FEATURES]`: integers →
    `long`, `BMI`/`DiabetesPedigree` → `double`, the same as the committed
    model. Retest predicted **`[1]`**.
+5. **PR #4 checks green** (train-dev + the lab 06 workflow). The dev job
+   `diabetes-train-dev-36688899562` saved a full MLflow model under
+   `azureml/<job>/model_output/` (`MLmodel`, `model.pkl`, `conda.yaml`,
+   `input_example.json`, `python_env.yaml`, `requirements.txt`). Azure
+   **auto-listed** it as `azureml_diabetes-train-dev-36688899562_output_model_output`,
+   an automatic entry for an `mlflow_model` job output, **not** a
+   `diabetes-model` version. Only `/train-prod` registers deliberately.
+   ("Approved" here means I approved *running* prod training; there's no
+   metric gate before registration yet.)
 
 ### How dev and prod share one job definition
 
