@@ -748,3 +748,11 @@ the **live** streaming path. The next PR-triggered run will show whether it
 repeats.
 *Context:* the training is fine; the GitHub check is red only because of
 the CLI.
+
+**00:39 · me → Claude · "Do these workflows launch Azure ML pipelines?"**
+No: every lab workflow submits the **command job** `src/job.yml` (one
+script); `deploy-prod.yml` runs an SDK deploy script. Lab 04's pipeline files
+exist only on the Studio clone. The same `az ml job create -f` would submit
+a pipeline YAML unchanged. My project's workflow does submit a pipeline
+(prep → train → evaluate with an AUC gate). Added to section 5 of the lab
+06 file.

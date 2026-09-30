@@ -131,6 +131,21 @@ recorded GitHub, not me, as the submitter.
 Tags (legend in [README](README.md#tags)): 🧪 lab shortcut · 📘 Microsoft docs
 recommendation (**the exam answer**) · 🛠 my project's own choice.
 
+**Do these workflows launch Azure ML pipelines? No, command jobs.**
+`manual-trigger-job.yml` (lab 06) and `train-dev.yml`/`train-prod.yml` (lab 07)
+all run `az ml job create -f src/job.yml`, and `src/job.yml` is a **command
+job** (`commandJob.schema.json`) running one script,
+`train-model-parameters.py`. `deploy-prod.yml` runs an SDK deploy script,
+not a job. Lab 04's pipeline only exists as notebook-generated files on the
+Studio clone, not in this repo. The same `az ml job create -f <file>`
+would submit a **pipeline** if the YAML were `type: pipeline`; the workflow
+doesn't change.
+
+| | Lab | My project | Microsoft's recommended answer |
+|---|---|---|---|
+| What the workflow submits | 🧪 One **command job** (`src/job.yml`) | A **pipeline job** (`ml/pipelines/train_pipeline.yml`: prep → train → evaluate, registered components) | 📘 Command job for a single script; **pipeline job** for multi-step, reusable, versioned steps. Both via `az ml job create -f` |
+| Quality gate | None; accuracy only printed (lab 07 posts it to the PR) | `evaluate` fails the pipeline below AUC 0.95, so nothing is registered | 📘 Required status checks on PRs; a gate before registering is 🛠 my addition |
+
 ## 6. In my words
 
 <!-- Mine to write. -->
