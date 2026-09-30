@@ -76,8 +76,7 @@ jobs:
             --resource-group "${{ steps.detect.outputs.resource_group }}" \
             --workspace "${{ steps.detect.outputs.workspace }}" \
             --endpoint-name "${{ steps.detect.outputs.endpoint_name }}" \
-            --model-name diabetes-model \
-            --pr-number "${{ github.event.issue.number }}"
+            --deployment-name "blue"
 
       - name: Comment deployment result on pull request
         uses: actions/github-script@v7
@@ -87,12 +86,10 @@ jobs:
             const body = [
               '🚀 Deployment workflow completed.',
               '',
-              'Registered model `diabetes-model:${{ steps.deploy.outputs.model_version }}` (registered by this PR\'s /train-prod) has been deployed on the managed online endpoint.',
+              'The diabetes model has been deployed (or updated) on the managed online endpoint.',
               '',
               'Endpoint name: `${{ steps.detect.outputs.endpoint_name }}`',
-              'Deployment name: `${{ steps.deploy.outputs.deployment_name }}`',
-              'Traffic: `${{ steps.deploy.outputs.traffic }}` (previous deployments kept at 0% for rollback)',
-              'Smoke test response: `${{ steps.deploy.outputs.smoke_test }}`',
+              'Deployment name: `blue`',
               'Data collection for model inputs and outputs is enabled on this deployment.',
               '',
               'Check the workflow run logs for the endpoint scoring URI and verify the endpoint in Azure Machine Learning studio.',

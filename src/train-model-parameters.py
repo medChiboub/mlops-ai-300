@@ -3,7 +3,6 @@ import glob
 import json
 import os
 import mlflow
-from mlflow.models.signature import infer_signature
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -11,9 +10,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 import matplotlib.pyplot as plt
-
-FEATURES = ['Pregnancies','PlasmaGlucose','DiastolicBloodPressure','TricepsThickness',
-    'SerumInsulin','BMI','DiabetesPedigree','Age']
 
 def main(args):
     # read data
@@ -32,10 +28,6 @@ def main(args):
     if args.metrics_output:
         save_metrics(metrics, args.metrics_output)
 
-    # save the trained model as an MLflow model so it can be registered and deployed
-    if args.model_output:
-        save_model(model, df[FEATURES].head(5), args.model_output)
-
 def get_data(path):
     # function that reads the data from a file or a folder of CSV files
     print("Reading data...")
@@ -53,7 +45,8 @@ def get_data(path):
 # function that splits the data
 def split_data(df):
     print("Splitting data...")
-    X, y = df[FEATURES].values, df['Diabetic'].values
+    X, y = df[['Pregnancies','PlasmaGlucose','DiastolicBloodPressure','TricepsThickness',
+    'SerumInsulin','BMI','DiabetesPedigree','Age']].values, df['Diabetic'].values
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
 
@@ -107,21 +100,6 @@ def save_metrics(metrics, output_dir):
 
     print(f"Saved metrics to {metrics_path}")
 
-def save_model(model, input_example, output_dir):
-    # signature from the original columns (integers stay integers), so the endpoint
-    # accepts the same payload as the committed model: 8 named features
-    signature = infer_signature(input_example, model.predict(input_example.values))
-    mlflow.sklearn.save_model(
-        model,
-        output_dir,
-        signature=signature,
-        input_example=input_example,
-        # needed by the online deployment's data collector (same as the committed model/)
-        extra_pip_requirements=["azureml-ai-monitoring==1.0.0", "azureml-contrib-services"],
-    )
-
-    print(f"Saved MLflow model to {output_dir}")
-
 def parse_args():
     # setup arg parser
     parser = argparse.ArgumentParser()
@@ -132,8 +110,6 @@ def parse_args():
     parser.add_argument("--reg_rate", dest='reg_rate',
                         type=float, default=0.05)
     parser.add_argument("--metrics_output", dest='metrics_output',
-                        type=str, default=None)
-    parser.add_argument("--model_output", dest='model_output',
                         type=str, default=None)
 
     # parse args
