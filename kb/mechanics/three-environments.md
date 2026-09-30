@@ -77,25 +77,54 @@ The list also shows **no-code deployment base environments**:
 `MlflowNCDEnv-mlflow-py312-inference`. "NCD" = no-code deployment. These are
 the bases Azure uses for MLflow models. Ours was built on the `py312` one.
 
+### How an environment becomes a running container
+
+```mermaid
+flowchart TD
+  S["A job or deployment references an environment"] --> K{"Which kind?"}
+  K -->|curated AzureML-…| C["Prebuilt image already in<br/>Microsoft's registry mcr.microsoft.com"]
+  K -->|custom, or created for you| H{"Image for this exact definition<br/>(content-hash version)<br/>already in the workspace ACR?"}
+  H -->|yes| R["Reuse it, no build<br/>(our 08:51 redeploy)"]
+  H -->|no| B["Build it: base image + conda/pip install<br/>(the ACR itself is created on the first build)"]
+  B --> P["Push to the workspace ACR<br/>(our 08:16 push, about 7 min)"]
+  C --> N["The compute node or deployment instance pulls the image"]
+  R --> N
+  P --> N
+  N --> X["Container starts: conda env activated,<br/>your script or the inference server runs"]
+```
+
+- **Curated** (labs 02–07 jobs): nothing to build, which is why those jobs
+  only spent about 2 min on setup.
+- **Custom or created for you** (deployment `blue`): the first use pays
+  for a build. Later uses with the identical definition reuse the image.
+
 ### Traced for real: the environment behind deployment `blue`
 
 Our `deploy_to_online_endpoint.py` passes **no environment at all**, only
 `Model(path="./model", type=MLFLOW_MODEL)`. Here's what Azure did, read back
 on 2026-09-30:
 
-```
-model/conda.yaml (logged by MLflow in 2023, at training time)
-  │  python=3.8, mlflow==1.30.0, scikit-learn==0.24.1, azureml-ai-monitoring==1.0.0, …
-  ▼
-08:08:46 UTC  Azure creates environment  c68e03c630c5…fc8f96 : fb674d0ce36f…  (by the service principal)
-              base image  mcr.microsoft.com/azureml/curated/mlflow-py312-inference@sha256:ccf9…
-              conda       the model's conda.yaml + azureml-inference-server-http   ← Azure added the server
-  ▼
-08:08:49 UTC  Azure creates the workspace's container registry (ACR, Basic)   ← it didn't exist before
-  ▼
-08:16:05 UTC  image azureml/azureml_708a01e5… pushed (tags 1, latest)         ← ~7 min: the slow part of the first deploy
-  ▼
-08:51–08:59   /deploy-prod (the lab's way) redeploys blue → the same environment version, no new image
+```mermaid
+sequenceDiagram
+  autonumber
+  participant R as Runner (deploy script)
+  participant AML as Azure ML workspace
+  participant ACR as Workspace ACR
+  participant EP as Deployment blue (VM)
+  R->>AML: create deployment blue with Model(path=./model, MLFLOW_MODEL), no environment given
+  AML->>AML: read model/MLmodel + conda.yaml (python 3.8, mlflow 1.30.0, scikit-learn 0.24.1)
+  AML->>AML: 08:08:46 create environment c68e03c6…fc8f96, version fb674d0c… (content hash)<br/>= base mlflow-py312-inference + the model's conda.yaml + azureml-inference-server-http
+  alt first deployment (no image for this hash yet)
+    AML->>ACR: 08:08:49 create the workspace ACR (Basic), it didn't exist before
+    AML->>AML: build the image (conda env with python 3.8 + pip installs)
+    AML->>ACR: 08:16:05 push azureml/azureml_708a01e5… (tags 1 and latest)
+  else redeploy of the same model (08:51)
+    AML->>ACR: an image for fb674d0c… exists, reuse it, no build
+  end
+  EP->>ACR: pull the image
+  EP->>EP: start azmlinfsrv, load the generated mlflow_score_script.py,<br/>model runs in /azureml-envs/…/python3.8, data collector ready
+  EP-->>AML: healthy (liveness probe GET / returns 200)
+  AML-->>R: deployment Succeeded, then traffic blue = 100
 ```
 
 What this shows:
@@ -184,6 +213,32 @@ environment.
 - **Plan limit:** on GitHub Free, protection rules only work in **public**
   repos. That's why this repo is public.
 
+### The gate, step by step (this repo)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor Me
+  participant GH as GitHub Actions
+  participant ENV as Environment settings
+  participant R as Runner
+  participant ID as Entra ID
+  alt train-dev.yml (environment dev)
+    GH->>ENV: the job declares environment dev, check its rules
+    ENV-->>GH: no rules, go
+  else train-prod.yml or deploy-prod.yml (environment prod)
+    GH->>ENV: the job declares environment prod, check its rules
+    ENV-->>GH: required reviewer, hold the job
+    GH-->>Me: Waiting, Review deployments (no runner and no secret yet)
+    Me->>GH: Approve
+  end
+  GH->>R: start the job on a runner
+  GH->>R: resolve secrets.AZURE_CREDENTIALS<br/>environment secret first, else the repository secret
+  R->>ID: azure/login with the client secret (the same service principal everywhere)
+  ID-->>R: token, Contributor on rg-ai300-l… only
+  GH->>GH: record a deployment to that environment (history)
+```
+
 ### Why it matters for Azure
 
 In this lab all three `AZURE_CREDENTIALS` are **the same service principal**
@@ -193,6 +248,27 @@ for **its own stage**, and with **OIDC** the federated credential's subject
 `repo:<owner>/<repo>:environment:prod` makes Entra ID issue prod tokens
 **only** to jobs running in the `prod` environment. That links the GitHub
 environment (2) to the stage (3).
+
+📘 The OIDC version (not used in this lab; my production project uses OIDC):
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant R as Runner (job in environment prod)
+  participant GHO as GitHub OIDC provider
+  participant ID as Entra ID app (the prod identity)
+  participant AZ as Prod workspace
+  R->>GHO: request an ID token (workflow permission id-token write)
+  GHO-->>R: signed JWT, subject repo:owner/repo:environment:prod
+  R->>ID: azure/login with client-id, tenant-id, subscription-id and the JWT, no secret
+  ID->>ID: federated credential check, the issuer is GitHub and the subject must be …environment:prod
+  alt subject matches
+    ID-->>R: short-lived Azure access token
+    R->>AZ: deploy, allowed by RBAC on the prod workspace only
+  else job not in environment prod (different subject)
+    ID-->>R: rejected, no token
+  end
+```
 
 ### Exam cues (📘)
 
@@ -237,6 +313,34 @@ So in lab 07, "prod" is a **label** made of two things: a data asset and a
 GitHub environment. The separation is logical, not physical. That's enough
 to teach the *flow* (PR → dev → approval → prod), but not the *isolation*.
 
+```mermaid
+flowchart LR
+  subgraph LAB["Lab 07: stages simulated in one workspace"]
+    direction TB
+    LGD["GitHub env dev<br/>no rule"] --> LSP["one service principal<br/>client secret"]
+    LGP["GitHub env prod<br/>required reviewer"] --> LSP
+    LSP --> LWS["one workspace mlw-ai300-l…"]
+    LWS --- LD1["data diabetes-dev-folder"]
+    LWS --- LD2["data diabetes-prod-folder<br/>byte-identical"]
+    LWS --- LEP["endpoint diabetes-endpoint-0533925c"]
+  end
+  subgraph REAL["Real setup, Microsoft's guidance"]
+    direction TB
+    RGD["GitHub env dev"] --> RID1["dev identity, OIDC"]
+    RGP["GitHub env prod<br/>reviewer + main only"] --> RID2["prod identity, OIDC"]
+    RID1 --> RW1["dev workspace<br/>dev subscription"]
+    RID2 --> RW2["prod workspace<br/>prod subscription"]
+    RW1 -->|share model or components| REG["registry"]
+    REG -->|deploy the same version| RW2
+    RW2 --- REP["prod endpoint"]
+  end
+```
+
+On the left, **every arrow ends at the same identity and workspace**: only
+the data path and the approval differ. On the right, dev and prod share
+**nothing but the registry**. A dev credential can't reach prod, and prod
+receives only promoted assets.
+
 ### What separation buys, one dimension at a time
 
 | Dimension | Separated how | Protects against |
@@ -270,3 +374,31 @@ to teach the *flow* (PR → dev → approval → prod), but not the *isolation*.
 | "waited for approval in the **prod environment**" | 2: GitHub environment | Actions run → "Review deployments" |
 | "deployed to the **production environment**" | 3: the prod stage (workspace/endpoint) | The prod workspace's endpoint |
 | "the **environment's image** failed to build" | 1: Azure ML environment | Deployment logs: the conda/package conflict |
+
+### All three in one real run: our `/deploy-prod`
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor Me
+  participant GH as GitHub, env prod (2)
+  participant R as Runner
+  participant WS as Workspace, prod stage (3)
+  participant ENV as Azure ML env (1)
+  participant EP as Deployment blue
+  Me->>GH: comment /deploy-prod on PR 3
+  GH-->>Me: (2) waiting for the prod environment's reviewer
+  Me->>GH: approve
+  GH->>R: (2) job starts, the prod AZURE_CREDENTIALS is released
+  R->>WS: (3) log in and deploy to the prod stage (in this lab, the one shared workspace)
+  WS->>ENV: (1) resolve the runtime from the model's conda.yaml
+  ENV-->>EP: (1) the image, built once at 08:16 and reused
+  EP-->>WS: serving, data collector on
+  WS-->>R: Succeeded, traffic blue = 100
+  R->>GH: comment "Deployment workflow completed" on the PR
+```
+
+Each numbered participant is one meaning of "environment". A failure at
+each one looks different: a job **stuck waiting** (2), a deploy that **can't
+reach or isn't allowed in** the workspace (3), or an **image build/import
+error** (1).
