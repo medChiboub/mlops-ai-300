@@ -17,3 +17,4 @@ gets ticked or corrected once we see it.
 | [automl.md](automl.md) | An AutoML job from submission to best model: featurization, guardrails, trials, CV, ensembles | Lab 01 §3 |
 | [mlflow-tracking.md](mlflow-tracking.md) | MLflow ↔ Azure ML mapping, tracking vs. submitting, autolog vs. custom logging, params vs. metrics vs. artifacts | Lab 01 §4 |
 | [command-jobs.md](command-jobs.md) | A command job's pieces, code snapshot and `.amlignore`, input upload reuse, environment, logs, job vs. terminal run | Lab 02 §3 |
+| [sweep-jobs.md](sweep-jobs.md) | Sweep = one command job run per hyperparameter combination: script requirements, search space, sampling, early termination, limits | Lab 03 |

@@ -28,7 +28,7 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 |---|---|---|
 | 01 | [Experiment and evaluate models](01-experiment-evaluate-models.md) | AutoML found a VotingEnsemble at 0.953 accuracy (vs. 0.774 for hand-made LogisticRegression) in about 11 min on 1 node, but kept `PatientID` as a feature with every guardrail green. MLflow autolog reports *training* metrics, and saving a file isn't logging it |
 | 02 | [Optimize model training](02-optimize-model-training.md) | A Studio export is just the cells pasted into one file; the refactored script takes arguments. A command job records code snapshot + data + environment + logs, which a terminal run doesn't (that one went to `Default`). The same code gave a different AUC in the job because the environment pins scikit-learn 1.0. Autolog adds 15 params, `training_*` metrics and the `model/` folder |
-| 03 | Hyperparameter tuning | _not started_ |
+| 03 | [Hyperparameter tuning](03-hyperparameter-tuning.md) | A sweep = the same command job once per value (3 trials for 3 grid values, even with a limit of 4). The script must log the metric under the exact `primary_metric` name, and a name like `training_accuracy_score` can hide a test metric. 0.01 and 0.1 tied at 0.774, so the metric choice decides the winner. Warm nodes run trials in about 17 s vs. about 2 min cold |
 | 04 | Run pipelines | _not started_ |
 | 05 | Plan and prepare | _not started_ |
 | 06 | Automate model training | _not started_ |
@@ -72,11 +72,11 @@ Status: ✅ done · 👀 seen but not done · ⚠ partial or failed · ⏳ plann
 | Configure experiment tracking with MLflow | 01, 02 | ✅ 01, 02 | ✅ |
 | Use AutoML to explore optimal models | 01 | ✅ 01 | ✅ |
 | Use notebooks for experimentation | 01 | ✅ 01 | ✅ |
-| Automate hyperparameter tuning | 03 | ⏳ | ✅ |
+| Automate hyperparameter tuning | 03 | ✅ 03 | ✅ |
 | Run model training scripts | 02, 06 | ✅ 02 | ✅ |
 | Manage distributed training | ❌ | ❌ | ❌ |
 | Implement training pipelines | 04 | ⏳ | ✅ |
-| Compare model performance across jobs | 01, 02, 07 (dev vs. prod metrics) | ✅ 01, 02 | ✅ |
+| Compare model performance across jobs | 01, 02, 03, 07 (dev vs. prod metrics) | ✅ 01, 02, 03 | ✅ |
 | Package a feature retrieval specification with the model | ❌ | ❌ | ❌ |
 | Register an MLflow model | 07 (only *implicitly*, through deployment) | ⏳ | ✅ |
 | Evaluate a model with responsible AI principles | 01 (module text only); optional notebook `Create Responsible AI dashboard.ipynb` | ⚠ 01: automatic `_RAI` run failed | ⚠ |

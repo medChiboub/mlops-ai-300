@@ -475,3 +475,53 @@ Added a "Versions checked" line to the kb README.
 *Context:* confirms the labs and theory we're following are the current ones.
 My production project's `CERT_NOTES.md` predates the 2026-08-27
 restructure, so its module numbering differs.
+
+---
+
+## Lab 03: Hyperparameter tuning
+
+### 2026-09-29
+
+**21:49 · Claude · Prepared lab 03**
+Read `Hyperparameter tuning.ipynb` and the live module *Perform
+hyperparameter tuning with Azure Machine Learning* (units 2–5 plus the
+2-question assessment, dated 2026-08-27). Created
+`kb/03-hyperparameter-tuning.md` and `mechanics/sweep-jobs.md`.
+**Correction:** earlier I said lab 03's sweep optimizes an autolog *training*
+metric. The notebook's own `train.py` logs `training_accuracy_score`
+computed on **`X_test`**, so it's held-out accuracy with a misleading name.
+Also found: the notebook writes a **new** `experimentation/src/train.py`
+(not the root `src/`); the grid has 3 values but `max_total_trials=4`; the
+notebook's text says the test job uses `reg_rate` 0.1 but the code uses 0.01.
+*Context:* one lab section: run the notebook (a command job test, then the
+sweep).
+
+**21:51 · me · Ran the whole sweep notebook** (Studio, kernel Python 3.10 - AzureML)
+Submitted two jobs:
+- **`jovial_insect_nygrdp1wqj`**: the test command job, experiment
+  `diabetes-training`, `reg_rate` 0.01, input `diabetes-data:1`
+- **`quiet_parcel_r5zv90jjw2`**: the **sweep job**, experiment
+  `sweep-diabetes`, grid over `reg_rate` ∈ {0.01, 0.1, 1}, 2 concurrent. It
+  inherited the display name `diabetes-train-mlflow` from the base job.
+
+*Context:* test the script once, then tune. With "Run all", the sweep was
+submitted without waiting for the test job to finish.
+
+**22:02 · Claude · Sweep Completed; wrote up lab 03**
+- **Trials:** `_0` (0.01) 0.774, `_1` (0.1) 0.774, `_2` (1.0) 0.7727. Best
+  = `_0` (a tie, decided by trial order). Parent ran 01:50:36 → 01:57:10 UTC.
+- **Nodes:** the test job and trial `_1` took the 2 nodes first. The warm-node
+  trials took **16–17 s** vs. **2 min 14 s** cold.
+- **Readable:** trials open with `az ml job show` (unlike AutoML).
+- **Input:** registered `diabetes-data:1`.
+- **Snapshot:** only `src/train.py`.
+- **Anomaly:** the job reads back `sampling_algorithm: Random`, but the
+  notebook ran `grid`. Rebuilt the sweep locally with SDK 1.35.0 (scratch
+  venv) and 1.34.1 → both serialize `Grid`. Behaviour was grid-like, so most
+  likely a service read-back quirk.
+
+Wrote the exam mapping (module comparison plus its 2-question assessment),
+the comparison with `ml/experiments/sweep/`, and an 8-question quiz. Coverage:
+*Automate hyperparameter tuning* ✅.
+*Context:* the lab's one exercise section is done. The Trials tab in Studio
+is left for me to look at.
