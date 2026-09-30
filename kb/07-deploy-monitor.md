@@ -138,6 +138,27 @@ byte-identical to dev, so the metrics will match; the model it trains is
 credentials (the pwn-request risk, mitigated here by the interaction limits
 + the reviewer gate).
 
+### Dev vs. prod in this lab: logical, not physical
+
+| | Dev | Prod | Really separate? |
+|---|---|---|---|
+| Azure workspace | `mlw-ai300-l…` | **the same** | ❌ |
+| Compute | `aml-cluster` | **the same** | ❌ |
+| Training data | `diabetes-dev-folder` | `diabetes-prod-folder` | ✅ a different asset (a byte-identical file) |
+| GitHub environment | `dev` | `prod` | ✅ |
+| `AZURE_CREDENTIALS` | `dev` env copy | `prod` env copy | ⚠ **the same service principal** |
+| Approval | none | **me** (required reviewer) | ✅ the one real control |
+| Workflows | `train-dev.yml` (auto on PRs) | `train-prod.yml`, `deploy-prod.yml` (comment + approval) | ✅ |
+| Endpoint | none | `diabetes-endpoint-0533925c` | prod only |
+
+The separation lives on the **GitHub side** (who triggers what, plus the
+approval). On Azure, dev and prod share everything but a data asset's name,
+so a dev run *could* read prod data or touch the endpoint. The 📘 fix is
+**physical separation**: separate workspaces/subscriptions, **one identity
+per environment** scoped to its own workspace, and a registry to promote
+between them. That's lab 05's design (documented in the lab 05 file and
+`infra/setup-prod-design.sh`) and what my production project runs.
+
 ### Why "prod" isn't lab 05's prod workspace
 
 Three reasons, all by design:
