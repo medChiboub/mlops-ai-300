@@ -241,3 +241,28 @@ line for lab 01, then committed `kb/`.
 *Context:* all lab 01 steps are done: provisioning, clone, AutoML, MLflow.
 "Delete resources" is skipped on purpose, since the workspace is reused
 through lab 07. "In my words" is left for me.
+
+**20:47 · me → Claude · "What about the lab docs themselves and my production project's docs?"**
+Claude read all 7 lab docs, the workflows, `src/job.yml`, the deploy script,
+the `model/` folder and the lab 02–04 notebooks. It also read the prod
+project's `AI300_PREP/CERT_NOTES.md` (Module 1 plus the "Challenge 7" lab 07
+record), `MSLEARN-MLOPS.md`, `AI-300.md` and the SCENARIOS/MONITORING
+headings. Then it checked Azure: Azure ML quota, the curated environment, and
+the subscription's offer.
+Wrote **`kb/SOURCES.md`**, a per-lab pre-flight list. Biggest findings:
+- The real DSv2 quota is **6**, not 10 (the wrong pool was checked on day
+  one). The instance plus the full cluster is exactly 6.
+- The curated environment `AzureML-sklearn-1.0-ubuntu20.04-py38-cpu` is gone
+  from the `azureml` registry, and the CLI can't read it. Risk for labs
+  02/03/06/07.
+- Lab 03's sweep optimizes a *training* metric.
+- Lab 06's YAML snippets use tab indentation, which breaks YAML.
+- Lab 07: `job.yml` type must become `uri_folder`; `sample-request.json` is
+  missing; the endpoint name isn't `diabetes-endpoint`; the model's
+  `conda.yaml` already has the packages that broke the earlier deployment;
+  ESv3 Spark quota is 20 (it was 0 on the earlier subscription).
+- AutoML dropped Titanic's `PassengerId` but kept `PatientID`. Hypothesis:
+  it needs 100% unique values to treat a column as an ID.
+
+*Context:* so every upcoming lab starts with known issues already listed,
+instead of finding them mid-lab.

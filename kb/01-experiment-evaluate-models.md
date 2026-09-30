@@ -56,7 +56,7 @@ My resources:
 | Data assets | `diabetes-training` (MLTable), `diabetes-data` (uri_file) |
 
 Before running we checked:
-- Quota: `az vm list-usage -l canadaeast` showed 10 DSv2-family vCPUs. The compute instance takes 2 and the cluster up to 4.
+- Quota: `az vm list-usage -l canadaeast` showed 10 DSv2-family vCPUs. The compute instance takes 2 and the cluster up to 4. *(Corrected later: that's the wrong pool. Azure ML's own quota, from `az ml compute list-usage`, is **6**, so the instance plus the full cluster uses exactly 6 of 6.)*
 - Name clashes: `az group list` showed no other `rg-ai300-*` group.
 
 It finished in about 6 minutes with exit code 0 and no errors. We verified it with:
@@ -155,6 +155,11 @@ az ml job download -n coral_drawer_c6770sv3k6_setup --all --download-path …   
 - **MLflow `runs/search` returned no metrics for the autolog run.** `runs/get`
   on the same ID returned all 7. Read single runs directly when numbers look
   missing.
+- **Checked the wrong quota pool.** Before provisioning I read `az vm list-usage`
+  (Microsoft.Compute: 10 DSv2 vCPUs). Azure ML compute counts against its own
+  quota, `az ml compute list-usage -l canadaeast`: **DSv2 = 6**. The instance
+  plus a full cluster is exactly 6 of 6. It didn't cause a failure, but a
+  third DSv2 consumer would have queued forever.
 - **Kernel mismatch in the saved notebook:** the AutoML notebook's metadata
   says *Python 3.8 - AzureML*. The lab's "verify it uses Python 3.10 -
   AzureML" step is there to catch exactly this.

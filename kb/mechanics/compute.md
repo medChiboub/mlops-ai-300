@@ -50,10 +50,18 @@ they're on the file share (see [workspace-and-storage.md](workspace-and-storage.
 - **`tier: dedicated`** vs. **low priority**: low-priority nodes are much
   cheaper but can be taken back by Azure mid-job. They're fine for sweeps
   and AutoML trials that can be retried, and risky for long single jobs.
-- **`max: 2`**: at most 2 nodes of 2 vCPUs each = 4 vCPUs. It has to fit the
-  subscription's regional **DSv2-family quota** (10 in canadaeast). The
-  instance's 2 vCPUs come from the same pool: 2 + 4 = 6 of 10. When a job sits
-  in *Queued* forever, the cause is usually quota or `max_instances`.
+  **On this subscription the low-priority quota is 0/0**, so it isn't an option.
+- **`max: 2`**: at most 2 nodes of 2 vCPUs each = 4 vCPUs. It has to fit
+  **Azure ML's own quota** for the DSv2 family, which is **6** in canadaeast.
+  The instance's 2 vCPUs come from the same pool: 2 + 4 = **6 of 6**, so
+  nothing is left over.
+  ⚠ Correction: on day one I checked `az vm list-usage` (the general
+  Microsoft.Compute pool, which showed 10) and called that the quota. That's
+  the wrong pool. It even showed 0 used while the instance was running. Azure
+  ML compute is counted by **`az ml compute list-usage -l <region>`**
+  (`standardDSv2Family 4 / 6` during the AutoML run). Monitoring's serverless
+  Spark uses yet another pool. When a job sits in *Queued* forever, the cause
+  is usually quota or `max_instances`.
 
 ## What happens when a job is submitted to the cluster
 
