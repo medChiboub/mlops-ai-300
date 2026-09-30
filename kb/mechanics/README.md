@@ -22,3 +22,4 @@ gets ticked or corrected once we see it.
 | [interfaces.md](interfaces.md) | Script vs. SDK vs. CLI + YAML vs. Studio: four layers over one REST API, the same job both ways | All labs |
 | [registries-and-environments.md](registries-and-environments.md) | Assets vs. resources, dev/prod workspaces, two promotion patterns, what a registry provisions (managed RG, Premium ACR, storage), naming rules, RBAC | Lab 05 |
 | [github-actions-azureml.md](github-actions-azureml.md) | The workflow → Azure chain, secrets vs. variables, service-principal secret vs. OIDC, triggers, branch protection vs. workflows, network | Lab 06 |
+| [job-types.md](job-types.md) | The 5 job types (command, sweep, automl, pipeline, spark), "is a pipeline a set of commands?" nuances, non-job `az ml` actions (register, deploy, schedule) | Labs 01–07 |

@@ -756,3 +756,13 @@ exist only on the Studio clone. The same `az ml job create -f` would submit
 a pipeline YAML unchanged. My project's workflow does submit a pipeline
 (prep → train → evaluate with an AUC gate). Added to section 5 of the lab
 06 file.
+
+**00:42 · me → Claude · "So we submit either a command job or a pipeline job? A pipeline is a set of commands?"**
+Nuanced and documented: **5 job types** (command, sweep, automl, pipeline,
+spark), all submitted with `az ml job create -f`, where the YAML's `type:`
+decides. A pipeline is a **graph of component steps** (usually commands, but
+steps can also be sweep/AutoML/Spark/parallel/sub-pipelines) whose
+output → input wiring gives ordering, data passing, reuse and per-step child
+jobs. Plus the non-job `az ml` actions a workflow may run (register,
+deploy, schedule). New `mechanics/job-types.md`, and a nuance section in
+`components-and-pipelines.md`.

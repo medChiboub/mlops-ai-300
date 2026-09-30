@@ -16,6 +16,16 @@ step runs as a **child job**.
 | Made with | YAML (or `@command_component`) + script | `@pipeline()` function (or pipeline YAML) | `ml_client.jobs.create_or_update(pipeline_job)` |
 | Stored as | `name:version` if **registered**; otherwise anonymous | Only inside the job definition | Job history: parent + child jobs |
 
+## Is a pipeline just "a set of commands"?
+
+Roughly, with two nuances (full version in [job-types.md](job-types.md)):
+1. **Steps are usually command components, but can also be** sweep, AutoML,
+   Spark, parallel steps, or a sub-pipeline.
+2. **The wiring (output → input) is the value:** it sets the order (and
+   parallelism), moves the data, lets unchanged steps **reuse** earlier
+   results, and gives each step its own child job and logs. Separate command
+   jobs give you none of that.
+
 ## The lab's two components
 
 ```yaml
