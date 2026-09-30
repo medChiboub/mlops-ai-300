@@ -59,6 +59,36 @@ upload folders still differ, because the hash covers the file name.
   never printed. The lab 06 repo secret (`rbac`) still works. Environment
   secrets take precedence for jobs that declare `environment:`.
 
+### How dev and prod share one job definition
+
+Both workflows submit **the same `src/job.yml`**; only submit-time settings
+differ:
+
+| | `train-dev.yml` | `train-prod.yml` |
+|---|---|---|
+| Job definition, script, environment, compute, `reg_rate` | `src/job.yml` | **the same** |
+| Training data (`--set inputs.training_data.path=…`) | `azureml:diabetes-dev-folder@latest` | `azureml:diabetes-prod-folder@latest` |
+| GitHub environment → secret and gate | `dev`: no approval | `prod`: **my approval** |
+| Workspace | lab 01 (found by the `rg-ai300-l` prefix) | **the same** |
+| Job name | `diabetes-train-dev-<run id>` | `diabetes-train-prod-<run id>` |
+
+"Same definition, different configuration": what was reviewed in dev is
+exactly what runs in prod. ⚠ `--set` overrides the **path**, not the
+**type**, so `job.yml` must say `type: uri_folder` (the lab's first edit).
+Lab 06 left it at `uri_file`.
+
+**What `train-prod.yml` does on `/train-prod`:** an `issue_comment` on a PR
+containing `/train-prod` → the job waits for **my approval** (`environment:
+prod`) → checks out **the PR's code** (`refs/pull/<N>/head`) → logs in with
+prod's `AZURE_CREDENTIALS` → submits `src/job.yml` with the prod data →
+`az ml job stream` → downloads `metrics.json` (the `metrics_output` output) →
+posts Accuracy and AUC as a PR comment. Caveats: the prod data is
+byte-identical to dev, so the metrics will match; the model it trains is
+**not** what `/deploy-prod` deploys (that's the committed `model/`);
+`contains()` matches anywhere in the comment; and it runs PR code with prod
+credentials (the pwn-request risk, mitigated here by the interaction limits
++ the reviewer gate).
+
 ## 3. What broke and how we fixed it
 
 ## 4. Exam mapping

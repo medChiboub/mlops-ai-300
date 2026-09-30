@@ -99,6 +99,41 @@ credential, the app registration gets a **federated credential** (ours has
 | `repository_dispatch` | An **external system** calls the GitHub API; how Azure events (Event Grid → Logic Apps / Functions) start a workflow, since GitHub can't subscribe to Event Grid |
 | `issue_comment` | Lab 07's `/train-prod`, `/deploy-prod` ChatOps; runs with **the base repo's secrets**, so it's risky on a public repo |
 
+## One job definition, several environments (`--set`)
+
+Lab 07's `train-dev.yml` and `train-prod.yml` submit **the same
+`src/job.yml`** and change only what differs per environment, at submit
+time:
+
+```bash
+az ml job create -f src/job.yml --set inputs.training_data.path=azureml:diabetes-dev-folder@latest    # dev
+az ml job create -f src/job.yml --set inputs.training_data.path=azureml:diabetes-prod-folder@latest   # prod
+```
+
+- **Same definition, different configuration:** the reviewed code and job
+  definition are exactly what runs in prod; only data, credentials (the
+  GitHub environment secret) and, in real setups, the workspace (`-g/-w`)
+  change. Separate per-environment YAML copies drift apart.
+- `--set` overrides **one field** of the YAML (the SDK equivalent: calling the
+  job with new values, `job(reg_rate=…)`). It doesn't change other fields: a
+  path override keeps the file's `type:`, so the type must fit both assets.
+- The same idea at a bigger scale: my project uses one Bicep template + a
+  `.bicepparam` per environment, and one model version promoted through the
+  registry.
+
+## `issue_comment` workflows (lab 07's `/train-prod`, `/deploy-prod`)
+
+- They run the workflow file **from the default branch (`main`)**, not from
+  the PR. So a fix to such a workflow only takes effect once merged (why
+  lab 07's CLI pin went in as its own PR first).
+- They run with **the base repo's secrets**, and the lab's versions check out
+  **the PR's code** (`refs/pull/<N>/head`): the **pwn-request** risk on
+  public repos. Mitigations: restrict who can comment (interaction limits,
+  or a permission check in the workflow), and a **protected environment with
+  a required reviewer**, so the job pauses before any secret is available.
+- `contains(comment.body, '/train-prod')` matches anywhere, even in a quote;
+  anchoring to the first line is safer (my project's `chatops.yml`).
+
 ## Branch protection vs. workflows
 
 A **workflow** decides *what runs*; a **branch protection rule** (or ruleset)

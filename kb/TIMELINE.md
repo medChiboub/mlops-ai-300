@@ -818,3 +818,12 @@ at 100%, with a client secret and an optional reviewer.
 
 *Context:* the setup lab 07's workflows need. The reviewer gate matters
 because the repo is public.
+
+**03:38 · me → Claude · "What does train-prod do? One job.yml for dev and prod?"**
+Documented, in the lab 07 file ("How dev and prod share one job
+definition") and in `mechanics/github-actions-azureml.md` (sections "One job
+definition, several environments (--set)" and "issue_comment workflows").
+Both workflows submit the same `src/job.yml`; `--set` swaps only the data
+path at submit time, and the GitHub environment supplies the credentials and
+the gate. `/train-prod` runs the workflow from `main` against the PR's
+code, after my approval.
