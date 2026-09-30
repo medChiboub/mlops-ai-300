@@ -292,7 +292,11 @@ properly.
   -f limit=contributors_only -f expiry=six_months` → only prior contributors
   (me) can comment or open issues and PRs, until **2027-03-30**.
 - **Disabling `train-prod.yml` / `deploy-prod.yml`:** Claude's permission
-  system blocked this (it counts as bypassing CI), so I do it myself.
+  system blocked this (it counts as bypassing CI), so I did it myself
+  (typing `! gh …` in the VS Code chat didn't run anything; I used the
+  Actions UI/terminal). Claude verified it with `gh workflow list`: both are
+  **`disabled_manually`**, and `manual-trigger-job.yml` and `train-dev.yml`
+  stay active.
 - **Current exposure: none.** No secrets and no environments exist yet
   (`gh secret list` and `…/environments` are both empty).
 
