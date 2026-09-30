@@ -878,3 +878,22 @@ untouched.** The separation stays documented (lab 05 file, registries
 mechanics, `infra/setup-prod-design.sh`), and lab 07's working dev/prod
 (GitHub environments + data assets) is unaffected.
 *Context:* stops the registry's .67/day; nothing used them.
+
+**08:05–08:13 UTC · Claude · `/deploy-prod` (the lab's way) started, then stopped**
+Commented `/deploy-prod` → run `36687608547` waiting → approved → endpoint
+**`diabetes-endpoint-0533925c` created**, deployment `blue` Creating with the
+**committed 2023 `model/`**, registered **implicitly** under a content-hash
+name (`c68e03c6…:1`). The workspace's model list also showed auto-generated
+entries from earlier jobs' MLflow outputs.
+Each PR comment starts **both** comment workflows; the non-matching one
+skips.
+
+**08:15 · me → Claude · "Why not deploy my own prod model? Delete blue and do it our way"**
+Cancelled the run and deleted `blue` (endpoint kept). Merged PR #3
+(`6802809`). Opened **PR #4** so that `/train-prod` registers
+`diabetes-model:N` from the prod job's `model_output`, and `/deploy-prod`
+deploys it as `vN`, smoke-tests it, then shifts traffic, keeping older
+deployments at 0%. A **local test** caught a signature bug (all-`double`
+types rejected the lab's integer payload) before pushing.
+*Context:* makes retraining actually change what's served. This goes
+beyond the lab, by my choice.

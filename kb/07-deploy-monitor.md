@@ -135,6 +135,48 @@ in a Microsoft workspace), scikit-learn **0.24.1** (cloudpickle), MLflow
   unit 2): **register the MLflow model explicitly** from the job output,
   with a name and version, and deploy by `name:version`.
 
+### 2.6 Change of plan: deploy our own model (my decision, 08:15 UTC)
+
+The lab's `/deploy-prod` deploys the committed 2023 `model/`, and the
+training jobs save no model, so retraining never changes what's served. I
+chose to **deploy my own prod-trained model** instead ("our way": it's what
+the module teaches and what makes the loop real). This goes beyond the lab.
+
+1. **Stopped the lab's deployment:** cancelled run `36687608547`
+   (`gh run cancel`, ended `cancelled`), then `az ml online-deployment delete -n
+   blue` (it had been `Creating`; deletion waits for the half-built deployment
+   to stop). **Endpoint kept** (`auth: key`); its traffic map still showed
+   `"blue": 0` afterwards, a stale key.
+2. **Merged PR #3** (`6802809`): its lab steps (dev training + `/train-prod`)
+   were done.
+3. **PR #4 `feature/deploy-own-model`** (6 files):
+   - `train-model-parameters.py`: `--model_output` → `mlflow.sklearn.save_model`
+     with a **signature from the original columns** + `input_example`, plus
+     `azureml-ai-monitoring==1.0.0` and `azureml-contrib-services` (as in the
+     committed model, for the data collector).
+   - `job.yml`: output `model_output: {type: mlflow_model}`.
+   - `train-prod.yml`: a **Register prod model** step: `az ml model create
+     --name diabetes-model --type mlflow_model --path
+     azureml://jobs/<job>/outputs/model_output`, tagged `training_job`, `pr`,
+     `data`, `accuracy`, `auc`. The comment reports `diabetes-model:<N>`.
+   - `deploy_to_online_endpoint.py` + `deploy-prod.yml`: deploy
+     `diabetes-model:<latest>` (`models.get(label="latest")`) as deployment
+     **`v<N>`**, **smoke-test it by invoking that deployment directly**, then
+     traffic **100% to it, 0% to the deployments that actually exist**
+     (built from `online_deployments.list`, not the traffic map, because of
+     stale keys). The comment reports model, deployment, traffic and the smoke
+     result.
+   - `sample-request.json`: the lab's payload (the lab references it; it
+     didn't exist).
+4. **Tested locally before pushing:** trained on `data/diabetes-data`, loaded
+   the saved model with `mlflow.pyfunc`, and predicted on the lab payload.
+   **First try failed:** the signature inferred from `X_train` (a float array)
+   typed every column `double`, and the lab's integer payload was rejected:
+   `Incompatible input types for column Pregnancies. Can not safely convert
+   int64 to float64`. Fixed by inferring from `df[FEATURES]`: integers →
+   `long`, `BMI`/`DiabetesPedigree` → `double`, the same as the committed
+   model. Retest predicted **`[1]`**.
+
 ### How dev and prod share one job definition
 
 Both workflows submit **the same `src/job.yml`**; only submit-time settings
