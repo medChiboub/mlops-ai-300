@@ -18,3 +18,5 @@ gets ticked or corrected once we see it.
 | [mlflow-tracking.md](mlflow-tracking.md) | MLflow ↔ Azure ML mapping, tracking vs. submitting, autolog vs. custom logging, params vs. metrics vs. artifacts | Lab 01 §4 |
 | [command-jobs.md](command-jobs.md) | A command job's pieces, code snapshot and `.amlignore`, input upload reuse, environment, logs, job vs. terminal run | Lab 02 §3 |
 | [sweep-jobs.md](sweep-jobs.md) | Sweep = one command job run per hyperparameter combination: script requirements, search space, sampling, early termination, limits | Lab 03 |
+| [components-and-pipelines.md](components-and-pipelines.md) | Component vs. pipeline vs. pipeline job, component YAML, `@pipeline()` wiring, loaded vs. registered, scheduling | Lab 04 |
+| [interfaces.md](interfaces.md) | Script vs. SDK vs. CLI + YAML vs. Studio: four layers over one REST API, the same job both ways | All labs |

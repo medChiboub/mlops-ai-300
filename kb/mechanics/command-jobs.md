@@ -102,6 +102,7 @@ scikit-learn 1.0; the compute instance has its own, probably newer, version).
 the estimator param `multi_class: auto`, while autolog on the compute
 instance in lab 01 logged `multi_class: deprecated`. scikit-learn changed that
 default in a newer release, so the two really do run different versions.
+Lab 04's `MLmodel` pins it exactly: **scikit-learn 1.0.2**, Python 3.8.16.
 This is the concrete reason jobs pin an **environment**: the result belongs
 to *code + data + environment*, not just code + data.
 

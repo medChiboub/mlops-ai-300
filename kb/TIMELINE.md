@@ -540,3 +540,60 @@ published `03-hyperparameter-tuning.html`, which matches our `docs/`. The only
 gap in the kb was the **parameter vs. hyperparameter** definition (unit 1),
 now added to section 4 of the lab 03 file.
 *Context:* confirm the kb covers the whole module before starting lab 04.
+
+---
+
+## Lab 04: Run pipelines
+
+### 2026-09-29
+
+**22:07 · Claude · Prepared lab 04**
+Read `Run a pipeline job.ipynb` and all 7 units of the live module *Run
+pipelines in Azure Machine Learning* (2026-08-27). Its exercise links to the
+published `04-run-pipelines.html`, which matches our `docs/`. Created
+`kb/04-run-pipelines.md` and `mechanics/components-and-pipelines.md`.
+Findings:
+- **The module's exercise unit says "build, run, and schedule a pipeline",
+  but the lab never schedules** (no "schedul" in the doc or notebook).
+  Scheduling (`JobSchedule` + `RecurrenceTrigger`) is in the theory and the
+  assessment.
+- The components are loaded, not registered.
+- The notebook writes into lab 03's `experimentation/src/`.
+- The prep step scales 7 of 8 features on all the data before the split.
+
+*Context:* the last lab that needs the compute instance. Stop it right
+after.
+
+**22:09 · me · Ran the pipeline notebook** (Studio, Python 3.10 - AzureML, Run all)
+Wrote `src/prep-data.py`, `src/train-model.py`, `prep-data.yml` and
+`train-model.yml`, loaded both components, built `diabetes_classification`
+with `@pipeline()`, and submitted **pipeline job `calm_ticket_wcbhgt8w7n`**
+(experiment `pipeline_diabetes`, input `diabetes-data:1`). The first child,
+**`clean_data`** (named after the pipeline variable, with a GUID job ID), was
+Queued.
+*Context:* two steps as one job; prep's output feeds train's input.
+
+**22:11 · me → Claude · "It's either Python, SDK, Azure ML or YAML. Why?"**
+Explained the four layers: the script does the ML; the SDK, CLI + YAML and
+Studio are ways to tell Azure ML to run it, all over one REST API. Wrote
+`mechanics/interfaces.md` with an SDK ↔ CLI/YAML table.
+*Context:* lab 04 mixes all of them (YAML components, SDK wiring, Python
+scripts).
+
+**22:17 · Claude · Pipeline Completed; wrote up lab 04**
+- **`clean_data`:** 02:11:02 → 02:13:11 (cold), 10,000 rows, 7 features
+  scaled, `Age` not scaled.
+- **`train_model`:** 02:13:36 → 02:13:59 (warm), created only after
+  `clean_data` finished. Accuracy 0.774 / AUC 0.84849, printed only.
+- **Components:** anonymous (`az ml component list` empty).
+- **Code snapshot:** one, shared by both steps.
+- **Outputs:** in `workspaceblobstore/azureml/<run>/…`. The `MLmodel` says
+  scikit-learn 1.0.2, which settles lab 02's version question.
+- **CLI bug:** `az ml job download` of the `mlflow_model` output crashes
+  (`BatchGetResolvedUrisDto … 'values'`); read the blobs directly instead.
+
+Wrote the exam mapping (module comparison plus its 2-question assessment),
+the comparison with my project, and an 8-question quiz. Coverage: pipelines
+✅, components ⚠ (loaded, not registered).
+*Context:* the lab's one section is done. Left: my Studio look at the
+graph, the optional schedule step, then stopping the compute instance.
