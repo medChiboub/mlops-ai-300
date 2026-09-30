@@ -969,3 +969,23 @@ now 201 lines, 171 KB), which confirms "one file per hour, one line per
 request".
 *Context:* a realistic **baseline**. Tomorrow's data drift run should show
 near-zero drift against `diabetes-training`.
+
+**05:20 · me (Studio) + Claude · Model monitor created**
+Studio → Monitoring → Add. **Basic settings:** deployment `blue`,
+E4s_v3, daily at "4 AM". **Data assets:** the two collector assets were
+pre-listed (with the "Model Data Collector - Preprocessor" component), and I
+added `diabetes-training:1` (the only **Table** asset). **Signals:** Studio
+pre-added 4 (data drift, data quality, prediction drift, and **feature
+attribution drift**, shown in red, which kept Next disabled). I deleted
+all but data drift and edited it: production `…-blue-model_inputs:1` with
+**lookback 7 days**, reference `diabetes-training:1` with **target
+`Diabetic`**, **Top N = 10**, and the default thresholds (NWD 0.1 / JSD 0.1).
+Email alert on. Claude read the result back through the REST API (the local
+`az ml schedule show` can't deserialize Studio's `ModelInputs` casing):
+**schedule `blue-fkfvn`**, created 09:19 UTC, enabled, and **`timeZone:
+UTC`**. So "4 AM" is **04:00 UTC**, midnight my time, not 4 AM local as
+Claude first said. The definition and an equivalent CLI YAML are recorded in
+`mechanics/monitoring.md`.
+*Context:* the first run is **2026-10-01 04:00 UTC**. The 7-day window
+covers today's 201 requests. Open question: how Top 10 treats `PatientID`
+(9 candidate columns).

@@ -125,11 +125,21 @@ sub-job per signal** on **serverless Spark**.
 | Question it answers | "Did traffic change **recently**?" | "Is traffic different from **what the model learned**?" |
 | Feature importance | No | Yes, if reference = training data **and** a target column is set |
 
-⚠ Even in the advanced wizard, Studio **pre-adds** the 3 out-of-box
-signals, which use past production as their reference. Only the data drift
-signal gets edited to use training data. The other two need a production
-history from **before** the last day, which we don't have. Keep only
-**data drift** (what the lab asks for), or expect the other two to fail.
+⚠ Even in the advanced wizard, Studio **pre-adds 4 signals** (seen
+2026-09-30): data drift, data quality and prediction drift (using past
+production as their reference), plus **feature attribution drift
+(preview)**. The last one shows in red and **keeps Next disabled** until
+it's configured or deleted. Only the data drift signal gets edited to use
+training data. The others need a production history from **before** the
+last day, which we don't have. We kept only **data drift** (what the lab
+asks for).
+
+**The wizard's first page, "Configure data asset"**, pre-lists the two
+collector assets, each with the preprocessing component **"Model Data
+Collector - Preprocessor"**
+(`azureml://registries/azureml/components/model_data_collector_preprocessor/versions/0.4.31`).
+That's the step that turns the CloudEvents JSONL into a table the drift
+computation can read. The training data (`mltable`) needs no preprocessor.
 
 ### Which reference data asset
 
@@ -142,10 +152,12 @@ The lab offers "`diabetes-training` or `diabetes-dev-folder`":
 
 - **Target column = `Diabetic`**: the label column in the training data. It
   turns on feature importance and **Top N features**.
-- **`PatientID`** is in the reference data but not in production data.
-  ▢ Verify how the drift signal handles it (skipped as "not in production",
-  or reported as a feature). Choosing **specific features** (the 8) instead
-  of Top N avoids the question.
+- **`PatientID`** is in the reference data but not in production data. We
+  chose **Top N = 10** (what the docs show): the training data has only 9
+  candidate columns (the 8 features + `PatientID`), so all of them are
+  "top", `PatientID` included. ▢ Verify on the first run how it's handled
+  (skipped, reported, or a failure). Fix if needed: edit the signal to
+  select specific features.
 
 ### Compute: serverless Spark, a separate quota pool
 
@@ -163,6 +175,81 @@ The lab offers "`diabetes-training` or `diabetes-dev-folder`":
   control.
 - Billed only while a run executes (🛠 the signal computation itself took
   about 2 min once it started).
+
+### What Studio actually created (the record)
+
+The wizard produced **schedule `blue-fkfvn`** (created 2026-09-30 09:19 UTC,
+enabled). Nothing about it is in Git, so this section is the record. It was
+read back with `az rest GET …/schedules/blue-fkfvn?api-version=2024-10-01`.
+⚠ `az ml schedule list/show` (local ml extension 2.38.1) **can't
+deserialize it**: `Value 'ModelInputs' passed is not in set ['model_inputs', …]`.
+Studio writes a different casing than the CLI expects. This is a tooling
+mismatch, not a monitor problem.
+
+What the raw definition says:
+
+| Field | Value | Meaning |
+|---|---|---|
+| `trigger` | `frequency: Day`, `hours: [4]`, `minutes: [0]`, **`timeZone: UTC`** | **04:00 UTC** = midnight in my time zone (UTC−4). Not 4 AM local: Studio's "4 AM" is UTC |
+| `computeConfiguration` | `ServerlessSpark`, `standard_e4s_v3`, runtime `3.4`, identity `AmlToken` | Serverless Spark, the smallest allowed size |
+| `monitoringTarget` | deployment `blue`, model `c68e03c6…fc8f96:1`, `taskType: Classification` | The model is the implicit hash-named registration the deploy script created |
+| `productionData` | `…-blue-model_inputs:1`, `uri_folder`, `dataContext: ModelInputs`, preprocessor `model_data_collector_preprocessor:0.4.31`, **`inputDataType: Rolling`**, `windowSize: P7D`, `windowOffset: PT0S` | A sliding 7-day window over the collected JSONL |
+| `referenceData` | `diabetes-training:1`, `mltable`, `target_column: Diabetic`, **`inputDataType: Fixed`** | A static reference: always "there", so no reference-window timing problem |
+| `features` | `filterType: TopNByAttribution`, `top: 10` | Top N by feature importance |
+| `metricThresholds` | Numerical `NormalizedWassersteinDistance` 0.1, Categorical `JensenShannonDistance` 0.1 | The same values my production project saw as "smart defaults" |
+| `alertNotificationSettings` | my email | Microsoft's default: whoever set it up |
+
+The same monitor as CLI YAML, in the format of Microsoft's advanced example
+(reconstructed for the record, **not applied**; this is what my production
+project keeps in Git instead of clicking):
+
+```yaml
+$schema: http://azureml/sdk-2-0/Schedule.json
+name: blue-fkfvn
+trigger:
+  type: recurrence
+  frequency: day
+  interval: 1
+  schedule:
+    hours: 4          # UTC
+    minutes: 0
+create_monitor:
+  compute:
+    instance_type: standard_e4s_v3
+    runtime_version: "3.4"
+  monitoring_target:
+    ml_task: classification
+    endpoint_deployment_id: azureml:diabetes-endpoint-0533925c:blue
+  monitoring_signals:
+    data-drift-signal:
+      type: data_drift
+      production_data:
+        input_data:
+          path: azureml:diabetes-endpoint-0533925c-blue-model_inputs:1
+          type: uri_folder
+        data_context: model_inputs
+        pre_processing_component: azureml://registries/azureml/components/model_data_collector_preprocessor/versions/0.4.31
+        data_window:
+          lookback_window_size: P7D
+          lookback_window_offset: P0D
+      reference_data:
+        input_data:
+          path: azureml:diabetes-training:1
+          type: mltable
+        data_context: training
+        data_column_names:
+          target_column: Diabetic
+      features:
+        top_n_feature_importance: 10
+      metric_thresholds:
+        numerical:
+          normalized_wasserstein_distance: 0.1
+        categorical:
+          jensen_shannon_distance: 0.1
+  alert_notification:
+    emails:
+      - <my email>
+```
 
 ## Timing: why the first run can't be today
 
@@ -205,8 +292,9 @@ The lab offers "`diabetes-training` or `diabetes-dev-folder`":
 - [x] ① `POST /score 200` in the deployment log (09:05 UTC)
 - [x] ② JSONL in `modelDataCollector/…/model_inputs/2026/09/30/09/` with the 8 features, `agent: azureml-ai-monitoring/1.0.0`
 - [x] ② Data assets `…-blue-model_inputs` / `…-model_outputs` auto-registered
-- [ ] ③ Monitor created: data drift, reference `diabetes-training` + target `Diabetic`, lookback ≥ 1 day, daily, E4s_v3
-- [ ] ③ ▢ How `PatientID` is handled
+- [x] ② 200 baseline requests (held-out test rows) appended to the same hourly file (201 lines)
+- [x] ③ Monitor `blue-fkfvn` created: data drift only, reference `diabetes-training:1` + target `Diabetic`, Top N 10, lookback P7D, daily 04:00 UTC, E4s_v3
+- [ ] ③ ▢ How `PatientID` is handled (Top 10 over 9 candidate columns)
 - [ ] ④ First run: status of each signal sub-job, **not just the parent**, and actual drift numbers
 - [ ] ④ ▢ Baseline traffic → low drift. Shifted traffic → a threshold exceeded → an email alert
 
