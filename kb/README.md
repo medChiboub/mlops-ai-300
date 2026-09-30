@@ -36,6 +36,25 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 06 | [Automate model training](06-automate-model-training.md) | `create-for-rbac` = app registration + service principal + role; its JSON → `AZURE_CREDENTIALS`, and the job's `created_by` is the SP. A `pull_request` trigger + branch protection make the PR the gate. The workflow went red while training succeeded: an unpinned `ml` 2.45.0 `--stream` bug, reproduced twice, fixed by pinning 2.44.1. OIDC is the recommended answer over the lab's client secret |
 | 07 | [Deploy and monitor](07-deploy-monitor.md) | _in progress_ |
 
+## Deviations from the canonical labs
+
+Everything not listed here follows the Microsoft Learn labs as written.
+
+| Deviation | Why | Changes what's learned? |
+|---|---|---|
+| Provisioned from my Mac (a patched copy of `setup.sh`: `uuidgen`, bash), not Cloud Shell; region pinned to canadaeast | `setup.sh` is Linux-only; my region choice | No: the same `az` commands |
+| One workspace reused for labs 01–07 (each lab's provision/delete skipped) | Cost and time; my decision | No |
+| Lab 04: scheduling documented, not run | The module covers it; the lab doesn't | No |
+| Lab 05: optional multi-environment script run; its registry name fixed (35 → 32 chars); resources deleted during lab 07 | My choice; Microsoft's script can't create its registry | Adds a real bug lesson |
+| Repo made public, interaction limits on, comment workflows disabled until lab 07 | Branch protection/reviewers are paid on private repos; safety on a public repo | Enables what the labs expect |
+| Lab 06 YAML snippets: tabs → spaces | The doc's snippets break YAML | No: a doc bug |
+| Azure ML CLI pinned to 2.44.1 in all 4 workflows | 2.45.0 `--stream` crashes after the job succeeds | No: without it the lab's workflows fail |
+| Secrets piped from the CLI (never shown); env secrets from a 2nd client secret on the same service principal | Security | No: the same result |
+| `prod` required reviewer on (optional in the lab) | Public repo; it's the module's point | Adds what the module teaches |
+| Some UI steps done by Claude at my request | Speed | Only who clicked |
+| PR #4 ("deploy our own registered model") built, then reverted by PR #5 | Tried the real-world design, went back to the lab | The code equals the lab's; the design is kept in [lab 07](07-deploy-monitor.md) |
+| Leftovers: `diabetes-model:1`, auto-listed dev model outputs | From the PR #4 experiment | Harmless; archive in lab 07's last step |
+
 ## What's original vs. what we changed
 
 Two independent copies of Microsoft's code (`MicrosoftLearning/mslearn-mlops`
