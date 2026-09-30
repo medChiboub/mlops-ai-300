@@ -266,3 +266,17 @@ Wrote **`kb/SOURCES.md`**, a per-lab pre-flight list. Biggest findings:
 
 *Context:* so every upcoming lab starts with known issues already listed,
 instead of finding them mid-lab.
+
+**20:51 · me → Claude · Dropped `kb/SOURCES.md`**
+Removed the per-lab pre-flight file and its README link.
+*Context:* a separate list of predicted problems blurs the reasoning. Pitfalls
+get briefed at the start of each lab section instead, and only real findings
+are recorded (lab file, `mechanics/`, this timeline). The quota correction
+stays, because it fixes a wrong statement in `compute.md` and the lab 01 file.
+Checks run just before, for the record:
+- **Branch protection** on this private repo returned `403 Upgrade to GitHub
+  Pro or make this repository public`, so it isn't available (lab 06).
+- **The curated environment** couldn't be read through the workspace REST API
+  either. The older `AzureML-sklearn-0.24-…` gave the same error, so this may
+  be how the API handles curated environments rather than proof that one
+  environment is gone. Lab 02's first command job will settle it.

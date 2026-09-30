@@ -12,9 +12,6 @@ thing differently.
 **[TIMELINE.md](TIMELINE.md):** every step across all labs, in order, with who
 did it and why.
 
-**[SOURCES.md](SOURCES.md):** read before each lab: known issues from the lab docs, the repo and
-Azure checks, the matching Microsoft Learn module, and where my production project covers the same ground.
-
 **[mechanics/](mechanics/README.md):** what Azure actually does underneath, one
 file per concept (workspace and storage, compute, data assets, AutoML, …).
 
