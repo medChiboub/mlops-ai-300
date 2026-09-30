@@ -30,7 +30,9 @@ def parse_args():
     parser.add_argument("--endpoint-name", dest="endpoint_name", default="diabetes-endpoint")
     parser.add_argument("--model-name", dest="model_name", default="diabetes-model")
     parser.add_argument("--model-version", dest="model_version", default=None,
-                        help="registered version to deploy; default: latest")
+                        help="registered version to deploy")
+    parser.add_argument("--pr-number", dest="pr_number", default=None,
+                        help="deploy the newest version registered by this pull request (tag pr=<number>)")
     parser.add_argument("--deployment-name", dest="deployment_name", default=None,
                         help="default: v<model version>")
     parser.add_argument("--request-file", dest="request_file", default="sample-request.json")
@@ -60,9 +62,15 @@ def ensure_endpoint(ml_client: MLClient, endpoint_name: str) -> ManagedOnlineEnd
         return ml_client.online_endpoints.begin_create_or_update(endpoint).result()
 
 
-def get_registered_model(ml_client: MLClient, model_name: str, model_version: str):
+def get_registered_model(ml_client: MLClient, model_name: str, model_version: str, pr_number: str):
     if model_version:
         return ml_client.models.get(name=model_name, version=model_version)
+    if pr_number:
+        # only the versions /train-prod registered for this pull request (archived versions are excluded)
+        versions = [m for m in ml_client.models.list(name=model_name) if (m.tags or {}).get("pr") == str(pr_number)]
+        if not versions:
+            raise SystemExit(f"No {model_name} version is registered for PR #{pr_number}. Run /train-prod on this PR first.")
+        return max(versions, key=lambda m: int(m.version))
     return ml_client.models.get(name=model_name, label="latest")
 
 
@@ -126,7 +134,7 @@ def main() -> None:
     endpoint = ensure_endpoint(ml_client, args.endpoint_name)
     print(f"Using endpoint: {endpoint.name}")
 
-    model = get_registered_model(ml_client, args.model_name, args.model_version)
+    model = get_registered_model(ml_client, args.model_name, args.model_version, args.pr_number)
     deployment_name = args.deployment_name or f"v{model.version}"
     print(f"Deploying registered model {model.name}:{model.version} as deployment '{deployment_name}'...")
     deployment = create_or_update_deployment(

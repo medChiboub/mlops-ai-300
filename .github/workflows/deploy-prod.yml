@@ -76,7 +76,8 @@ jobs:
             --resource-group "${{ steps.detect.outputs.resource_group }}" \
             --workspace "${{ steps.detect.outputs.workspace }}" \
             --endpoint-name "${{ steps.detect.outputs.endpoint_name }}" \
-            --model-name diabetes-model
+            --model-name diabetes-model \
+            --pr-number "${{ github.event.issue.number }}"
 
       - name: Comment deployment result on pull request
         uses: actions/github-script@v7
@@ -86,7 +87,7 @@ jobs:
             const body = [
               '🚀 Deployment workflow completed.',
               '',
-              'Registered model `diabetes-model:${{ steps.deploy.outputs.model_version }}` has been deployed on the managed online endpoint.',
+              'Registered model `diabetes-model:${{ steps.deploy.outputs.model_version }}` (registered by this PR\'s /train-prod) has been deployed on the managed online endpoint.',
               '',
               'Endpoint name: `${{ steps.detect.outputs.endpoint_name }}`',
               'Deployment name: `${{ steps.deploy.outputs.deployment_name }}`',
