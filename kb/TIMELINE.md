@@ -939,3 +939,19 @@ The 2023 model image (Python 3.8, sklearn 0.24.1) built without errors. The bot
 commented the endpoint and deployment on PR #3.
 *Context:* data collection is on, but nothing is collected until the first
 request arrives. Next: a test from the Studio Test tab.
+
+**05:05 · me + Claude · First test request, and data collection verified**
+My Studio Test tab request **never reached the deployment**: the container
+logs showed only health probes, with no `POST /score`. Claude sent the same
+8-feature payload with `az ml online-endpoint invoke`. It returned **`[1]`**
+(diabetic; the model returns 0/1 even though its signature says boolean),
+and the log shows `POST /score 200 12.9ms`. **About 2 s later** the collector
+had written 2 JSONL files to `workspaceblobstore`:
+`modelDataCollector/diabetes-endpoint-0533925c/blue/{model_inputs,model_outputs}/2026/09/30/09/<id>.jsonl`.
+Each line is a CloudEvents record: the inputs have the **8 named feature
+columns** (no PatientID or Diabetic), the output column is named **`"0"`**,
+and both share a `correlationid`. The agent is `azureml-ai-monitoring/1.0.0`
+(from the model's conda file), `rolling_rate: hour`, `sampling_rate: 1.0`.
+*Context:* this proves layer ② of monitoring (collection) before a
+monitor is created. The data collector started with the container
+(`mdc | INFO | data collector ready`), with no scoring script of ours.
