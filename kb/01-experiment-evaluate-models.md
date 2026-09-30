@@ -15,9 +15,10 @@ Mechanics: [workspace and storage](mechanics/workspace-and-storage.md) ·
 Provisions the Azure ML workspace, a compute instance and a compute cluster
 with one Azure CLI script from Cloud Shell, plus two data assets. Then it
 explores models two ways: an AutoML classification job submitted from a
-notebook (algorithm and featurization search, run in parallel on the
-cluster), and hand-written scikit-learn training in a notebook, tracked with
-MLflow (autologging vs. custom logging).
+notebook (an algorithm and featurization search that runs as child jobs on
+the cluster; one trial at a time here, because `max_concurrent_trials` was
+left at its default of 1), and hand-written scikit-learn training in a
+notebook, tracked with MLflow (autologging vs. custom logging).
 
 ## 2. Steps I actually ran
 
@@ -131,6 +132,20 @@ az ml job download -n coral_drawer_c6770sv3k6_setup --all --download-path …   
 
 ## 3. What broke and how we fixed it
 
+In the order we hit them.
+
+- **`setup.sh` doesn't run on macOS.** Its shebang is `#! /usr/bin/sh`, which
+  doesn't exist on macOS. It also reads `/proc/sys/kernel/random/uuid`, which
+  is Linux-only. Fix: we ran a copy with `bash` and generated the suffix with
+  `uuidgen`. In Cloud Shell (Linux) it runs as written.
+- **Random region.** The script picks one of 5 US/EU regions at random. We
+  pinned `canadaeast` with `sed`. The workspace takes the resource group's
+  location because `az ml workspace create` has no `--location`.
+- **Checked the wrong quota pool.** Before provisioning I read `az vm list-usage`
+  (Microsoft.Compute: 10 DSv2 vCPUs). Azure ML compute counts against its own
+  quota, `az ml compute list-usage -l canadaeast`: **DSv2 = 6**. The instance
+  plus a full cluster is exactly 6 of 6. It didn't cause a failure, but a
+  third DSv2 consumer would have queued forever.
 - **Ran the wrong notebook, and no AutoML job appeared.** I ran
   `Train classification model.ipynb` (plain sklearn, lab 02's starting
   point) instead of `Classification with Automated Machine Learning.ipynb`.
@@ -141,6 +156,9 @@ az ml job download -n coral_drawer_c6770sv3k6_setup --all --download-path …   
   (or `mlflow.start_run`) leaves a trace in the workspace. Side benefit: a
   baseline of LogisticRegression **accuracy 0.774 / AUC 0.848** to compare
   AutoML against.
+- **Kernel mismatch in the saved notebook:** the AutoML notebook's metadata
+  says *Python 3.8 - AzureML*. The lab's "verify it uses Python 3.10 -
+  AzureML" step is there to catch exactly this.
 - **`az ml job show` can't read AutoML trials.** On `<parent>_0` it fails
   with `UserError … JobNotSupported`. AutoML trials are an internal, older job
   type that the v2 jobs API doesn't expose; only the parent and the
@@ -154,27 +172,14 @@ az ml job download -n coral_drawer_c6770sv3k6_setup --all --download-path …   
   showed nothing active. `az ml compute list-nodes -n aml-cluster` named the
   job on the node: `coral_drawer_c6770sv3k6_rai`. It turned out to be
   `_RAI` (run type `automl.rai`), a Responsible AI dashboard run that AutoML
-  creates automatically under the best model. Lesson: **`list-nodes` is the
-  fastest way to find out what's using (and billing) a cluster.**
+  creates automatically under the best model. It then **failed**
+  (`User process 'python' exited with status code 1`, root cause not in the
+  logs we could reach). We didn't investigate further, because the lab
+  doesn't use it. Lesson: **`list-nodes` is the fastest way to find out
+  what's using (and billing) a cluster.**
 - **MLflow `runs/search` returned no metrics for the autolog run.** `runs/get`
   on the same ID returned all 7. Read single runs directly when numbers look
   missing.
-- **Checked the wrong quota pool.** Before provisioning I read `az vm list-usage`
-  (Microsoft.Compute: 10 DSv2 vCPUs). Azure ML compute counts against its own
-  quota, `az ml compute list-usage -l canadaeast`: **DSv2 = 6**. The instance
-  plus a full cluster is exactly 6 of 6. It didn't cause a failure, but a
-  third DSv2 consumer would have queued forever.
-- **Kernel mismatch in the saved notebook:** the AutoML notebook's metadata
-  says *Python 3.8 - AzureML*. The lab's "verify it uses Python 3.10 -
-  AzureML" step is there to catch exactly this.
-
-- **`setup.sh` doesn't run on macOS.** Its shebang is `#! /usr/bin/sh`, which
-  doesn't exist on macOS. It also reads `/proc/sys/kernel/random/uuid`, which
-  is Linux-only. Fix: we ran a copy with `bash` and generated the suffix with
-  `uuidgen`. In Cloud Shell (Linux) it runs as written.
-- **Random region.** The script picks one of 5 US/EU regions at random. We
-  pinned `canadaeast` with `sed`. The workspace takes the resource group's
-  location because `az ml workspace create` has no `--location`.
 
 ## 4. Exam mapping
 
@@ -298,13 +303,14 @@ environment on a cluster, with the code snapshotted per run. My project's
 README records that the clean-container run caught bugs the notebook's local
 packages had hidden.
 
-**AutoML (3), so far**
+**AutoML (2.3)**
 
 | | Lab | My project | Microsoft's recommended answer |
 |---|---|---|---|
 | Primary metric | 🧪 `accuracy` | AUC (`AUC_weighted` in its AutoML script) | 📘 **`AUC_weighted`** when classes are imbalanced; accuracy is threshold-dependent and misleading under skew |
 | ID column | 🧪 `PatientID` left in the MLTable, and AutoML kept it as Numeric | Its data has no ID column | 📘 **Drop identifiers** before training, or set featurization to `custom` and mark the column *Ignore*. Automatic featurization isn't guaranteed to catch them |
 | Training data | Registered MLTable asset `diabetes-training:1` | 🛠 Local, unregistered MLTable folder | 📘 **A registered, versioned data asset**, so the job's lineage points at fixed data. The lab matches |
+| Parallel trials | 🧪 `max_concurrent_trials` not set → default 1, so 1 node of 2 was used | `max_concurrent_trials=2` in its AutoML script | 📘 **Set `max_concurrent_trials`** (up to the cluster's max nodes) to run trials in parallel |
 
 **MLflow tracking (2.4)**
 

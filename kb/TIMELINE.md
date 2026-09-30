@@ -324,3 +324,18 @@ units 2–7 and the unit 9 assessment, then compared them with our run:
 Added to section 4 of the lab file, and corrected `mechanics/automl.md`.
 *Context:* the exam uses the module's wording, so know both what the module
 says and what actually happened.
+
+**21:02 · me → Claude · "Is my doc up to date for lab 01?"**
+Claude reviewed the lab 01 file and the mechanics files end to end:
+- **Section 1:** said the trials ran "in parallel"; now says one at a time
+  ( default 1).
+- **Section 3:** put in the order we hit the problems. The `_RAI` bullet now
+  records that the run failed.
+- **Section 5:** removed the "so far" label from the AutoML table and added a
+  *parallel trials* row (lab default 1 vs. `max_concurrent_trials=2` in my
+  project).
+- **`mechanics/automl.md`:** the intro no longer claims AutoML "uses what it
+  learned" to pick trials; it uses the module's "randomly selects" wording.
+
+*Context:* the file was written as we went, so early statements had fallen
+behind later findings.

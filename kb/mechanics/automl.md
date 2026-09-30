@@ -5,7 +5,8 @@
 AutoML is a **search loop run as a job**. It repeatedly picks a
 *pipeline*: a preprocessing step (scaler or encoder) plus an algorithm plus
 hyperparameters. It trains and scores that pipeline, records the score, and
-uses what it has learned so far to pick the next one. It stops when it hits
+picks the next one (the Microsoft Learn module describes the default choice
+as random, from the task's full list of algorithms). It stops when it hits
 a limit. The result is a ranked leaderboard and a best model. It doesn't
 register or deploy anything.
 
