@@ -25,6 +25,30 @@ writes every request to blob storage. Once a day, a Spark job reads those
 files and compares them statistically with a reference dataset. If a layer
 is broken, the later layers still "run", just on nothing.
 
+```mermaid
+flowchart LR
+  subgraph L1["① Request"]
+    C["Caller<br/>POST /score + key"] --> EP["Deployment blue<br/>azmlinfsrv + MLflow model"]
+  end
+  subgraph L2["② Collection"]
+    MDC["Data collector<br/>azureml-ai-monitoring 1.0.0"] --> ST["workspaceblobstore<br/>modelDataCollector/…/YYYY/MM/DD/HH/*.jsonl"]
+  end
+  subgraph L3["③ Monitor"]
+    SCH["Schedule blue-fkfvn<br/>daily 04:00 UTC"] --> SPK["Serverless Spark E4s_v3<br/>preprocessor + data drift signal"]
+    REF["Reference<br/>diabetes-training MLTable"] --> SPK
+  end
+  subgraph L4["④ Result"]
+    RES["Drift per feature vs 0.1<br/>Studio → Monitoring"] --> MAIL["Alert email<br/>if exceeded"]
+  end
+  EP --> MDC
+  ST --> SPK
+  SPK --> RES
+  V1(["check: POST /score in deployment logs"]) -.-> EP
+  V2(["check: az storage blob list"]) -.-> ST
+  V3(["check: each signal sub-job ran on data"]) -.-> SPK
+  V4(["check: read the numbers, not the green tick"]) -.-> RES
+```
+
 | Layer | Lives where | How to check it directly | Status here |
 |---|---|---|---|
 | ① Requests reach the model | Deployment `blue` container | `az ml online-deployment get-logs` → `POST /score 200` | ✅ 2026-09-30 09:05 |
@@ -99,6 +123,30 @@ What this tells us:
 - **Not retroactive:** collection is set on the deployment, and only requests
   made after it's live are recorded.
 
+**One request's path, as measured on 2026-09-30:**
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Caller (CLI invoke)
+  participant EP as Endpoint diabetes-endpoint-0533925c
+  participant S as azmlinfsrv in the blue container
+  participant SC as mlflow_score_script.py (generated)
+  participant M as Model (sklearn 0.24.1)
+  participant MDC as Data collector
+  participant ST as workspaceblobstore
+  C->>EP: 09:05:00 POST /score with key, 8-feature JSON
+  EP->>S: route to deployment blue (traffic 100)
+  S->>SC: run(input_data)
+  SC->>MDC: collect(input DataFrame), returns a correlation id
+  SC->>M: predict
+  M-->>SC: 1
+  SC->>MDC: collect(output, same correlation id)
+  SC-->>C: 200 [1] in 12.9 ms
+  MDC->>ST: 09:05:02 append one line to model_inputs/2026/09/30/09/ID.jsonl and one to model_outputs/…
+  Note over MDC,ST: asynchronous, one file per hour, later requests are appended as new lines
+```
+
 **Azure also registered 2 data assets automatically** when the deployment was
 created (by the service principal, 08:08 UTC). These are what the monitor
 wizard offers as "production data":
@@ -124,6 +172,32 @@ sub-job per signal** on **serverless Spark**.
 | Metrics and thresholds | "Smart defaults" (🛠 observed: Normalized Wasserstein for numeric features, Jensen-Shannon for categorical ones, threshold 0.1) | You choose them in the signal editor |
 | Question it answers | "Did traffic change **recently**?" | "Is traffic different from **what the model learned**?" |
 | Feature importance | No | Yes, if reference = training data **and** a target column is set |
+
+**The two window layouts** at a trigger on Oct 2, 04:00 UTC:
+
+```mermaid
+gantt
+  title Windows at a trigger on Oct 2 0400 UTC
+  dateFormat YYYY-MM-DD HH:mm
+  axisFormat %b %d
+  section Our traffic
+  Baseline                                  :milestone, b, 2026-09-30 09:05, 0d
+  Shifted                                   :milestone, s, 2026-10-01 18:17, 0d
+  section Out-of-box (default)
+  Reference - past production, 2 days       :o1, 2026-09-29 04:00, 2d
+  Production - last day                     :o2, 2026-10-01 04:00, 1d
+  section Advanced (ours)
+  Reference - diabetes-training, not a time window :done, a0, 2026-09-25 04:00, 7d
+  Production - last 7 days                  :a1, 2026-09-25 04:00, 7d
+```
+
+- **Out-of-box** compares two **non-overlapping** slices of production
+  traffic. On Oct 2 it would compare the shifted batch with the baseline,
+  which would also show drift. On **Oct 1**, its reference slice (Sep 28–30
+  04:00) would be **empty**, so it would fail. That's why the pre-added
+  signals were deleted.
+- **Advanced** compares the production window with the **training data**,
+  which is always there. Only the production side needs traffic.
 
 ⚠ Even in the advanced wizard, Studio **pre-adds 4 signals** (seen
 2026-09-30): data drift, data quality and prediction drift (using past
@@ -175,6 +249,33 @@ The lab offers "`diabetes-training` or `diabetes-dev-folder`":
   control.
 - Billed only while a run executes (🛠 the signal computation itself took
   about 2 min once it started).
+
+### One monitor run, step by step
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant SCH as Schedule blue-fkfvn
+  participant AML as Azure ML monitoring job
+  participant SPK as Serverless Spark E4s_v3
+  participant ST as workspaceblobstore
+  participant REF as diabetes-training (MLTable)
+  actor Me
+  SCH->>AML: 04:00 UTC trigger, create the monitoring pipeline job
+  AML->>AML: fix the production window = the 7 days before the trigger (▢ verify)
+  AML->>SPK: submit (can queue, serverless Spark has its own quota pool)
+  SPK->>ST: preprocessor model_data_collector_preprocessor 0.4.31 reads the model_inputs JSONL in the window
+  SPK->>SPK: flatten the CloudEvents lines into a table (8 feature columns)
+  SPK->>REF: read the reference table (PatientID, 8 features, Diabetic)
+  SPK->>SPK: feature importance with target Diabetic, keep the top 10
+  SPK->>SPK: per feature, Normalized Wasserstein (numeric) or Jensen-Shannon (categorical), compare with 0.1
+  Note over AML,SPK: 🛠 in my production project each signal ran as a SubGraph running the registry component data_drift_signal_monitor
+  SPK-->>AML: metrics per feature, signal passed or failed
+  AML-->>Me: results in Studio → Monitoring → blue-fkfvn
+  opt a threshold is exceeded
+    AML-->>Me: alert email
+  end
+```
 
 ### What Studio actually created (the record)
 
@@ -261,6 +362,35 @@ create_monitor:
 | **Advanced:** the reference is the training asset (always there), and only the production window needs traffic | Follows from the above. ▢ verify on the first run | Today's traffic counts as long as it's inside the production lookback. **Choose a lookback of several days (for example 7)**, so traffic from 09:05 today isn't just outside a 1-day window when the run fires |
 | Manual trigger: `az ml schedule trigger -n <monitor>` | 🛠 | Same windows, just now instead of at the scheduled time. Useful tomorrow |
 
+### The drift demo on a timeline (UTC)
+
+```mermaid
+gantt
+  title Drift demo, all times UTC
+  dateFormat YYYY-MM-DD HH:mm
+  axisFormat %b %d
+  section Traffic
+  Baseline 203 requests (Claude)            :milestone, t1, 2026-09-30 09:05, 0d
+  Shifted 300 requests (GitHub schedule)    :milestone, t2, 2026-10-01 18:17, 0d
+  section Monitor runs
+  Run 1 - baseline only, expect about 0     :milestone, r1, 2026-10-01 04:00, 0d
+  Run 2 - baseline + shifted, expect drift  :milestone, r2, 2026-10-02 04:00, 0d
+  Runs 3 to 6 - still drift, emails         :r3, 2026-10-03 04:00, 3d
+  I check and clean up                      :milestone, me, 2026-10-06 12:00, 0d
+  section Production windows (7 days)
+  Run 1 window                              :w1, 2026-09-24 04:00, 7d
+  Run 2 window                              :w2, 2026-09-25 04:00, 7d
+```
+
+- Run 1's window ends at **Oct 1 04:00**, before the shifted batch (18:17),
+  so it only sees the baseline.
+- Run 2's window contains **both** batches (300 shifted vs 203 baseline).
+  The mix is still far enough from the training data to cross 0.1 on
+  PlasmaGlucose and BMI (expected, ▢ verify).
+- Without cleanup, the baseline leaves the window with the Oct 8 run. From
+  **Oct 9**, runs find no data and fail. The cleanup on Oct 6 removes the
+  monitor first.
+
 ## Traps: why "Completed" or "Failed" can mislead
 
 | Trap | What you'd see | How to tell |
@@ -272,6 +402,22 @@ create_monitor:
 | 🛠 **"Completed but did nothing"**: signal sub-jobs tolerate missing optional inputs | Green check, no metrics | Open the signal sub-job and check that `production_data` was actually an input and there's an output |
 | Monitor jobs stuck Queued | Hours of "Queued", 0 compute used | Not quota you can see with `az ml compute list-usage`. Wait, or check Portal → Usage + quotas → Serverless Spark |
 | Reference and production columns differ | Failure or odd features in the results | Target column = `Diabetic`, and select the 8 features explicitly |
+
+### Diagnosing a run, layer by layer
+
+```mermaid
+flowchart TD
+  A["Open the run: Studio → Monitoring → blue-fkfvn"] --> Q{"Status?"}
+  Q -->|Queued for hours| Q1["Serverless Spark queueing for monitor jobs<br/>wait, or Portal → Usage + quotas → Serverless Spark"]
+  Q -->|Failed| F{"Which signal sub-job failed,<br/>and with what error?"}
+  F -->|No data found for the window| D{"JSONL files with a time<br/>inside the window?"}
+  D -->|no files at all| L1["Layers ①–②: requests never arrived or collector not writing<br/>check POST /score in the logs and the blob prefix"]
+  D -->|files, but outside the window| L2["Timing: lookback too short,<br/>or traffic sent after the trigger time"]
+  F -->|column or schema error| L3["Reference vs production columns<br/>PatientID, target Diabetic, feature list"]
+  Q -->|Completed| C{"Drift numbers shown per feature?"}
+  C -->|no| L4["Completed but did nothing<br/>open the signal sub-job, check that production_data was an input"]
+  C -->|yes| OK["Read them: baseline about 0,<br/>shifted batch over 0.1 on PlasmaGlucose and BMI"]
+```
 
 ## What "drift" means in this lab (be honest about it)
 

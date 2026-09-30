@@ -26,6 +26,7 @@ flowchart LR
       WD["train-dev.yml<br/>workflow_dispatch + pull_request (paths)"]
       WP["train-prod.yml<br/>issue_comment /train-prod"]
       WDP["deploy-prod.yml<br/>issue_comment /deploy-prod"]
+      WST["send-monitor-traffic.yml<br/>schedule Oct 1 18:17 UTC (helper)"]
     end
     subgraph CFG["Settings"]
       RSEC["repo secret AZURE_CREDENTIALS"]
@@ -51,7 +52,7 @@ flowchart LR
     DPROD["data diabetes-prod-folder"]
     EP["Managed online endpoint<br/>diabetes-endpoint-0533925c"]
     DEP["deployment blue<br/>D2as_v4 x1, data collector"]
-    MON["Model monitor<br/>serverless Spark, schedule"]
+    MON["Model monitor blue-fkfvn<br/>serverless Spark, daily 04:00 UTC"]
     ST["workspace storage<br/>blobstore, collected data"]
     WS --- CL
     WS --- DDEV
@@ -61,7 +62,7 @@ flowchart LR
     MON -->|reads| ST
   end
 
-  subgraph IDLE["Lab 05 (idle, not used by any workflow)"]
+  subgraph IDLE["Lab 05 (deleted 2026-09-30, never used by a workflow)"]
     L5["rg-ai300-dev-… / rg-ai300-prod-… workspaces<br/>rg-ai300-reg-… registry"]
   end
 
@@ -78,7 +79,7 @@ flowchart LR
 Key points:
 - **One workspace** plays both "dev" and "prod". They're distinguished only by
   the **data asset** (`--set …path=`) and the **GitHub environment** (secret +
-  gate). Lab 05's separate workspaces sit idle.
+  gate). Lab 05's separate workspaces were never used, and were deleted on 2026-09-30.
 - **One identity** for everything (the same service principal behind all three
   `AZURE_CREDENTIALS`), limited to one resource group.
 - The **runner only submits**; training runs on `aml-cluster`, serving on
@@ -211,20 +212,30 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor Me
-  participant EP as Endpoint / deployment blue
+  participant CL as Claude (local CLI)
+  participant GHS as GitHub schedule (send-monitor-traffic.yml)
+  participant EP as Endpoint, deployment blue
   participant ST as Workspace blob storage
-  participant MON as Model monitor (schedule)
+  participant MON as Monitor blue-fkfvn (schedule)
   participant SP as Serverless Spark
-  Me->>EP: Test tab: POST input_data (8 features)
-  EP-->>Me: prediction
-  EP->>ST: data collector writes model_inputs / model_outputs (JSONL)
-  Me->>MON: Studio → Monitoring: create monitor (data drift, reference = training data, daily)
-  MON->>SP: on schedule: compute drift (production window vs reference)
-  SP->>ST: read collected production data
-  Note over MON,SP: needs at least about 1 day of collected traffic (1-day lookback minimum)
-  SP-->>MON: drift metrics per feature
-  MON-->>Me: results in Studio, optional email alert
+  Me->>EP: Test tab request (never arrived, no POST /score in the logs)
+  CL->>EP: az ml online-endpoint invoke, then 200 baseline rows (Sep 30, 09:05 to 09:15 UTC)
+  EP->>ST: data collector appends model_inputs and model_outputs lines (JSONL, hourly files)
+  Me->>MON: Studio → Monitoring → Add (data drift only, reference diabetes-training + target Diabetic, lookback 7 days, daily 04:00 UTC)
+  MON->>SP: Oct 1 04:00, run 1 (window = the 7 days before)
+  SP->>ST: read collected inputs (baseline only)
+  SP-->>MON: drift per feature, expected about 0
+  GHS->>EP: Oct 1 18:17, 300 shifted rows (PlasmaGlucose +40, BMI x1.3)
+  EP->>ST: collector appends them
+  MON->>SP: Oct 2 04:00, run 2
+  SP->>ST: read baseline + shifted
+  SP-->>MON: drift over 0.1 on PlasmaGlucose and BMI (expected)
+  MON-->>Me: results in Studio + alert email
+  Note over MON,SP: lookback minimum is 1 day, details and traps in monitoring.md
 ```
+
+Full monitoring mechanics, with a diagram per layer, the windows and a
+troubleshooting tree: [monitoring.md](monitoring.md).
 
 ## Where the humans are
 
