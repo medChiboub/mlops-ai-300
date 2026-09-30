@@ -711,3 +711,13 @@ confirmed from the CLI (`public_network_access: Enabled`, default Allow, no
 IP rules, 0 private endpoints). Wrote `mechanics/github-actions-azureml.md`.
 *Context:* GitHub-hosted runners need public access; private workspaces need
 self-hosted runners.
+
+**00:28 · me → Claude · "Why didn't you add the service principal to the mechanics?"**
+Added a section to `mechanics/github-actions-azureml.md`, verified against
+Entra ID: one command created an **app registration** (appId `a9bd6f2c-…`,
+objectId `f9c702e5-…`, 1 client secret until 2027-09-30, 0 federated
+credentials), a **service principal** (objectId `15b1f7f7-…`), and a
+**Contributor role assignment** on the lab RG. Also covers how `azure/login`
+uses the JSON, and why cleanup must delete the app registration.
+*Context:* section 1 of lab 06 was done by me while I was away; this makes
+the mechanics explicit.

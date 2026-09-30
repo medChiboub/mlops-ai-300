@@ -27,6 +27,57 @@ Azure as an identity and calls the same `az ml` commands I run locally.
 - **Least privilege:** scope the role to the resource group or workspace, not
   the subscription.
 
+## What `az ad sp create-for-rbac` actually created (verified, lab 06)
+
+```bash
+az ad sp create-for-rbac --name "sp-mslearn-mlops-github" --role contributor \
+    --scopes "/subscriptions/<sub>/resourceGroups/rg-ai300-l0533925c724d4c839e" --json-auth \
+  | gh secret set AZURE_CREDENTIALS -R medChiboub/mlops-ai-300
+```
+
+One command, **four things**, in two different places:
+
+```
+Microsoft Entra ID (the tenant: identities)                     Azure (the subscription: resources)
+┌─────────────────────────────────────────────────┐          ┌──────────────────────────────────────────┐
+│ 1. App registration  "sp-mslearn-mlops-github"  │          │ 4. Role assignment                        │
+│    appId     a9bd6f2c-…  (the "client ID")       │          │    Contributor                            │
+│    objectId  f9c702e5-…                          │          │    → scope: rg-ai300-l0533925c724d4c839e  │
+│    3. client secret (password credential)        │          │    → assigned to the SP (objectId 15b1…)  │
+│       valid 2026-09-30 → 2027-09-30              │          └──────────────────────────────────────────┘
+│       federated credentials: 0 (no OIDC)         │                          ▲
+│                                                  │                          │ "this identity may do this, here"
+│ 2. Service principal ("Enterprise application")  │──────────────────────────┘
+│    same appId a9bd6f2c-…, objectId 15b1f7f7-…    │
+│    the identity that actually signs in and holds roles │
+└─────────────────────────────────────────────────┘
+```
+
+| Object | What it is | Where you see it |
+|---|---|---|
+| **App registration** | The *definition* of the application: its ID (`appId` = client ID) and its **credentials** (the client secret lives here) | Entra ID → **App registrations** |
+| **Service principal** | The app's *identity instance* in this tenant: what signs in and what **roles are assigned to** | Entra ID → **Enterprise applications** |
+| **Client secret** | The password (1 year by default). Its value is shown **only once**, at creation | App registration → Certificates & secrets (only the hint `uR9` is visible afterwards) |
+| **Role assignment** | Azure RBAC: *identity + role + scope* | Resource group → **Access control (IAM)** |
+
+**The JSON that went into `AZURE_CREDENTIALS`** (`--json-auth` format) holds
+`clientId`, `clientSecret`, `subscriptionId` and `tenantId` (plus Azure
+endpoint URLs). The `azure/login@v2` step reads it and signs in as the
+service principal (`az login --service-principal` under the hood), then
+selects the subscription. Every later `az` step in that job runs **as
+`sp-mslearn-mlops-github`**, with exactly Contributor on one resource group.
+
+**Why this matters for cleanup:** deleting the role assignment, or even the
+resource group, does **not** delete the identity or its secret. You have to
+delete the **app registration** (`az ad app delete --id <appId>`), which also
+removes its service principal. That's why it's on the final cleanup list.
+
+**Rotation:** `az ad app credential reset --id <appId>` creates a new secret
+(and, without `--append`, removes the old one), so `AZURE_CREDENTIALS` must be
+updated. With **OIDC** there's nothing to rotate: instead of a password
+credential, the app registration gets a **federated credential** (ours has
+0) that trusts GitHub tokens for one repo, branch or environment.
+
 ## Service principal secret vs. OIDC (the module's key point)
 
 | | Client secret (the lab) | Workload identity federation / OIDC (my project, and the recommended answer) |

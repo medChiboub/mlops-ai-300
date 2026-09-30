@@ -58,6 +58,10 @@ Verified:
   OIDC.
 - Two older app registrations from earlier work (`sp-ai300-prod`,
   `sp-ai300-github-actions`) exist in the tenant and were left untouched.
+- What the command created underneath (app registration vs. service
+  principal vs. client secret vs. role assignment, and how `azure/login`
+  uses them):
+  [mechanics/github-actions-azureml.md](mechanics/github-actions-azureml.md#what-az-ad-sp-create-for-rbac-actually-created-verified-lab-06).
 
 ### 2.2 Review workspace network access (portal, me; read only)
 
