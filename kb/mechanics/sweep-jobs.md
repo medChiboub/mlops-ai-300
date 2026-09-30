@@ -105,7 +105,10 @@ The parent job ran 01:50:36 → 01:57:10 (about 6.5 min in total).
   says `sampling_algorithm="grid"`. Rebuilding the same sweep locally with
   **SDK 1.35.0 (the notebook's version)** and 1.34.1 serializes
   `samplingAlgorithmType: "Grid"`, so the SDK sends Grid. The behaviour matches
-  grid too: 3 unique values, stopped at 3 of 4 allowed. So it's most likely
-  **how the service reports the setting when read back**, not what it ran.
-  Not proven: we can't see the server's input. Exam answer unchanged: grid =
-  every combination, discrete only.
+  grid too: 3 unique values, stopped at 3 of 4 allowed. ✅ **Settled: Studio's Overview shows *Grid*.** Every REST jobs API version
+  tried (2023-10-01, 2024-04-01, 2024-10-01, 2025-01-01-preview, 2025-06-01,
+  2025-09-01) returns `Random`. So the sweep **ran as a grid**, and **the jobs
+  API (and therefore `az ml job show`) reads this field back wrongly.** Don't
+  trust the CLI for a sweep's sampling method, for example in an audit
+  script; Studio shows the real value. Exam answer unchanged: grid = every
+  combination, discrete only.

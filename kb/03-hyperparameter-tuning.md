@@ -59,8 +59,10 @@ Nothing failed. Things that surprised us:
 - **Stored sampling algorithm `Random` vs. `grid` in the notebook.** The SDK
   (1.35.0 and 1.34.1, rebuilt locally in a scratch venv without submitting)
   sends `Grid`, and the run behaved like a grid (3 unique trials, stopped at 3
-  of 4). Most likely a read-back quirk on the service side. Details in the
-  mechanics file.
+  of 4). **Settled: Studio's Overview shows *Grid*,** while every REST API version
+  (2023-10 → 2025-09) and `az ml job show` return `Random`. The sweep ran as a
+  grid; the jobs API reads the field back wrongly. Lesson: for a sweep's
+  sampling method, trust Studio, not the CLI. Details in the mechanics file.
 - **The test job and the sweep competed for nodes.** "Run all" submitted
   both at once; the notebook's text says to wait for the test job first.
   Harmless here (it only delayed trial `_0`), but the notebook's own advice
@@ -104,7 +106,7 @@ scripts* and *Compare model performance across jobs*.
 | The example's base job uses environment `AzureML-sklearn-1.5@latest` (unit 5) | The lab uses `AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest` | Curated names changed; know the pattern, not a specific name |
 | The example logs `Accuracy` and sweeps on `primary_metric="Accuracy"` | The lab logs **test** accuracy under the name `training_accuracy_score` | The name must *match*; it doesn't have to *describe* the metric. Check what's actually computed |
 | Early termination is unnecessary for a small grid (the example: 6 trials) | 3-trial grid, no policy | Matches |
-| Grid tries every combination | 3 trials for 3 values, even with `max_total_trials=4`, though read back as `Random` | Behaviour matches the module |
+| Grid tries every combination | 3 trials for 3 values, even with `max_total_trials=4`. Studio shows *Grid*; the CLI/REST read-back says `Random` | Behaviour matches the module; the API field is wrong |
 
 **Module assessment (unit 7)**, two questions:
 1. Try every combination of specified discrete values → **grid sampling**.

@@ -525,3 +525,10 @@ the comparison with `ml/experiments/sweep/`, and an 8-question quiz. Coverage:
 *Automate hyperparameter tuning* ✅.
 *Context:* the lab's one exercise section is done. The Trials tab in Studio
 is left for me to look at.
+
+**22:05 · me · Checked the sweep in Studio**
+Trials tab: the 3 trials. **Overview shows sampling = Grid.**
+Claude then queried the jobs REST API with 6 versions (2023-10-01 →
+2025-09-01): all return `Random`.
+*Context:* settles the anomaly. The sweep ran as a grid; the API/CLI read-back
+of `sampling_algorithm` is wrong. Lab 03 closed ("Delete resources" skipped).
