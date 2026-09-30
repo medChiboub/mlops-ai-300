@@ -99,6 +99,83 @@ credential, the app registration gets a **federated credential** (ours has
 | `repository_dispatch` | An **external system** calls the GitHub API; how Azure events (Event Grid → Logic Apps / Functions) start a workflow, since GitHub can't subscribe to Event Grid |
 | `issue_comment` | Lab 07's `/train-prod`, `/deploy-prod` ChatOps; runs with **the base repo's secrets**, so it's risky on a public repo |
 
+## GitHub environments (lab 07's `dev` and `prod`)
+
+**A GitHub environment is a named deployment target in the repo's settings.
+It has its own secrets and variables, and rules that must pass before a job
+can use it.** A job joins it with one line, `environment: prod`. Until the
+rules pass, GitHub doesn't start the job and doesn't release its secrets.
+
+### What this repo has (read back 2026-09-30)
+
+| | `dev` | `prod` | Repository level (no environment) |
+|---|---|---|---|
+| Secrets | `AZURE_CREDENTIALS` | `AZURE_CREDENTIALS` | `AZURE_CREDENTIALS` |
+| Variables | none | none | `AZURE_RESOURCE_GROUP`, `AZURE_WORKSPACE_NAME` |
+| Protection rules | none | **required reviewer: medChiboub** | none |
+| Deployment branch policy | none | none | none |
+| Used by | `train-dev.yml` | `train-prod.yml`, `deploy-prod.yml` | `manual-trigger-job.yml`, `send-monitor-traffic.yml` |
+
+All three `AZURE_CREDENTIALS` are **the same service principal** (the
+repo copy uses the `rbac` client secret; both environment copies use
+`gh-environments-lab07`), with Contributor on the same resource group. So
+the environments **don't separate Azure access**. They separate **who
+decides and when**. 🧪 This is the lab's shortcut.
+
+### What happens when a `prod` job starts
+
+```
+/deploy-prod comment → job declares environment: prod
+  → status "Waiting": no runner, no secret exposed
+  → the reviewer gets a notification → Review deployments → Approve (or Reject)
+  → the runner starts, and secrets.AZURE_CREDENTIALS = the prod environment's value
+  → GitHub records a deployment to "prod" (visible under Deployments)
+```
+
+- **Name precedence:** environment secret > repository secret >
+  organization secret. That's why one name, `AZURE_CREDENTIALS`, works
+  everywhere: a job with `environment: prod` gets the prod value, and a job
+  without an environment gets the repository value.
+- **Rejecting or never approving:** the job doesn't run. It fails after
+  30 days waiting.
+- **One approval is enough**, even when several reviewers are listed.
+
+### Protection rules available (we use one)
+
+| Rule | What it does | Here |
+|---|---|---|
+| **Required reviewers** | Up to 6 people or teams; one approval releases the job | ✅ `prod` |
+| Prevent self-review | Whoever triggered it can't approve it | ❌ (I'm the only reviewer) |
+| Wait timer | Waits N minutes before starting | ❌ |
+| **Deployment branches and tags** | Only listed branches can deploy to it (for example `main`) | ❌ (📘 a real `prod` would restrict it) |
+| Custom rules (GitHub Apps) | External checks, for example "is monitoring green?" | ❌ |
+
+⚠ Plan limit: on GitHub **Free**, environments with protection rules only
+work in **public** repos. That's why this repo was made public in lab 06.
+Going private would drop the `prod` gate.
+
+### How a real setup uses environments (📘)
+
+- **Each environment points at a different Azure target**: `prod` holds
+  credentials for an identity that can only touch the prod
+  workspace/subscription, and `dev` for one that can only touch dev.
+  Then the gate protects **real** separation.
+- **With OIDC, the environment becomes part of the identity**: the federated
+  credential's subject `repo:<owner>/<repo>:environment:prod` makes Entra ID
+  trust **only** jobs running in the `prod` environment. There's no secret
+  to leak, and a job outside `prod` can't get a prod token at all.
+- Exam cue: *"require approval before deploying to production"* → a
+  **GitHub environment with required reviewers** (this module's
+  assessment).
+
+### Three different "environments" (don't mix them up)
+
+| Term | What it is | Example here |
+|---|---|---|
+| **GitHub environment** | A deployment target plus rules and secrets, in the repo settings | `dev`, `prod` |
+| **Azure ML environment** | The Docker image plus Python packages a job runs in | `AzureML-sklearn-1.0-ubuntu20.04-py38-cpu` (lab 02 onward) |
+| **Dev/prod environment (stage)** | The architecture idea: separate workspaces, subscriptions or regions per stage | Lab 05's design (deleted); in lab 07, simulated in one workspace |
+
 ## One job definition, several environments (`--set`)
 
 Lab 07's `train-dev.yml` and `train-prod.yml` submit **the same
