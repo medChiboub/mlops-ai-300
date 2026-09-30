@@ -727,3 +727,10 @@ Clarified: lab 05's dev/prod are real separate workspaces that **no workflow
 uses**. Lab 07's dev/prod are GitHub Environments + data assets **inside the
 lab 01 workspace** (the lab says so). Lab 06 has no dev/prod. Added a
 "Careful: labs 06–07 don't use this design" section to the lab 05 file.
+
+**00:33 · me → Claude · "Which code is original vs. what we edited?"**
+Mapped it: two independent copies. **The GitHub repo** differs from the
+template only in `src/job.yml` and `manual-trigger-job.yml` (mine, lab 06),
+plus `infra/setup-prod-design.sh` and `kb/` (Claude). **The workspace file
+share clone** has the notebook-generated files and the lab 02 `autolog` edit,
+which isn't in GitHub. Added the map to the kb README.

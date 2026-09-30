@@ -34,6 +34,41 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 06 | [Automate model training](06-automate-model-training.md) | _in progress_ |
 | 07 | Deploy and monitor | _not started_ |
 
+## What's original vs. what we changed
+
+Two independent copies of Microsoft's code (`MicrosoftLearning/mslearn-mlops`
+@ `87482bc`). Nothing syncs between them.
+
+```
+Microsoft's original
+  ├── Copy 1: this GitHub repo (medChiboub/mlops-ai-300)   → used by the GitHub workflows (labs 06–07)
+  └── Copy 2: git clone on the workspace file share        → used by the Studio notebooks (labs 01–04)
+```
+
+**Copy 1, this repo** (`git diff 412d2d5 HEAD`, the template commit):
+
+| File | Change | Who |
+|---|---|---|
+| `src/job.yml` | 2 placeholders filled: `type: uri_file`, `path: azureml:diabetes-data@latest` | me, lab 06 |
+| `.github/workflows/manual-trigger-job.yml` | + the "Run Azure Machine Learning training job" step | me, lab 06 |
+| `infra/setup-prod-design.sh` | **new**: the lab 05 design script (reference + registry-name fix) | Claude, lab 05 |
+| `kb/` | **new**: this knowledge base | Claude |
+| everything else | untouched original | |
+
+**Copy 2, the workspace file share** (`Users/mohamedd.chiboubb/mslearn-mlops/`):
+
+| File | Origin |
+|---|---|
+| `experimentation/train-classification-model.py` | lab 02, Studio *Export as .py* |
+| `src/train-model-parameters.py` | lab 02, **edited**: `mlflow.autolog()` added (**only here, not in the GitHub repo**) |
+| `experimentation/src/train.py` | lab 03 notebook `%%writefile` |
+| `experimentation/src/prep-data.py`, `train-model.py`, `experimentation/prep-data.yml`, `train-model.yml` | lab 04 notebook |
+| `experimentation/ROC-Curve.png`, `src/ROC-Curve.png` | lab 01 run 5, lab 02 terminal test |
+| `*.ipynb` | code unchanged; saved outputs from running them |
+
+So the GitHub workflows train with the **original** `train-model-parameters.py`
+(no autolog).
+
 ## AI-300 coverage (MLOps domains)
 
 Skills measured from the [AI-300 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-300)
