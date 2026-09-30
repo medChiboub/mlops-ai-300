@@ -198,6 +198,31 @@ the module teaches and what makes the loop real). This goes beyond the lab.
    - GitHub nuance seen here: this commit only changed `train-prod.yml`, yet
      **`train-dev` re-ran**. For `pull_request` events, the `paths` filter looks
      at the **whole PR diff vs. the base**, not just the new commit.
+7. **Deploy *this PR's* version, not "latest"** (my decision, after Claude's
+   review of the approach), commit `14c56a9`: `deploy-prod.yml` passes
+   `--pr-number ${{ github.event.issue.number }}`. The script picks the newest
+   `diabetes-model` version whose tag `pr` equals that number (archived
+   versions excluded), or stops with *"No diabetes-model version is registered
+   for PR #N. Run /train-prod on this PR first."* An explicit `--model-version`
+   still wins; no PR number falls back to `latest`. Unit-tested locally with
+   a fake client (5/5 pass: PR 4 → v3 even though v4 from PR 5 is newer).
+   Why: with "latest", two PRs running `/train-prod` could make one PR deploy
+   the other's model.
+
+**Review of our approach (known limits, documented rather than fixed):**
+- a **fixed AUC bar** (0.80) lets a regression from 0.848 to 0.81 pass;
+  **champion vs. challenger** (compare with the latest version's `auc` tag)
+  would be stronger
+- an **instant 0 → 100% cutover** after one smoke request, which proves the
+  model *answers*, not that it answers *well*; the module's pattern shifts
+  10% first
+- **old deployments at 0% still cost** about $2.57/day each; keep only the
+  previous one
+- the structural lab limits remain: one workspace, one identity, PR code with
+  prod credentials, identical dev/prod data
+- vs. my project: pattern A (train once in dev, promote the same artifact) vs.
+  ours, pattern B (retrain in prod behind human gates). Both are valid; B
+  fits when prod data can't leave prod.
 
 ### How dev and prod share one job definition
 

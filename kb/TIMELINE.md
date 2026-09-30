@@ -905,3 +905,11 @@ comparison locally (0.8483 pass, 0.79 fail). The new commit re-ran
 `train-dev` too: the `paths` filter uses the whole PR diff.
 *Context:* registration now means an approved prod run *and* a metric
 standard.
+
+**04:41 · me → Claude · "What do you think about this approach?" → "Address 1"**
+Claude's review: good (lineage, 3 checkpoints + a smoke test, rollback-ready,
+covers registration/versioning); weak spots: (1) deploying *latest* could ship
+another PR's model, (2) a fixed 0.80 bar, (3) an instant 100% cutover, (4) 0%
+deployments still cost. I chose to fix #1: `/deploy-prod` now deploys the
+version tagged `pr=<this PR>` (`14c56a9`), unit-tested 5/5 with a fake
+client. #2–#4 are documented as known limits.
