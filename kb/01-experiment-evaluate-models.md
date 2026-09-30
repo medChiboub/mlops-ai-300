@@ -2,6 +2,10 @@
 
 Source: [docs/01-experiment-evaluate-models.md](../docs/01-experiment-evaluate-models.md)
 
+Microsoft Learn module: [Experiment with Azure Machine Learning](https://learn.microsoft.com/en-us/training/modules/experiment-azure-machine-learning/)
+(module 2 of the learning path [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/),
+restructured 2026-08-27). The lab is its unit 8.
+
 Mechanics: [workspace and storage](mechanics/workspace-and-storage.md) ·
 [compute](mechanics/compute.md) · [data assets](mechanics/data-assets.md) ·
 [AutoML](mechanics/automl.md) · [MLflow tracking](mechanics/mlflow-tracking.md)
@@ -231,6 +235,28 @@ az ml job download -n coral_drawer_c6770sv3k6_setup --all --download-path …   
 - *Compare model performance across jobs*: select runs in Studio →
   **Compare**, or `mlflow.search_runs()`. Set seeds; otherwise the same
   params can give different scores (runs 4 vs. 5).
+
+**What the Microsoft Learn module says, checked against our run**
+
+Units 2–7 of the module, read on 2026-09-29. Where the module and our real
+run disagree, **the exam will phrase it the module's way**, but know what
+actually happens:
+
+| Module says | Our run | Take-away |
+|---|---|---|
+| Featurization includes *"dropping high-cardinality features, such as record IDs"* (unit 2) | `PatientID` (9,959 unique of 10,000) was **kept** as Numeric; all guardrails Passed | The *capability* exists, but it isn't guaranteed to fire. Exam answer: AutoML featurization can drop IDs. Real life: drop them yourself |
+| *"You can have as many parallel trials as you have nodes… to set fewer, use `max_concurrent_trials`"* (unit 3) | `max_concurrent_trials` defaulted to **1**; 1 node used of 2 | Reads as if parallelism follows node count by default. In SDK v2 you must **set** `max_concurrent_trials` to get parallel trials |
+| *"By default, AutoML randomly selects from the full range of algorithms"* (unit 3) | Pipelines chosen one after another; we can't tell from logs whether it was random or guided | Use the module's wording on the exam |
+| The RAI dashboard is built as a **pipeline** (constructor → tools → gather) and shown on a **registered** model (unit 7) | AutoML started an automatic `_RAI` run itself, which **failed**; nothing registered | The module doesn't mention the automatic AutoML RAI run. The exam topic is the pipeline recipe |
+| Models tab → **Explain model** works for *any* trial; explanations are an *approximation* of feature importance (unit 4) | `_ModelExplain` ran only for the best model (`enable_model_explainability=True`) | Other trials get explained on demand |
+| Local MLflow: install `mlflow` + **`azureml-mlflow`**, then `mlflow.set_tracking_uri(...)` (unit 5) | Compute instance: already configured | Two packages: `mlflow` (open source) + `azureml-mlflow` (the Azure ML integration) |
+| `mlflow.autolog()` (generic) or `mlflow.<framework>.autolog()`; custom logging with `log_param`, `log_metric` (numbers only), `log_figure`, `log_image`, `log_artifact`, `log_model` (unit 6) | Lab used `mlflow.sklearn.autolog()` + `log_param`/`log_metric` | `log_figure` is what run 5 needed for its ROC plot |
+| Blocking algorithms is useful when the data doesn't suit them **or to comply with an organizational policy**; ensembles can be turned off (unit 3) | LogisticRegression blocked; ensembles on | Two reasons to block, both exam-worthy |
+
+**Module assessment (unit 9)**, three questions:
+1. Best `AUC_weighted` → set **`primary_metric='AUC_weighted'`** (not `task`, not `target_column_name`).
+2. Data already preprocessed, iterate quickly, don't change it → featurization **`off`**.
+3. scikit-learn, minimum logging effort → **autologging**.
 
 ## 5. Lab way vs. my production project
 

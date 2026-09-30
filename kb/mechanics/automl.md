@@ -86,7 +86,9 @@ assigned by clinic). The MLflow notebook drops it by hand; AutoML doesn't.
 **The fix is on me, not AutoML:** drop ID columns from the MLTable, for
 example with a `drop_columns` transformation, or set featurization to
 `custom` and mark it *Ignore*. Exam lesson: **automatic featurization isn't a
-substitute for knowing your columns.**
+substitute for knowing your columns.** The Microsoft Learn module (unit 2) lists
+*"dropping high-cardinality features, such as record IDs"* as something
+featurization does. It's a capability, not a guarantee, as this run shows.
 
 The logs refer to columns by index only. AutoML's logs deliberately leave out
 column names, so the mapping above comes from the CSV's column order.
@@ -115,8 +117,9 @@ These are automatic checks run during featurization. Each one reports
 
 Each trial is a child job that trains one pipeline, named like
 `MaxAbsScaler, LightGBM` or `StandardScalerWrapper, XGBoostClassifier`. The
-next pipeline is chosen by AutoML's recommender, using the scores so far. It
-isn't a fixed list.
+Microsoft Learn module says AutoML *"randomly selects from the full range of
+algorithms"* by default. Use that wording on the exam. From outside, we only
+saw pipelines being picked one after another.
 
 **How one trial is scored with 5-fold CV:** the data is split into 5 equal
 parts. The pipeline is trained 5 times, each time on 4 parts and scored on
@@ -138,6 +141,10 @@ Trials run one after another.
 runs them in turn. So the "Running" count in Studio shows 2 (the worker plus
 the current trial), but only one pipeline is training at a time. One worker
 per node means the setup and image-pull cost is paid once, not per trial.
+
+The Microsoft Learn module (unit 3) says *"you can have as many parallel
+trials as you have nodes"* and presents `max_concurrent_trials` as a way to
+set *fewer*. Our run shows the opposite default in SDK v2: unset means 1.
 
 To use both nodes: `set_limits(max_concurrent_trials=2)`. The cluster would
 then scale to 2 nodes (2 × 2 vCPU, within quota) and the search would take

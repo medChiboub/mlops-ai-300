@@ -305,3 +305,22 @@ it with `AZURE_CREDENTIALS`, and they don't check who commented. Once lab 06
 adds a repo-level secret, that's the "pwn request" hole on a public repo.
 Plan: keep them disabled until lab 07, where `prod` gets me as required
 reviewer *before* they're re-enabled.
+
+**21:05 · me → Claude · Read the Microsoft Learn module behind lab 01**
+Claude fetched the live learning path. It was restructured on 2026-08-27 as
+*Operationalize machine learning models (MLOps)*, with 7 modules. Lab 01 is
+unit 8 of the module **Experiment with Azure Machine Learning**. Claude read
+units 2–7 and the unit 9 assessment, then compared them with our run:
+- **Featurization:** the module says it drops "record IDs". Our run kept
+  `PatientID`.
+- **Parallel trials:** the module suggests they follow node count. Ours
+  defaulted to `max_concurrent_trials` = 1.
+- **Algorithm choice:** the module says AutoML "randomly selects" algorithms.
+- **RAI dashboard:** the module describes it as a pipeline on a registered
+  model, and never mentions AutoML's automatic `_RAI` run.
+- **Assessment answers:** `primary_metric='AUC_weighted'`, featurization
+  `off`, autologging.
+
+Added to section 4 of the lab file, and corrected `mechanics/automl.md`.
+*Context:* the exam uses the module's wording, so know both what the module
+says and what actually happened.
