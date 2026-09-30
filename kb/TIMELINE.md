@@ -328,7 +328,7 @@ says and what actually happened.
 **21:02 · me → Claude · "Is my doc up to date for lab 01?"**
 Claude reviewed the lab 01 file and the mechanics files end to end:
 - **Section 1:** said the trials ran "in parallel"; now says one at a time
-  ( default 1).
+  (`max_concurrent_trials` default 1).
 - **Section 3:** put in the order we hit the problems. The `_RAI` bullet now
   records that the run failed.
 - **Section 5:** removed the "so far" label from the AutoML table and added a
