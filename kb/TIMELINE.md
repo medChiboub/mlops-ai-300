@@ -306,7 +306,7 @@ adds a repo-level secret, that's the "pwn request" hole on a public repo.
 Plan: keep them disabled until lab 07, where `prod` gets me as required
 reviewer *before* they're re-enabled.
 
-**21:05 · me → Claude · Read the Microsoft Learn module behind lab 01**
+**21:00 · me → Claude · Read the Microsoft Learn module behind lab 01**
 Claude fetched the live learning path. It was restructured on 2026-08-27 as
 *Operationalize machine learning models (MLOps)*, with 7 modules. Lab 01 is
 unit 8 of the module **Experiment with Azure Machine Learning**. Claude read
