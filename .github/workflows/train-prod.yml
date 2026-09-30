@@ -106,6 +106,21 @@ jobs:
           echo "prod_accuracy=$ACC" >> "$GITHUB_OUTPUT"
           echo "prod_auc=$AUC" >> "$GITHUB_OUTPUT"
 
+      - name: Register prod model
+        id: register
+        run: |
+          JOB_NAME="${{ steps.train.outputs.job_name }}"
+          VERSION=$(az ml model create \
+            --name diabetes-model \
+            --type mlflow_model \
+            --path "azureml://jobs/$JOB_NAME/outputs/model_output" \
+            --description "Trained on diabetes-prod-folder by $JOB_NAME (PR #${{ github.event.issue.number }})" \
+            --tags training_job="$JOB_NAME" pr="${{ github.event.issue.number }}" data=diabetes-prod-folder \
+                   accuracy="${{ steps.parse-metrics.outputs.prod_accuracy }}" auc="${{ steps.parse-metrics.outputs.prod_auc }}" \
+            --query version -o tsv)
+          echo "Registered diabetes-model:$VERSION"
+          echo "model_version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Comment prod metrics on pull request
         uses: actions/github-script@v7
         with:
@@ -114,6 +129,7 @@ jobs:
             const auc = '${{ steps.parse-metrics.outputs.prod_auc }}';
             const jobName = '${{ steps.train.outputs.job_name }}';
             const studioUrl = '${{ steps.download.outputs.studio_url }}';
+            const modelVersion = '${{ steps.register.outputs.model_version }}';
 
             const prNumber = context.issue.number;
 
@@ -125,6 +141,9 @@ jobs:
             body += '\n\n**Prod evaluation metrics**';
             body += `\n- Accuracy: ${acc}`;
             body += `\n- AUC: ${auc}`;
+
+            body += '\n\n**Registered model**';
+            body += `\n- diabetes-model:${modelVersion} (deploy it with /deploy-prod)`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
