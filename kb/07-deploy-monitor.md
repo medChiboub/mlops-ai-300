@@ -72,6 +72,42 @@ upload folders still differ, because the hash covers the file name.
   again (disabled since the repo went public). Now safe: interaction limits
   (only I can comment) + the `prod` reviewer gate.
 
+### 2.4 PR #3: dev training from the PR (Claude, on "do all of that for me")
+
+On branch `feature/lab07-dev-training`:
+- `src/job.yml` → `type: uri_folder`, `path: azureml:diabetes-dev-folder@latest`
+- `train-dev.yml` → `pull_request` on `main` with `paths:
+  ['src/train-model-parameters.py', 'src/job.yml']`
+- `src/train-model-parameters.py` → default `--reg_rate` **0.01 → 0.05** (the
+  lab's suggestion). ⚠ **It has no effect on these runs:** `job.yml` passes
+  `--reg_rate ${{inputs.reg_rate}}` = **0.1** explicitly, and an argparse
+  default only applies when no value is passed.
+
+Opened **PR #3** → two runs started automatically: **"Train model in dev"**
+(the `paths` filter matched) and lab 06's workflow (it runs on every PR).
+Both green. The bot commented: **Dev evaluation metrics: Accuracy 0.774, AUC
+0.8483**. The metrics came from the streamed log, which only works because
+of PR #2's pin.
+
+### 2.5 `/train-prod` (Claude, on "do it for me for prod")
+
+1. `gh pr comment 3 --body "/train-prod"` → run `36686100623`
+   ("Train model in prod (PR comment)", workflow file from `main`).
+2. The run stopped at **`waiting`**: the `prod` environment's required
+   reviewer. `…/pending_deployments` → env `prod`, reviewers `[medChiboub]`,
+   `current_user_can_approve: true`.
+3. **Approved** through the API (`POST …/actions/runs/<id>/pending_deployments`
+   with `state: approved`, with a comment citing the dev metrics). GitHub
+   records the approval as me. *In real life the point of this gate is a
+   person reviewing the evidence; here I delegated it.*
+4. Job **`diabetes-train-prod-36686100623`**: input
+   **`diabetes-prod-folder:1`**, `created_by` = the service principal, ran
+   07:56:16 → 07:58:39 UTC. Every step green (stream, `job download
+   --output-name metrics_output`, parse `metrics.json`, comment).
+5. The bot commented: **Prod evaluation metrics: Accuracy 0.774, AUC 0.8483**
+   plus the job name and Studio link. **Identical to dev**, as expected: the
+   two CSVs are byte-identical.
+
 ### How dev and prod share one job definition
 
 Both workflows submit **the same `src/job.yml`**; only submit-time settings
