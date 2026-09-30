@@ -287,6 +287,30 @@ create_monitor:
   `PlasmaGlucose` and `BMI`) through the endpoint. The drift score for those
   features should cross the threshold on the next run.
 
+## Unattended traffic (our helper, not the lab)
+
+The shifted batch has to arrive **after** run 1 and **before** run 2, so it
+must not depend on anyone being online. `.github/workflows/send-monitor-traffic.yml`:
+
+- **`schedule: cron '17 18 1 10 *'`**: Oct 1, 18:17 UTC. Not on the hour,
+  because GitHub delays `:00` schedules the most. A scheduled workflow always
+  runs from **`main`**, so it had to be merged first (PR #6).
+- **`workflow_dispatch`** with `mode`/`n` inputs: tested with `baseline × 3`
+  → `200: 3` (run `36697165251`).
+- **Repo secret, not the `prod` environment**: an unattended job can't wait for
+  a required reviewer. That's acceptable because it only sends test traffic.
+- **A year guard** (it does nothing outside 2026), and the file is deleted at cleanup.
+- **The window is fixed when the monitor job is *created*** (the trigger
+  time), so a monitor run that sits queued at 04:00 still only reads data
+  sent before 04:00. 🛠 Inferred from my production project's error windows,
+  which ended at the trigger time. ▢ verify.
+
+⚠ Side effect we learned: opening PR #6 **started a training job**. The
+lab 06 `manual-trigger-job.yml` runs on **every** PR into `main`, whatever
+the PR changes (no `paths` filter). Its GitHub run was cancelled, but the Azure
+ML job had already finished. Cancelling a workflow **doesn't cancel the job it
+already submitted**: `az ml job cancel` is a separate call.
+
 ## Verification checklist (tick as we go)
 
 - [x] ① `POST /score 200` in the deployment log (09:05 UTC)

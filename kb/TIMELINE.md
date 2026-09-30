@@ -1012,3 +1012,22 @@ one command, without this conversation.
    run should exceed 0.1 on PlasmaGlucose and BMI → email alert.
 4. Lab: `feature/drift-retrain` PR → train-dev → `/train-prod` →
    `/deploy-prod`; rollback; close the kb/07 file; cleanup.
+
+**05:40 · me → Claude · "Assume I won't be here: automate the shifted batch (cron or GitHub Actions)"**
+Claude added `.github/workflows/send-monitor-traffic.yml`: a schedule for
+**Oct 1 at 18:17 UTC** (2:17 PM my time; after run 1, 10 h before run 2)
+running `infra/send-traffic.py shifted --n 300`, plus `workflow_dispatch`
+for tests; the repo secret, because the prod gate would block an unattended
+run; a 2026 year guard. A cron job on my Mac was rejected: it wouldn't run
+with the laptop closed.
+**Side effect:** opening **PR #6** triggered lab 06's
+`manual-trigger-job.yml` (it runs on every PR to main) → an unneeded
+training job. I asked why; Claude cancelled the GitHub run (the Azure ML
+job `silly_pocket_f0kx16w6sv` had already completed, and cancelling a
+workflow doesn't cancel its submitted job). Claude's merge was blocked by
+the permission check ("merge without review"), so **I merged PR #6**
+(`1214243`). Test run `36697165251` (dispatch, baseline × 3): **success,
+3 × 200**. (GitHub masks `{` `}` in logs because they're in the secret's
+JSON.)
+*Context:* the drift demo now runs without me or a Claude session. Next
+human step: read the results on Oct 2.
