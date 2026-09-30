@@ -1031,3 +1031,17 @@ the permission check ("merge without review"), so **I merged PR #6**
 JSON.)
 *Context:* the drift demo now runs without me or a Claude session. Next
 human step: read the results on Oct 2.
+
+**05:55 · me → Claude · "Write about the three environments, heavily"**
+New `mechanics/three-environments.md`: Azure ML environment (runtime) vs.
+GitHub environment (gate) vs. dev/prod environment (stage), each with real
+examples and exam cues, plus a validated Mermaid diagram of how they fit.
+New facts read back for it: deployment `blue` runs in an **auto-created
+Azure ML environment** `c68e03c6…fc8f96:fb674d0c…` (created 08:08:46 by the
+service principal) = base image `mlflow-py312-inference` + the model's
+`conda.yaml` + `azureml-inference-server-http` (added by Azure). The
+**workspace ACR didn't exist until then**: created 08:08:49 (Basic), image
+`azureml/azureml_708a01e5…` pushed 08:16:05 (the ~7 min of the first
+deploy), and reused by the 08:51 redeploy. The workspace lists 26
+environments; the curated `AzureML-sklearn-1.0…` still can't be read through
+the CLI or REST (`HttpConnectionResponseContent`).

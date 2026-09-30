@@ -170,6 +170,8 @@ Going private would drop the `prod` gate.
 
 ### Three different "environments" (don't mix them up)
 
+Full comparison, with real examples and exam cues: [three-environments.md](three-environments.md).
+
 | Term | What it is | Example here |
 |---|---|---|
 | **GitHub environment** | A deployment target plus rules and secrets, in the repo settings | `dev`, `prod` |
