@@ -30,7 +30,7 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 02 | [Optimize model training](02-optimize-model-training.md) | A Studio export is just the cells pasted into one file; the refactored script takes arguments. A command job records code snapshot + data + environment + logs, which a terminal run doesn't (that one went to `Default`). The same code gave a different AUC in the job because the environment pins scikit-learn 1.0. Autolog adds 15 params, `training_*` metrics and the `model/` folder |
 | 03 | [Hyperparameter tuning](03-hyperparameter-tuning.md) | A sweep = the same command job once per value (3 trials for 3 grid values, even with a limit of 4). The script must log the metric under the exact `primary_metric` name, and a name like `training_accuracy_score` can hide a test metric. 0.01 and 0.1 tied at 0.774, so the metric choice decides the winner. Warm nodes run trials in about 17 s vs. about 2 min cold |
 | 04 | [Run pipelines](04-run-pipelines.md) | Component = metadata + interface + command/code/environment; the pipeline wires output → input, so order comes from the data dependency (train didn't exist until prep finished). Loaded components stay anonymous (`az ml component list` was empty). Outputs land in `workspaceblobstore/azureml/<run>/<output>/`. The lab never schedules, although the module does |
-| 05 | [Plan and prepare](05-plan-and-prepare.md) | _in progress_ |
+| 05 | [Plan and prepare](05-plan-and-prepare.md) | Dev and prod workspaces + a shared registry. The lab's literal design script would have created a second `rg-ai300-l*` group (breaking labs 06–07), and Microsoft's reference script can't create its registry (a 35-character name, over the limit) yet reports success (no `set -e`). A registry's Premium ACR costs $1.67/day. It carries models (pattern A) or components + environments (pattern B, retrain in prod) |
 | 06 | Automate model training | _not started_ |
 | 07 | Deploy and monitor | _not started_ |
 
@@ -51,16 +51,16 @@ Status: ✅ done · 👀 seen but not done · ⚠ partial or failed · ⏳ plann
 
 | Skill | Labs | Status | Prod |
 |---|---|---|---|
-| Create and manage a workspace | 01 (CLI), 05 (dev/prod design) | ✅ 01 | ✅ |
+| Create and manage a workspace | 01 (CLI), 05 (dev/prod) | ✅ 01, 05 | ✅ |
 | Create and manage datastores | none creates one | 👀 01: the 4 defaults | ✅ |
 | Create and manage compute targets | 01 | ✅ 01 | ✅ |
 | Configure identity and access for workspaces | 06 (service principal, RG scope), 07 (environment secrets) | ⏳ | ✅ |
-| Create and manage data assets | 01 (uri_file, MLTable), 07 (uri_folder dev/prod) | ✅ 01 | ✅ |
+| Create and manage data assets | 01 (uri_file, MLTable), 05, 07 (uri_folder dev/prod) | ✅ 01, 05 | ✅ |
 | Create and manage environments | 02/03 *use* a curated one; none creates one | 👀 02: used curated `sklearn-1.0` (and saw it change results) | ✅ |
 | Create and manage components | 04 | ⚠ 04: defined in YAML and used in a pipeline, but only loaded, not registered | ✅ |
-| Share assets across workspaces with registries | 05 (design; optional create) | ⏳ | ✅ |
+| Share assets across workspaces with registries | 05 (design; optional create) | ⚠ 05: registry created (after fixing its name), nothing shared through it | ✅ |
 | Configure GitHub integration for secure access | 06, 07 | ⏳ | ✅ (OIDC) |
-| Deploy workspaces and resources with Bicep and Azure CLI | 01 (CLI); **no Bicep in any lab** | ⚠ 01: CLI half | ✅ |
+| Deploy workspaces and resources with Bicep and Azure CLI | 01, 05 (CLI); **no Bicep in any lab** | ⚠ 01, 05: CLI half | ✅ |
 | Automate provisioning with GitHub Actions | ❌ (05 only mentions it) | ❌ | ✅ |
 | Restrict network access to workspaces | 06 (read-only review) | ⏳ | ❌ |
 | Manage source control with Git | 06, 07 (branches, PRs, branch protection) | ⏳ | ✅ |

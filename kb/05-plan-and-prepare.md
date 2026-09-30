@@ -126,6 +126,32 @@ Exam cues: *share across workspaces* → registry; *train in dev, deploy the
 same model in prod* → publish the model to a registry; *prod data can't leave
 prod* → register components and environments, retrain in prod.
 
+### 2.5 Plan how to extend the script for several environments (design)
+
+```bash
+ENVIRONMENT=${1:-dev}                    # ./setup.sh prod → prod; no argument → dev
+if [ "$ENVIRONMENT" = "prod" ]; then
+  RESOURCE_GROUP=$PROD_RESOURCE_GROUP; WORKSPACE_NAME=$PROD_WORKSPACE_NAME
+else
+  RESOURCE_GROUP=$DEV_RESOURCE_GROUP;  WORKSPACE_NAME=$DEV_WORKSPACE_NAME
+fi
+```
+- **Shared, created once:** the registry. **Isolated per environment:**
+  workspace, compute and data assets (so each gets its own access controls).
+- **In CI:** GitHub Actions calls it with `dev` to validate PRs and `prod`
+  for approved deployments; locally, `dev` rebuilds the experimentation
+  environment.
+- My project's version: **one Bicep template + one `.bicepparam` per
+  environment**, the same idea, declarative.
+
+### 2.6 Clean up (the lab's last step): skipped on purpose
+
+The lab says to delete the extra resource groups. **I chose to keep all
+three** (`rg-ai300-dev-…`, `rg-ai300-prod-…`, `rg-ai300-reg-…`). Ongoing cost:
+mainly the registry's Premium ACR, **$1.67/day**. The dev compute instance is
+stopped. They're on the final cleanup list after lab 07, together with the
+lab 01 group and the service principal.
+
 ## 3. What broke and how we fixed it
 
 - **The lab's literal design script would have broken labs 06–07** (see
@@ -146,13 +172,118 @@ prod* → register components and environments, retrain in prod.
 
 ## 4. Exam mapping
 
+Domain 1: *Create and manage a workspace*, *Share assets across workspaces by
+using registries*, *Deploy Machine Learning workspaces and resources by using
+Bicep and Azure CLI*, *Create and manage data assets*; also the design side
+of *Configure identity and access management*.
+
+- **Why several workspaces:** security and compliance isolation, separate
+  subscriptions for billing, and regions. Train in dev, deploy in test and
+  prod. Keep **prod data out of dev** (separate data assets per workspace).
+- **Registry:** shares **models, environments, components and data assets**
+  across workspaces, regions and subscriptions in the same tenant. **Assets**
+  are workspace-agnostic; **resources** (compute, jobs, endpoints) aren't.
+- **Promotion:** publish a good model to the registry and deploy it from
+  there (pattern A), or register components and environments and retrain in
+  each workspace (pattern B, when prod data can't leave prod).
+- **Create a registry:** YAML (`name`, `location`, `replication_locations`,
+  where the primary appears in both) → `az ml registry create --file …
+  --resource-group …`. Also possible from Studio, the portal, or REST. It
+  provisions a **managed resource group** with storage per region and one
+  **Premium ACR** with geo-replication. **The name** (unique in the tenant,
+  32 characters max) and **the primary region can't be changed**; extra
+  regions can be added.
+- **Registry RBAC:** use assets → **Reader** (or `registries/read` +
+  `registries/assets/read`); publish assets → add
+  `registries/assets/write`/`delete` (a custom role); create or delete the
+  registry → **Contributor/Owner**.
+- **Scripted provisioning with the CLI:** a random suffix for unique names,
+  `az provider register --namespace Microsoft.MachineLearningServices`,
+  `az configure --defaults` (global, which is a trap with multiple
+  environments), and rendering YAML with `sed` placeholders because the CLI
+  reads YAML literally. "Repeatable, version-controlled" provisioning still
+  points to **Bicep/ARM**.
+
 ## 5. Lab way vs. my production project
 
 Tags (legend in [README](README.md#tags)): 🧪 lab shortcut · 📘 Microsoft docs
 recommendation (**the exam answer**) · 🛠 my project's own choice.
+
+| | Lab | My project | Microsoft's recommended answer |
+|---|---|---|---|
+| Environments | Dev + prod workspaces, one subscription and region | Dev, staging and prod resource groups, each from the same Bicep template with its own `.bicepparam` | 📘 Separate workspaces (and often subscriptions) per environment |
+| Provisioning | 🧪 Imperative bash + `az`: no `set -e`, random region, a registry name that always fails, global defaults left on prod | Bicep (`infra/main.bicep`, `registry.bicep`): declarative, idempotent, fails loudly | 📘 **IaC (Bicep/ARM)** for repeatable environments; the CLI for one-off tasks |
+| Registry | 🧪 Created, **never used** by labs 06–07 | `mlreg-diabetes`: `az ml model share` dev → registry, staging and prod deploy `azureml://registries/…/versions/N` | 📘 Publish approved assets to a registry and deploy them from there |
+| Promotion pattern | Retrain in prod (lab 07) | Train once in dev, promote the same model (pattern A) | 📘 Both are documented; pattern B needs the components and environment in the registry, and a prod evaluation gate |
+| Data separation | `diabetes-dev-folder` vs. `diabetes-prod-folder` (byte-identical files) | One data asset, used only by dev training | 📘 Separate data assets per environment; prod data stays in prod |
+| Identity per environment | (Lab 07: one service principal for both) | OIDC, one app, federated per GitHub Environment | 📘 Least privilege, **separate identities** per environment |
 
 ## 6. In my words
 
 <!-- Mine to write. -->
 
 ## 7. Self-check
+
+Click a question to reveal its answer. Answer before opening.
+
+<details>
+<summary><strong>1.</strong> You train a model in a dev workspace and must deploy exactly that model to a prod workspace in another subscription. What do you use?<br><br>A) Copy the model file to prod's datastore<br>B) Publish it to an Azure ML <strong>registry</strong> and deploy from the registry in prod<br>C) Retrain it in prod<br>D) Share the dev workspace with prod users</summary>
+
+> **✅ Answer: B.** Registries decouple assets from workspaces, across subscriptions and regions, and keep lineage back to the training job.
+</details>
+
+---
+
+<details>
+<summary><strong>2.</strong> Production data can't leave the prod environment. How do you still reuse dev's validated training pipeline?<br><br>A) Copy prod data to dev<br>B) Register the pipeline's <strong>components and environment</strong> in a registry and run the pipeline in the prod workspace with prod data and compute<br>C) Deploy dev's model<br>D) Use one shared workspace</summary>
+
+> **✅ Answer: B.** Pattern B. The docs: the compute and training data, unique to each workspace, determine where it runs.
+</details>
+
+---
+
+<details>
+<summary><strong>3.</strong> Which can a registry hold?<br><br>A) Compute clusters and endpoints<br>B) Models, environments, components and data assets<br>C) Jobs and their logs<br>D) Workspaces</summary>
+
+> **✅ Answer: B.** Those are <em>assets</em> (workspace-agnostic). Compute, jobs and endpoints are <em>resources</em> (workspace-specific).
+</details>
+
+---
+
+<details>
+<summary><strong>4.</strong> <code>az ml registry create</code> fails with <em>"Names must be between 3 and 33 in length"</em>. The name was <code>mlr-ai300-shared-5ae342744a834c9880</code>. What happened, and what can you change later?<br><br>A) A region problem; rename later<br>B) The name is 35 characters, over the limit. Neither the name nor the primary region can be changed after creation, so pick both carefully<br>C) The name has a hyphen<br>D) The name is fine; retry</summary>
+
+> **✅ Answer: B.** Lab 05's reference script always builds a 35-character name. We shortened the suffix to get 32 characters. Extra replication regions <em>can</em> be added later.
+</details>
+
+---
+
+<details>
+<summary><strong>5.</strong> A team should publish models to the shared registry but must not be able to delete the registry itself. Which role?<br><br>A) Owner<br>B) Contributor<br>C) A custom role with <code>registries/read</code>, <code>registries/assets/read</code>, <code>registries/assets/write</code> (and <code>delete</code> if needed), without <code>registries/write</code>/<code>delete</code><br>D) Reader</summary>
+
+> **✅ Answer: C.** Contributor and Owner can also create, update and delete registries. Reader can only use assets.
+</details>
+
+---
+
+<details>
+<summary><strong>6.</strong> After running the multi-environment script, you run <code>az ml job create -f job.yml</code> without <code>-g</code>/<code>-w</code>. Where does the job go?<br><br>A) The first workspace created<br>B) Whatever <code>az configure --defaults</code> last set: here, <strong>prod</strong><br>C) An error<br>D) Dev, because it's the default environment</summary>
+
+> **✅ Answer: B.** Defaults are global. The script left them on prod; we restored them. With several environments, pass <code>-g</code>/<code>-w</code> explicitly (or use per-environment config).
+</details>
+
+---
+
+<details>
+<summary><strong>7.</strong> What does creating a registry provision besides the registry resource?<br><br>A) Nothing<br>B) A compute cluster<br>C) An Azure-managed resource group with a storage account per region and a Premium Azure Container Registry (geo-replicated)<br>D) A new workspace</summary>
+
+> **✅ Answer: C.** Ours: <code>azureml-rg-mlr-ai300-shared-…_&lt;guid&gt;</code> with a Premium ACR ($1.67/day) and Standard_LRS storage.
+</details>
+
+---
+
+<details>
+<summary><strong>8.</strong> A provisioning script's registry step fails, yet the script prints "Provisioning complete" and exits 0. Why, and what's the better approach?<br><br>A) Azure retried it<br>B) The bash script has no <code>set -e</code>, so it keeps going after errors. Read the logs; better, use declarative IaC (Bicep) that fails the deployment<br>C) The error was only a warning<br>D) Exit code 0 means it succeeded</summary>
+
+> **✅ Answer: B.** Exactly what lab 05's reference script did.
+</details>

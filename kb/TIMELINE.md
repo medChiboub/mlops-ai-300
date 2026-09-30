@@ -663,3 +663,13 @@ Then:
 
 *Context:* lab 05's optional run done. Left: the "extend the script" design
 question, then cleanup of the 3 extra RGs.
+
+**22:37 · me · Decision: keep all lab 05 resource groups**
+Kept `rg-ai300-dev-…`, `rg-ai300-prod-…` and `rg-ai300-reg-…` (skipping the
+lab's cleanup). They're added to the final cleanup list after lab 07.
+Claude finished the lab 05 write-up: the "extend the script" design (2.5),
+the exam mapping, the comparison with my project, an 8-question quiz, and
+the coverage (workspace ✅, data assets ✅, registries ⚠: created but
+nothing shared).
+*Context:* ongoing cost is about $1.67/day (the registry's Premium ACR); the
+dev compute instance is stopped.
