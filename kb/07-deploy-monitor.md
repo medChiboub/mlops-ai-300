@@ -102,6 +102,23 @@ byte-identical to dev, so the metrics will match; the model it trains is
 credentials (the pwn-request risk, mitigated here by the interaction limits
 + the reviewer gate).
 
+### Why "prod" isn't lab 05's prod workspace
+
+Three reasons, all by design:
+- **Discovery:** every workflow takes the first `rg-ai300-l*` group and its
+  `mlw-ai300-l*` workspace. Lab 05's `rg-ai300-prod-…`/`mlw-ai300-prod-…`
+  doesn't match.
+- **Access:** the service principal is Contributor on the lab 01 RG only.
+- **The lab's words:** *"a single workspace and separate data assets to
+  represent development and production"*. Lab 05's prod workspace also has no
+  cluster, so `compute: azureml:aml-cluster` would fail there.
+
+Using it for real (📘, and what my project does) takes: per-environment
+`AZURE_RESOURCE_GROUP`/`AZURE_WORKSPACE_NAME` **environment variables**
+instead of prefix discovery, **a separate prod identity** (OIDC) with a role
+on the prod RG only, **compute in the prod workspace**, and **the registry**
+to promote models or components. A possible optional extra after lab 07.
+
 ### What PR-triggered dev training does, and doesn't, prove
 
 - **Runs only when a PR changes the training code** (`paths:` =
