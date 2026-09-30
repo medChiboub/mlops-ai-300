@@ -989,3 +989,26 @@ Claude first said. The definition and an equivalent CLI YAML are recorded in
 *Context:* the first run is **2026-10-01 04:00 UTC**. The 7-day window
 covers today's 201 requests. Open question: how Top 10 treats `PatientID`
 (9 candidate columns).
+
+**05:30 · me → Claude · "What if I close this session? Shouldn't you automate the traffic?"**
+No automation needed: the monitor schedule lives **in Azure** and fires at
+04:00 UTC without this session, and with a 7-day lookback today's
+requests stay in the window until Oct 7. My production project needed a
+twice-daily traffic workflow only because its reference was *past
+production*. The shifted batch is a one-time action after the first run.
+So Claude added **`infra/send-traffic.py`** (a helper, not lab code; stdlib
+only; detects the RG, workspace and endpoint the same way `deploy-prod.yml`
+does; reads the key with `az` and never prints it). Modes: `baseline` and
+`shifted` (PlasmaGlucose +40 ≈ 1.25 std, BMI ×1.3 ≈ 1 std). Tested with 3
+baseline rows: 3 × 200.
+*Context:* anyone (me, or a new Claude session) can run the next step with
+one command, without this conversation.
+
+**Plan from here**
+1. 2026-10-01 04:00 UTC: first monitor run (automatic).
+2. After it: check each signal sub-job, drift numbers, and `PatientID` →
+   expect ~0 drift.
+3. `python infra/send-traffic.py shifted --n 300` → the 2026-10-02 04:00 UTC
+   run should exceed 0.1 on PlasmaGlucose and BMI → email alert.
+4. Lab: `feature/drift-retrain` PR → train-dev → `/train-prod` →
+   `/deploy-prod`; rollback; close the kb/07 file; cleanup.
