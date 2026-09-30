@@ -13,7 +13,7 @@ jobs:
     - name: Check out repo
       uses: actions/checkout@main
     - name: Install az ml extension
-      run: az extension add -n ml -y
+      run: az extension add -n ml --version 2.44.1 -y   # pinned: 2.45.0 --stream crashes (binascii.Error)
     - name: Azure login
       uses: azure/login@v2
       with:
