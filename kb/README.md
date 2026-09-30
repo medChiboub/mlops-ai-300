@@ -25,6 +25,65 @@ file per concept (workspace and storage, compute, data assets, AutoML, …).
 | 06 | Automate model training | _not started_ |
 | 07 | Deploy and monitor | _not started_ |
 
+## AI-300 coverage (MLOps domains)
+
+Skills measured from the [AI-300 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-300)
+(checked 2026-09-29). These labs only cover **Domain 1 (15–20%)** and
+**Domain 2 (25–30%)**. **Domains 3–5 (GenAIOps / Microsoft Foundry, about
+45–55% of the exam) aren't in any lab or in my production project.**
+
+Updated after each lab. **Labs** = the labs whose docs cover the skill.
+**Status** = what I've done so far in these labs.
+**Prod** = my production project (from its `docs/AI-300.md`).
+
+Status: ✅ done · 👀 seen but not done · ⚠ partial or failed · ⏳ planned in a later lab · ❌ no lab covers it
+
+### Domain 1: Design and implement an MLOps infrastructure (15–20%)
+
+| Skill | Labs | Status | Prod |
+|---|---|---|---|
+| Create and manage a workspace | 01 (CLI), 05 (dev/prod design) | ✅ 01 | ✅ |
+| Create and manage datastores | none creates one | 👀 01: the 4 defaults | ✅ |
+| Create and manage compute targets | 01 | ✅ 01 | ✅ |
+| Configure identity and access for workspaces | 06 (service principal, RG scope), 07 (environment secrets) | ⏳ | ✅ |
+| Create and manage data assets | 01 (uri_file, MLTable), 07 (uri_folder dev/prod) | ✅ 01 | ✅ |
+| Create and manage environments | 02/03 *use* a curated one; none creates one | ⏳ | ✅ |
+| Create and manage components | 04 | ⏳ | ✅ |
+| Share assets across workspaces with registries | 05 (design; optional create) | ⏳ | ✅ |
+| Configure GitHub integration for secure access | 06, 07 | ⏳ | ✅ (OIDC) |
+| Deploy workspaces and resources with Bicep and Azure CLI | 01 (CLI); **no Bicep in any lab** | ⚠ 01: CLI half | ✅ |
+| Automate provisioning with GitHub Actions | ❌ (05 only mentions it) | ❌ | ✅ |
+| Restrict network access to workspaces | 06 (read-only review) | ⏳ | ❌ |
+| Manage source control with Git | 06, 07 (branches, PRs, branch protection) | ⏳ | ✅ |
+
+### Domain 2: Implement ML model lifecycle and operations (25–30%)
+
+| Skill | Labs | Status | Prod |
+|---|---|---|---|
+| Configure experiment tracking with MLflow | 01, 02 | ✅ 01 | ✅ |
+| Use AutoML to explore optimal models | 01 | ✅ 01 | ✅ |
+| Use notebooks for experimentation | 01 | ✅ 01 | ✅ |
+| Automate hyperparameter tuning | 03 | ⏳ | ✅ |
+| Run model training scripts | 02, 06 | ⏳ | ✅ |
+| Manage distributed training | ❌ | ❌ | ❌ |
+| Implement training pipelines | 04 | ⏳ | ✅ |
+| Compare model performance across jobs | 01, 07 (dev vs. prod metrics) | ✅ 01 | ✅ |
+| Package a feature retrieval specification with the model | ❌ | ❌ | ❌ |
+| Register an MLflow model | 07 (only *implicitly*, through deployment) | ⏳ | ✅ |
+| Evaluate a model with responsible AI principles | 01 (module text only); optional notebook `Create Responsible AI dashboard.ipynb` | ⚠ 01: automatic `_RAI` run failed | ⚠ |
+| Manage model lifecycle, including archiving | 07 (optional rollback step) | ⏳ | ✅ |
+| Deploy real-time or batch endpoints | 07 (real-time only) | ⏳ | ✅ both |
+| Test and troubleshoot endpoints | 07 | ⏳ | ✅ |
+| Progressive rollout and safe rollback | 07 (optional) | ⏳ | ✅ |
+| Detect and analyze data drift | 07 (needs about a day of traffic) | ⏳ | ⚠ |
+| Monitor performance metrics in production | 07 (partly) | ⏳ | ❌ |
+| Configure retraining or alert triggers | 07 (simulated by hand) | ⏳ | ❌ |
+
+**Gaps no lab and no prod work covers:** distributed training, feature
+retrieval specifications, restricting network access (beyond a read-only
+review), and automated retraining or alert triggers. Study these from the
+docs.
+
 ## Tags
 
 Every "lab way vs. my project" table has a **Microsoft's recommended answer**

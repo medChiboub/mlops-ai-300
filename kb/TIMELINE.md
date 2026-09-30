@@ -339,3 +339,13 @@ Claude reviewed the lab 01 file and the mechanics files end to end:
 
 *Context:* the file was written as we went, so early statements had fallen
 behind later findings.
+
+**21:05 · me → Claude · Added the AI-300 coverage table**
+`kb/README.md` now maps every Domain 1 and Domain 2 skill (31 in all) to the
+labs that cover it, my status so far, and my production project's status.
+After lab 01: 8 skills ✅ plus the CLI half of Bicep/CLI.
+Not covered by any lab or by my project: distributed training, feature
+retrieval specifications, restricting network access, and automated
+retraining or alert triggers. Domains 3–5 (GenAIOps) aren't in these labs.
+*Context:* one place to see exam coverage across all labs, updated at the end
+of each lab.
