@@ -1045,3 +1045,22 @@ service principal) = base image `mlflow-py312-inference` + the model's
 deploy), and reused by the 08:51 redeploy. The workspace lists 26
 environments; the curated `AzureML-sklearn-1.0…` still can't be read through
 the CLI or REST (`HttpConnectionResponseContent`).
+
+**20:31 (Sep 30, my time) · me → Claude · "Studio says Next run Oct 2, 12:00 AM. Why?"**
+Studio shows local time (UTC−4), so that's **Oct 2 04:00 UTC**, one day later
+than the stored trigger (daily 04:00 UTC from Sep 30 → next **Oct 1 04:00
+UTC**, re-read with the newest API `2026-07-15-preview`; no next-run field
+exists). The cause is unknown (a Studio display quirk, or the service holding
+the first run). Risk: if Studio is right, the first run comes after the
+shifted batch (Oct 1 18:17 UTC) → no clean baseline run.
+**Fix (I said yes):** Claude triggered one run by hand: `az ml schedule
+trigger -n blue-fkfvn` → pipeline job `blue-fkfvn-727ba0a9…` (display
+`blue-fkfvn-20261001T003437Z`). This works even though `schedule show`
+can't deserialize the monitor. Its parameters **confirm that the window is
+fixed at creation**: `2026-09-24T00:34:37Z → 2026-10-01T00:34:37Z` (covers the
+203 baseline requests), and its properties include
+`continue_on_failed_optional_input: True` (the "Completed but did nothing"
+trap flag).
+*Context:* a baseline-only run tonight, whatever the schedule does. The
+shifted batch stays at Oct 1 18:17 UTC, and the next scheduled run shows the
+drift.

@@ -262,7 +262,7 @@ sequenceDiagram
   participant REF as diabetes-training (MLTable)
   actor Me
   SCH->>AML: 04:00 UTC trigger, create the monitoring pipeline job
-  AML->>AML: fix the production window = the 7 days before the trigger (▢ verify)
+  AML->>AML: fix the production window = the 7 days before the trigger (verified, job parameters)
   AML->>SPK: submit (can queue, serverless Spark has its own quota pool)
   SPK->>ST: preprocessor model_data_collector_preprocessor 0.4.31 reads the model_inputs JSONL in the window
   SPK->>SPK: flatten the CloudEvents lines into a table (8 feature columns)
@@ -361,6 +361,7 @@ create_monitor:
 | **Out-of-box:** reference = the 2 days **before** the last day, production = the last day (non-overlapping) | 🛠 reverse-engineered from a real "No data found" error | One batch of traffic can never fill both windows. This is why the pre-added signals fail |
 | **Advanced:** the reference is the training asset (always there), and only the production window needs traffic | Follows from the above. ▢ verify on the first run | Today's traffic counts as long as it's inside the production lookback. **Choose a lookback of several days (for example 7)**, so traffic from 09:05 today isn't just outside a 1-day window when the run fires |
 | Manual trigger: `az ml schedule trigger -n <monitor>` | 🛠 | Same windows, just now instead of at the scheduled time. Useful tomorrow |
+| ⚠ **Studio's "Next run" said Oct 2, 12:00 AM** (local = **Oct 2 04:00 UTC**), while the stored trigger (daily 04:00 UTC from Sep 30) gives **Oct 1 04:00 UTC** | Seen 2026-10-01 00:30 UTC | Unexplained: a Studio display quirk, or the first run held back a day. We triggered run 1 by hand so the baseline exists either way. ▢ See which date the scheduled run really fires |
 
 ### The drift demo on a timeline (UTC)
 
@@ -399,7 +400,7 @@ gantt
 | Custom scoring script without `Collector` calls | Same | Same (not our case: no-code MLflow) |
 | Traffic outside the lookback window | Same | Compare the JSONL `time` values with the run's window in its error |
 | Pre-added out-of-box signals with no past production | Those signals fail; the run may show as failed overall | Open the run: which **signal** sub-job failed |
-| 🛠 **"Completed but did nothing"**: signal sub-jobs tolerate missing optional inputs | Green check, no metrics | Open the signal sub-job and check that `production_data` was actually an input and there's an output |
+| 🛠 **"Completed but did nothing"**: signal sub-jobs tolerate missing optional inputs (✅ our run's properties: `azureml.continue_on_failed_optional_input: True`, `azureml.continue_on_step_failure: True`) | Green check, no metrics | Open the signal sub-job and check that `production_data` was actually an input and there's an output |
 | Monitor jobs stuck Queued | Hours of "Queued", 0 compute used | Not quota you can see with `az ml compute list-usage`. Wait, or check Portal → Usage + quotas → Serverless Spark |
 | Reference and production columns differ | Failure or odd features in the results | Target column = `Diabetic`, and select the 8 features explicitly |
 
@@ -448,8 +449,9 @@ must not depend on anyone being online. `.github/workflows/send-monitor-traffic.
 - **A year guard** (it does nothing outside 2026), and the file is deleted at cleanup.
 - **The window is fixed when the monitor job is *created*** (the trigger
   time), so a monitor run that sits queued at 04:00 still only reads data
-  sent before 04:00. 🛠 Inferred from my production project's error windows,
-  which ended at the trigger time. ▢ verify.
+  sent before 04:00. ✅ Verified on the manual run (2026-10-01 00:34 UTC). Its
+  job parameters say `data_window_start 2026-09-24T00:34:37Z`,
+  `data_window_end 2026-10-01T00:34:37Z` = `monitor_current_time`.
 
 ⚠ Side effect we learned: opening PR #6 **started a training job**. The
 lab 06 `manual-trigger-job.yml` runs on **every** PR into `main`, whatever
