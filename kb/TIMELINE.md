@@ -1084,3 +1084,21 @@ transient; (2) **`az provider register -n Microsoft.Synapse`** → Registered,
 then retriggered → `blue-fkfvn-8e7235c4…` (00:48 UTC).
 *Context:* without a fix, the scheduled runs fail too, and so does the
 whole drift demo.
+
+**20:53–21:00 (my time) · Claude · Run 3 failed too, and so did a minimal Spark job: Spark itself doesn't start**
+Run `blue-fkfvn-8e7235c4…` (after registering Synapse) failed identically.
+The run definition shows what a monitor Spark step asks for: `standard_e4s_v3`,
+runtime 3.4, driver 4 cores/28g, executors 4 cores/28g with dynamic
+allocation 1→4 (up to 20 vCPUs), identity `AMLToken`. Quota check: the
+docs list Azure ML compute "including serverless Spark"; the region's
+**TotalDedicatedCores = 20** (not adjustable through the API) with **6
+used** (stopped compute instance 2 + `blue` 4 = D2as_v4 ×1, with the 20%
+upgrade reserve rounding up to 2 instances), so 14 free; ESv3 20, 0 used.
+Hypothesis "too big for 14 free vCPUs" → test: a **minimal standalone
+Spark job** (`loyal_gas_fx7fjbr342`, driver 1 core, 1 executor 2 cores, no
+dynamic allocation, user identity, `print(spark.range(1000).count())`) →
+**failed the same way** after about 4 min. So it's not size. No failed
+operations in the subscription's activity log (the Spark sessions live in
+Microsoft-managed infrastructure). **Conclusion: serverless Spark doesn't
+start in this subscription/region at all**, with an opaque error. The
+monitor configuration itself never got tested.

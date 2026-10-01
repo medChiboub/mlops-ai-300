@@ -401,6 +401,7 @@ gantt
 | Traffic outside the lookback window | Same | Compare the JSONL `time` values with the run's window in its error |
 | Pre-added out-of-box signals with no past production | Those signals fail; the run may show as failed overall | Open the run: which **signal** sub-job failed |
 | 🛠 **"Completed but did nothing"**: signal sub-jobs tolerate missing optional inputs (✅ our run's properties: `azureml.continue_on_failed_optional_input: True`, `azureml.continue_on_step_failure: True`) | Green check, no metrics | Open the signal sub-job and check that `production_data` was actually an input and there's an output |
+| ✅ **Seen here: serverless Spark never starts** (2026-10-01) | Each Spark step sits "Execution status: NotStarted" for about 4 min, then `UserError: The long operation status is Failed` (component `commonjobprovider`), with no details | It's not the data: a tiny standalone Spark job (`spark-test`, 1 driver + 1 executor) fails the same way. Not fixed by registering `Microsoft.Synapse`, not transient (failed 4 of 4), nothing in the activity log. Next: the Portal's Usage + quotas (serverless Spark), then support |
 | Monitor jobs stuck Queued | Hours of "Queued", 0 compute used | Not quota you can see with `az ml compute list-usage`. Wait, or check Portal → Usage + quotas → Serverless Spark |
 | Reference and production columns differ | Failure or odd features in the results | Target column = `Diabetic`, and select the 8 features explicitly |
 
