@@ -1102,3 +1102,15 @@ operations in the subscription's activity log (the Spark sessions live in
 Microsoft-managed infrastructure). **Conclusion: serverless Spark doesn't
 start in this subscription/region at all**, with an opaque error. The
 monitor configuration itself never got tested.
+
+**21:05 (my time) · me (portal) + Claude · No Spark quota anywhere: it's not ours to fix**
+I checked Studio → Quota (subscription view, Canada East: 6 cores used,
+14 available, only dedicated and low-priority tabs) and Portal →
+Subscriptions → Cheboss Azure subscription 1 → Usage + quotas, with provider
+**Machine Learning** (Compute showed nothing): **64 records, no Spark
+entry**. ESv3 0/20, DASv4 4/10, DSv2 2/6, regional total 6/20, low-priority
+0/0. **Conclusion:** serverless Spark fails to start for a reason outside the
+subscription's visible settings (regional capacity or a backend issue for
+this subscription). The only path left is a support ticket, not worth it for
+a lab. Monitoring stays configured (failed runs cost nothing, because Spark
+never starts). The schedule may still succeed if the backend recovers.
