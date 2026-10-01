@@ -1142,3 +1142,15 @@ contradicts my production project's working Canada East serverless Spark
 (Aug 2026). Possible partial truth: capacity in Canada East may be
 restricted for newer subscriptions, consistent with "works on the other
 subscription, not this one", but unproven.
+
+**21:20–21:27 (my time, 01:20–01:27 UTC) · Claude · Decisive test: Canada Central fails too, so it's the subscription, not the region**
+A temporary RG `rg-ai300-sparktest` + workspace `mlw-sparktest-cc` in
+**canadacentral** (created in 44 s), running the same minimal Spark job
+(`tough_fowl_rj00mpsjf8`): Starting 01:22 → **Failed 01:26** with the
+identical `The long operation status is Failed` (`commonjobprovider`,
+location canadacentral). The RG was deleted afterwards. **Conclusion:
+serverless Spark is blocked for this whole subscription**, not just Canada
+East. The "Canada East has no Spark" claim is ruled out. Most likely: an
+internal serverless Spark quota of 0 on this subscription (Microsoft Q&A
+5513576), which only Azure Support can see and raise → a free "Service and
+subscription limits (quotas)" request.
