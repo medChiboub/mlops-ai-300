@@ -1064,3 +1064,23 @@ trap flag).
 *Context:* a baseline-only run tonight, whatever the schedule does. The
 shifted batch stays at Oct 1 18:17 UTC, and the next scheduled run shows the
 drift.
+
+**20:39–20:48 (my time) · Claude · Manual run 1 failed: serverless Spark never started**
+Run `blue-fkfvn-727ba0a9…` **failed** after about 4 min. Both Spark steps failed
+the same way: the preprocessor `model_data_collector_preprocessor:0.4.31`
+(step `data-drift-signal_774b…`, job type Spark, `AmlSparkCloudStep`) and,
+inside the signal sub-graph, `compute_feature_importances` =
+`feature_importance_metrics:0.3.33`. Each sat in "Execution status:
+NotStarted" for about 4 min, then `UserError: The long operation status is
+Failed` (component `commonjobprovider`), with no details. The run-history
+API (`/history/v1.0/…/runs/<id>/details`) showed nothing more. So it's not
+data, `PatientID` or configuration: **the Spark session never started**.
+Checks: ESv3 quota 20, 0 used (the serverless Spark pool isn't visible
+from the CLI); **`Microsoft.Synapse` resource provider: NotRegistered**
+(serverless Spark is "backed by Azure Synapse" per the docs, but no doc lists
+the registration as a prerequisite). I approved two tests:
+(1) **Retry unchanged** → `blue-fkfvn-7b70442e…` failed identically, so not
+transient; (2) **`az provider register -n Microsoft.Synapse`** → Registered,
+then retriggered → `blue-fkfvn-8e7235c4…` (00:48 UTC).
+*Context:* without a fix, the scheduled runs fail too, and so does the
+whole drift demo.
