@@ -1114,3 +1114,19 @@ subscription's visible settings (regional capacity or a backend issue for
 this subscription). The only path left is a support ticket, not worth it for
 a lab. Monitoring stays configured (failed runs cost nothing, because Spark
 never starts). The schedule may still succeed if the backend recovers.
+
+**21:20 (my time) · me → Claude · "Lead: Canada East never had Spark, fact-check"**
+The workspace's portal "Usage + quotas" just redirects to Studio's quota
+page (nothing new). The lead is **false**: (1) `Microsoft.Synapse` (the
+engine behind serverless Spark) lists **Canada East** for both `workspaces`
+and `workspaces/bigDataPools` (40 regions); (2) **my production project
+runs in `canadaeast`** (`scripts/config.sh`), and its MONITORING.md records a
+serverless Spark session on `exec.nbs.canadaeast.azuresynapse.net` that
+attached in 0.0 s, plus a drift signal computed in about 2 min (Aug 2026);
+(3) Microsoft's Spark and monitoring articles (raw markdown on GitHub) have
+no region restriction. Web search: the closest match is Microsoft Q&A
+5513576 ("separate internal quota for serverless pools, which can only be
+adjusted by Azure Support", unconfirmed). Nobody posts our exact error.
+Remaining explanations: an **internal serverless Spark quota for this
+(newer) subscription**, or temporary regional capacity. Only Azure Support
+can see either.
