@@ -1154,3 +1154,15 @@ East. The "Canada East has no Spark" claim is ruled out. Most likely: an
 internal serverless Spark quota of 0 on this subscription (Microsoft Q&A
 5513576), which only Azure Support can see and raise → a free "Service and
 subscription limits (quotas)" request.
+
+**21:45 (my time) · me (portal) · Support route: a dead end on Basic support**
+Help + support → "Service and subscription limits (quotas)" → service Machine
+Learning → workspace. The built-in AI troubleshooter found **no outage or
+platform failure** and concluded "insufficient Azure ML compute quota for
+serverless Spark" (AI-generated, no numbers). Problem types offered: only
+"Machine Learning Service: Endpoint Limits" and "…: Virtual Machine Quota".
+The latter **redirects to Studio's quota blade**, which handles only VM-family
+quotas (no Spark entry; its Request button was greyed out). There's no form
+for serverless Spark quota on Basic support. Remaining options: Microsoft Q&A
+or @AzureSupport (free, uncertain), or a paid Developer plan (a technical
+ticket). **I stopped here.** Drift result → the Oct 6 local calculation.
