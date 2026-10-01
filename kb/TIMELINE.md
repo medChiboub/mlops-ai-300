@@ -1166,3 +1166,16 @@ quotas (no Spark entry; its Request button was greyed out). There's no form
 for serverless Spark quota on Basic support. Remaining options: Microsoft Q&A
 or @AzureSupport (free, uncertain), or a paid Developer plan (a technical
 ticket). **I stopped here.** Drift result → the Oct 6 local calculation.
+
+**Oct 1, ~01:50 UTC · me → Claude · "Delete the deployment and the monitor, I'm done with this"**
+Monitor `blue-fkfvn`: disabled → deleted (verified `NotFound`; the CLI
+deletes it despite the deserialization warnings). Deployment `blue`: traffic
+`blue=0` → deleted (0 deployments, traffic `{}`). The empty endpoint
+`diabetes-endpoint-0533925c` stays (no cost). The collected JSONL stays in
+blob storage for the local drift calculation. **Costs so far** (Cost
+Management, Sep 28 → Oct 1, data lags up to about a day): **CAD 11.02 for the
+subscription**, of which the lab RG is about CAD 9.49 (VMs 5.34, storage 2.26,
+load balancer 1.37, ACR 0.27, VNet 0.25); the lab 05 RGs (deleted) about 0.76;
+the unrelated `rg-dev-trail-guide` (Foundry) about 0.74. Still billing: the
+workspace ACR Basic (USD 0.1666/day) plus storage and the stopped
+CI's disk: cents a day until cleanup.
