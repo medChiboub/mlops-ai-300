@@ -1130,3 +1130,15 @@ adjusted by Azure Support", unconfirmed). Nobody posts our exact error.
 Remaining explanations: an **internal serverless Spark quota for this
 (newer) subscription**, or temporary regional capacity. Only Azure Support
 can see either.
+
+**21:30 (my time) · me → Claude · Google AI Mode says "Canada East doesn't support serverless Spark in Azure ML"**
+Checked against evidence: its main source is a **Databricks** forum post
+("serverless compute is not supported in CanadaEast") and the **Databricks**
+regional matrix, a different product (Azure Databricks serverless, not
+Azure ML serverless Spark). Its predicted symptoms are also wrong here: the
+monitor wizard **offered** E4s_v3 serverless Spark in Canada East, and the
+service **accepted** the jobs (no "unavailable in region" error). And it
+contradicts my production project's working Canada East serverless Spark
+(Aug 2026). Possible partial truth: capacity in Canada East may be
+restricted for newer subscriptions, consistent with "works on the other
+subscription, not this one", but unproven.
