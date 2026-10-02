@@ -1179,3 +1179,14 @@ load balancer 1.37, ACR 0.27, VNet 0.25); the lab 05 RGs (deleted) about 0.76;
 the unrelated `rg-dev-trail-guide` (Foundry) about 0.74. Still billing: the
 workspace ACR Basic (USD 0.1666/day) plus storage and the stopped
 CI's disk: cents a day until cleanup.
+
+**Oct 2 · me → Claude · "Disable the workflow"**
+The scheduled run had already fired on **Oct 1 at 18:34 UTC** (17 min late)
+and showed **success**, but its log says `shifted x300 → status 404: 300`:
+every request failed, because deployment `blue` had been deleted at about
+01:50 UTC. The green status is a flaw in `infra/send-traffic.py`: it counts
+HTTP errors but always exits 0 (it should fail when nothing returns 200).
+**No shifted data was collected**, so a local drift calculation now has only
+the 203 baseline requests (expected: no drift). Workflow
+`send-monitor-traffic.yml` → **disabled_manually**; the file gets deleted at
+cleanup.
