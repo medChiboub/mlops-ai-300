@@ -130,3 +130,25 @@ My project has one asset, `diabetes-raw` (uri_file, declared in YAML and
 versioned in Git). For AutoML it pointed at a local, **unregistered** MLTable
 folder, because its only registered asset was uri_file. The lab registers
 both types up front.
+
+## Datastores and versions in SDK v2
+
+From practice questions [Q124](../../practice/mlops/q124-blob-datastore-account-key.md), [Q125](../../practice/mlops/q125-image-files-uri-folder-wasbs.md), [Q126](../../practice/mlops/q126-cluster-and-registered-data.md), [Q130](../../practice/mlops/q130-versioned-data-reproducibility.md).
+
+```python
+from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration
+store = AzureBlobDatastore(
+    name="blobdatastore",
+    account_name="sampleaccount1",
+    container_name="samplecontainer1",   # the container parameter
+    protocol="wasbs",                     # or "https" (default)
+    credentials=AccountKeyConfiguration(account_key="..."),
+)
+ml_client.create_or_update(store)
+```
+
+- Images and other unstructured files → `uri_folder`; tabular data for
+  AutoML → MLTable ("tabular dataset" is the v1 name).
+- **Reproducibility:** each data asset version is immutable and a job input
+  `azureml:<name>:<version>` records exactly what a run used. Write each data
+  refresh to a new path, because a version points at a path, not a copy.

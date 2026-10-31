@@ -203,3 +203,10 @@ From practice questions [Q110](../../practice/mlops/q110-mlflow-log-figure-boole
 | A local file / folder | `mlflow.log_artifact(path)` / `log_artifacts(dir)` |
 | A string as a file | `mlflow.log_text(text, "note.txt")` |
 | Fetch a run later | `MlflowClient().get_run(run.info.run_id)` |
+
+Additions from [Q131](../../practice/mlops/q131-log-metric-log-artifact-plot.md) and [Q135](../../practice/mlops/q135-log-batch-list-of-metrics.md):
+
+| Value | Call |
+|---|---|
+| A **list** of metric values | `MlflowClient().log_batch(run_id, metrics=[Metric(...)...])` (the v1 `run.log_list` replacement) |
+| A plot already saved to disk | `mlflow.log_artifact("plot.png")` |

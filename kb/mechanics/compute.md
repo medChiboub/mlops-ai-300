@@ -135,6 +135,8 @@ From practice question [Q29](../../practice/mlops/q029-reset-notebook-state.md).
 The trap: "stop the kernel" feels like it should clear state, but Microsoft
 lists it as **not** changing it.
 
+State-preserving action from [Q122](../../practice/mlops/q122-preserve-notebook-state.md): **stop the kernel** (cells stop, variables stay).
+
 ## Cloning a Git repo into the workspace
 
 From practice question [Q52](../../practice/mlops/q052-git-clone-ssh.md). From the Studio

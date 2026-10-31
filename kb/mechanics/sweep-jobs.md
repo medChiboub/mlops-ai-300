@@ -134,3 +134,13 @@ For a maximised metric, Bandit cancels a run whose metric is below
 `slack_factor=0.25` cuts runs below **80%** of the best (a 20% drop), and a
 true 25% drop would need ≈0.333. Exam questions still map "25%" →
 `slack_factor=0.25`; answer that, but know the formula.
+
+## Bayesian sampling and concurrency
+
+From practice question [Q138](../../practice/mlops/q138-bayesian-concurrency.md).
+
+- Bayesian picks the next trial from **completed** results, so **lower
+  `max_concurrent_trials`** improves convergence (fewer blind trials).
+- Docs: `max_total_trials` ≥ 20 × the number of hyperparameters.
+- Bayesian sampling doesn't support early termination; a Bandit slack setting
+  can't help convergence.

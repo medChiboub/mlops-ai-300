@@ -28,3 +28,8 @@ this mainly names what I already did.
 managed identity. Nothing else inherits it: child or related resources (for
 example Foundry **projects**) have their own identities and need their own
 role assignments.
+
+## Practice cue
+
+[Q123](../../practice/mlops/q123-cli-deploy-bicep-declare.md): "define declaratively" → **Bicep**; "deploy from a pipeline" →
+**Azure CLI** (`az deployment group create`) as the pipeline step.

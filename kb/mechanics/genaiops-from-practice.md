@@ -399,3 +399,28 @@ From practice question [Q104](../../practice/genaiops/q104-token-usage-llm-judge
 - **Quality** = AI-assisted evaluators (**LLM-as-a-judge**: coherence,
   relevance, groundedness, fluency) on the same dataset for both variants.
 - Latency and run-to-run consistency are secondary signals.
+
+## Traces, metrics, logs: which answers what
+
+From practice questions [Q129](../../practice/genaiops/q129-traces-vs-metrics.md), [Q132](../../practice/genaiops/q132-tracing-early-termination.md), [Q133](../../practice/genaiops/q133-tracing-vs-aggregated-metrics.md).
+
+| Question | Look at |
+|---|---|
+| What happened inside **one** request: which step, inputs/outputs, tokens per node, latency, errors, `finish_reason` | **Traces** (spans per flow node / agent step) |
+| Trends over **many** requests: error rates, latency regressions, recurring failures | **Aggregated metrics** (dashboards, alerts) |
+| A quality score (accuracy, groundedness) from an evaluation | **Evaluation metrics** |
+| Raw text output for debugging | Logs |
+
+Production-only, intermittent bugs ("ends early, can't reproduce") → enable
+**tracing** first.
+
+## Manual and human evaluation
+
+From practice question [Q137](../../practice/genaiops/q137-manual-evaluation-steps.md), [Q134](../../practice/genaiops/q134-evaluation-inputs.md).
+
+- Manual evaluation in the portal: import a CSV (or type rows) → run → rate
+  each response 👍/👎 → **save** to review later.
+- Automated evaluation inputs: a fixed **test dataset** (reuse it for
+  comparable runs), **ground truth** where metrics need it, and **column
+  mapping** from dataset/app fields to evaluator inputs (`query`, `response`,
+  `context`, `ground_truth`).
