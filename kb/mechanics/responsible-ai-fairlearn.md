@@ -98,3 +98,18 @@ Retraining allowed → a reductions technique (`GridSearch` or
 `ExponentiatedGradient`) with that constraint. No retraining →
 `ThresholdOptimizer`. Outlier detection and dimensionality reduction aren't
 fairness techniques.
+
+## RAI dashboard components: which question each answers
+
+From practice questions [Q117](../../practice/mlops/q117-rai-counterfactual-causal.md), [Q119](../../practice/mlops/q119-rai-counterfactual-pipeline.md).
+
+| Question | Component |
+|---|---|
+| Where/for whom does the model make most errors? | **Error analysis** |
+| Which features does the model rely on (global/local)? | **Explanation** (interpretability) |
+| What minimal change flips this prediction? What should change to get the desired outcome? | **Counterfactuals** (what-if) |
+| What's the real effect on the outcome if we intervene on a feature? | **Causal** analysis |
+| Performance gaps across groups | Fairness / model overview cohorts |
+
+Pipeline (SDK/CLI): **constructor** → tool components → **gather**. Studio:
+registered model → *Create Responsible AI dashboard* ([Q38](../../practice/mlops/q038-rai-dashboard-register-first.md)).

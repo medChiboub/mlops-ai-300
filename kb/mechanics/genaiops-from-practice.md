@@ -389,3 +389,13 @@ From practice questions [Q91–Q94](../../practice/genaiops/q091-pf-variants-eva
 
 Prompt flow is the *classic* Foundry experience; the same ideas carry over
 to agents (versions, tracing, evaluations).
+
+## Comparing prompt variants: cost and quality
+
+From practice question [Q104](../../practice/genaiops/q104-token-usage-llm-judge.md).
+
+- **Cost** = tokens (input + output) on pay-per-token deployments → monitor
+  **token usage**; longer responses cost more.
+- **Quality** = AI-assisted evaluators (**LLM-as-a-judge**: coherence,
+  relevance, groundedness, fluency) on the same dataset for both variants.
+- Latency and run-to-run consistency are secondary signals.

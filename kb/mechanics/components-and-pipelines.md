@@ -253,3 +253,8 @@ cold start, then the two steps ran one after the other on **one node**.
 - 🧪 **The scaler is fit on all the data before the split**, so the min/max
   values include the test rows. A mild leak; fit on training data only in a
   real pipeline.
+
+## Practice cues
+
+- Component from a Python function → `@command_component` (mldesigner); typed `Input`/`Output` parameters form the interface ([Q111](../../practice/mlops/q111-command-component-decorator.md)).
+- "Repeatable, auditable training instead of notebooks" → Azure ML **pipelines** ([Q114](../../practice/mlops/q114-fabrikam-training-pipelines.md)).

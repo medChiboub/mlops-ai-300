@@ -183,3 +183,8 @@ A literal value (`--training_data training_data`) or a bare file name
   **Outputs + logs**.
 - CLI equivalent: the same job as YAML (`src/job.yml`) →
   `az ml job create -f job.yml`, which is what labs 06–07's workflows use.
+
+## Practice cues: snapshot and packages
+
+- `.amlignore` beats `.gitignore`: when both exist, only `.amlignore` is read for the code snapshot ([Q112](../../practice/mlops/q112-amlignore-over-gitignore.md)).
+- In a notebook, `%pip install` targets the running kernel; `!pip` may not ([Q105](../../practice/mlops/q105-pip-magic-current-kernel.md)).

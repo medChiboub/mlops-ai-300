@@ -185,3 +185,21 @@ import (for example `accuracy_score`) fails the run before it logs.
   DataFrame.
 - **Tracking vs. registering:** a logged model is just an artifact on a run.
   It becomes a versioned workspace model only when it's registered.
+
+## Which log call for which value
+
+From practice questions [Q110](../../practice/mlops/q110-mlflow-log-figure-boolean.md), [Q115](../../practice/mlops/q115-mlflow-log-metrics-artifact-run-id.md). Source: Microsoft's *Log metrics, parameters and files with MLflow* page (checked 2026-10-31).
+
+| Value | Call |
+|---|---|
+| A number | `mlflow.log_metric("acc", 0.9)` |
+| A number over time | `mlflow.log_metric("loss", v, step=i)` |
+| A **boolean** | `mlflow.log_metric("flag", 0)` (**0 = False, 1 = True**) |
+| Several numbers | `mlflow.log_metrics({"a": 1, "b": 2})` |
+| A hyperparameter / config value | `mlflow.log_param("max_iter", 200)` (stored as string) |
+| A matplotlib figure | `mlflow.log_figure(fig, "figure.png")` |
+| An image array / PIL image | `mlflow.log_image(img, "img.png")` |
+| A dict or DataFrame as a table | `mlflow.log_table(data, "table.json")` |
+| A local file / folder | `mlflow.log_artifact(path)` / `log_artifacts(dir)` |
+| A string as a file | `mlflow.log_text(text, "note.txt")` |
+| Fetch a run later | `MlflowClient().get_run(run.info.run_id)` |
