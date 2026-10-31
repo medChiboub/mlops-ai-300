@@ -83,6 +83,30 @@ The exam angle: *Queued* for a long time means capacity or quota.
 of your code's output appears usually means an environment or data-access
 problem, not a code problem.
 
+## Adding a Jupyter kernel on a compute instance
+
+📘 From *Access a compute instance terminal* (read 2026-10-31). Added after
+practice questions [Q9/Q10](../../practice/q009-q010-jupyter-kernel-prereq.md).
+
+A Jupyter kernel = **a conda environment + `ipykernel` + a registered
+kernelspec**. From the compute instance terminal (Studio → Notebooks →
+terminal):
+
+```bash
+conda create --name newenv          # first, required step: a new environment
+conda activate newenv
+conda install pip
+conda install ipykernel
+python -m ipykernel install --user --name newenv --display-name "Python (newenv)"
+```
+
+- **Nothing has to be deleted first.** Microsoft warns **not** to delete
+  conda environments or kernels you didn't create, such as
+  *Python 3.8 - AzureML*, because it can break Jupyter/JupyterLab.
+- The new kernel shows up in the notebook's kernel picker.
+- Exam series pattern: "Solution: delete the Python 3.x - AzureML kernel" →
+  **No**. "Solution: create a new environment" → **Yes**.
+
 ## Lab vs. my project
 
 My project has **no compute instance** (notebooks run on my Mac) and one

@@ -15,6 +15,22 @@ split Azure ML entities into two kinds:
 A **registry** is a central store for assets (a bit like a Git repository),
 outside any workspace. Dev publishes an asset; test and prod use it.
 
+## Which asset holds what
+
+Added after practice question [Q4](../../practice/q004-register-model-for-reuse.md).
+
+| Asset | Holds | Question cue |
+|---|---|---|
+| **Model** | The trained artifact (MLflow, custom, Triton) | "output of experimentation", "reuse and govern the result", "deploy" |
+| **Component** | One reusable step: code + inputs/outputs + environment | "reuse a step across pipelines" |
+| **Environment** | Docker image + conda/pip packages | "same runtime everywhere", "reproducible dependencies" |
+| **Data asset** | A versioned pointer to data | "version the training data" |
+
+A pipeline **job** isn't a registered asset. You register its
+**components**, and to reuse a whole pipeline you register it as a
+**pipeline component**. All four assets get immutable versions and can be
+shared through a registry.
+
 ## Why separate dev and prod workspaces
 
 From the docs, the drivers are **security and compliance** (isolate access,

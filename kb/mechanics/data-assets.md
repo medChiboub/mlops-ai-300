@@ -19,6 +19,27 @@ path." Jobs refer to `azureml:diabetes-data:1` instead of a storage URL, so:
 | `uri_folder` | A folder | A path to a directory | Many files, images, anything not tabular |
 | `mltable` | A folder containing an **`MLTable`** file | `mltable.load(path).to_pandas_dataframe()` | **Tabular data with a read recipe. Required by AutoML** |
 
+## Path formats: recognize the scheme by its shape
+
+📘 From *Create data assets* and *Access data in a job* (read 2026-10-31).
+Added after practice question [Q1](../../practice/q001-data-asset-public-blob-uri.md),
+where the site's answer got this wrong.
+
+| Where the data is | Path | Notes |
+|---|---|---|
+| Local folder | `./data/my_data` | Uploaded to the default datastore on create |
+| Public web / **public** blob container | `https://<account>.blob.core.windows.net/<container>/<path>` | Input only; no auth, so public only |
+| Azure Blob (private) | `wasbs://<container>@<account>.blob.core.windows.net/<path>` | **Container before the `@`**; identity-based auth |
+| ADLS Gen2 | `abfss://<filesystem>@<account>.dfs.core.windows.net/<path>` | Note **`.dfs.`**, not `.blob.` |
+| Datastore | `azureml://datastores/<datastore>/paths/<path>` | Uses the datastore's credentials. The **recommended** form inside Azure ML (input *and* output) |
+| Existing data asset | `azureml:<name>:<version>` | What jobs should reference |
+
+How to read a question's URL:
+- `<container>@<account>` → `wasbs` (blob) or `abfss` (dfs).
+- `<account>/<container>` → `https`.
+- If the dropdown only offers a scheme and the rest of the URL is fixed,
+  **the URL's shape decides**, not the word "blob".
+
 ## What `az ml data create` actually did (lab 01 §1)
 
 ```bash
