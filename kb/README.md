@@ -26,6 +26,10 @@ did it and why.
 **[mechanics/](mechanics/README.md):** what Azure actually does underneath, one
 file per concept (workspace and storage, compute, data assets, AutoML, …).
 
+**[../practice/](../practice/README.md):** third-party practice questions,
+rewritten in my own words with answers checked against Microsoft docs. What
+each one teaches is added to the mechanics notes here.
+
 | Lab | File | What I learned |
 |---|---|---|
 | 01 | [Experiment and evaluate models](01-experiment-evaluate-models.md) | AutoML found a VotingEnsemble at 0.953 accuracy (vs. 0.774 for hand-made LogisticRegression) in about 11 min on 1 node, but kept `PatientID` as a feature with every guardrail green. MLflow autolog reports *training* metrics, and saving a file isn't logging it |

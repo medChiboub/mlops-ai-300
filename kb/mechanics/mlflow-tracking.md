@@ -119,6 +119,35 @@ apart:
   doesn't always include metrics, so read a run directly when numbers look
   missing.
 
+## Logging a table: file vs. Python object
+
+Added after practice question
+[Q169](../../practice/q169-mlflow-log-table-file.md). Choose the function by
+**what you're holding**:
+
+| You have… | Use | Notes |
+|---|---|---|
+| A number | `mlflow.log_metric("auc", 0.96)` | Charted if logged repeatedly |
+| A setting | `mlflow.log_param("reg_rate", 0.01)` | Shown under Params |
+| **A file already on disk** | **`mlflow.log_artifact("table.json")`** | One file → **Outputs + logs** |
+| A folder | `mlflow.log_artifacts("outputs/")` | Every file in it |
+| A dict or DataFrame **in memory**, as a table | `mlflow.log_table(data=table, artifact_file="table.json")` | MLflow 2.3+. No file needed |
+| A dict in memory | `mlflow.log_dict(table, "table.json")` | Writes JSON or YAML for you |
+| A matplotlib figure | `mlflow.log_figure(fig, "roc.png")` | No `savefig` needed |
+
+The file route takes two steps. Note `dump` (to a file) vs. `dumps` (to a
+string):
+
+```python
+import json
+with open("table.json", "w") as f:
+    json.dump(table, f)             # not json.dumps: that returns a string, no file
+mlflow.log_artifact("table.json")   # not log_table: that wants the data, not a path
+```
+
+SDK v1 used `run.log_table(...)`. In SDK v2 there's no `run` object, and
+everything goes through MLflow.
+
 ## Exam cheat-sheet
 
 - `mlflow.set_experiment`, `mlflow.start_run` (a context manager, so the run

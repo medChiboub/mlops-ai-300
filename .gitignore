@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Practice questions worked from third-party sites -- kept local, never committed.
+practice/

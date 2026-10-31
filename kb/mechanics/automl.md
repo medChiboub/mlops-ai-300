@@ -334,6 +334,40 @@ data is far more skewed, where always-negative gets about 91.5%. The lab's
 data is mild enough that accuracy still ranks models sensibly, but on the
 exam, "imbalanced classes" + "which primary metric" → `AUC_weighted`.
 
+## Limits and their defaults
+
+📘 From the SDK v2 `set_limits` reference and the AutoML how-to (read
+2026-10-31). Added after practice question
+[Q170](../../practice/q170-automl-set-limits.md).
+
+Limits work at **two levels**: the whole job, and each trial. The exam likes
+to blur them.
+
+| Setting | Scope | Default if not set | Lab 01 value |
+|---|---|---|---|
+| `timeout_minutes` | **Whole job** (setup, featurization, trials; not the final ensembling or explanation) | **6 days** (8,640 min) | 60 |
+| `trial_timeout_minutes` | **Each trial** | **1 month** (43,200 min) | 20 |
+| `max_trials` | Whole job | **1,000** | 5 |
+| `max_concurrent_trials` | Whole job | **1** | not set → 1 |
+| `enable_early_termination` | Whole job | Off | True |
+| `exit_score` | Whole job | None: runs until no further progress | not set |
+
+- `timeout_minutes=60` **doesn't** mean each trial gets 60 minutes. Leave
+  `trial_timeout_minutes` unset and the trial limit is the 1-month default,
+  even though the job itself stops much sooner.
+- **Early termination timing:** never in the first 20 iterations, then it
+  watches 10 more, so the **earliest stop is iteration 31**. Two ensemble
+  iterations still run afterwards.
+- **`max_concurrent_trials`:**
+  - It's capped by nodes: AmlCompute runs one trial per node. That's why
+    lab 01 used only one of its two nodes.
+  - It doesn't apply to local runs.
+  - It's **ignored for distributed training** in classification and
+    regression, where trials run one after another, each using `max_nodes`
+    nodes (at least 4).
+- **A timeout of 60 minutes or less errors** if the data has more than
+  10,000,000 cells (rows × columns).
+
 ## Exam cheat-sheet
 
 - AutoML needs **MLTable** training data (SDK/CLI v2).
