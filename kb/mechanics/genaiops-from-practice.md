@@ -293,3 +293,72 @@ From practice question [Q51](../../practice/genaiops/q051-prompt-governance.md).
 | Roll back | Redeploy a **prior agent/prompt version** (or revert and redeploy) |
 
 Never edit prompts directly in production; that bypasses all three.
+
+## Building a RAG flow from files
+
+From practice question [Q61](../../practice/genaiops/q061-rag-flow-from-local-files.md), [Q76](../../practice/genaiops/q076-fabrikam-rag-serving-retrieval.md).
+
+| Step | What it produces |
+|---|---|
+| 1. **Data asset** (upload local files) | The source content, versioned in the project |
+| 2. **Vector index** | Chunks + embeddings, stored in Azure AI Search (or a FAISS file) |
+| 3. **Connection** | Credentials/endpoint for the model (and search) the flow calls |
+| 4. **Flow** | lookup (index) → prompt (context + question) → LLM |
+
+To serve it: deploy the flow to a **managed online endpoint**. If curated
+documents already live in **Azure AI Search**, reuse that index as the
+retriever instead of building a new one.
+
+## Chunk size, overlap and similarity threshold
+
+From practice question [Q66](../../practice/genaiops/q066-chunk-overlap-threshold.md).
+
+| Knob | Too high | Too low |
+|---|---|---|
+| **Chunk size** | *Semantic dilution*: one chunk mixes topics → blurry embedding → loose, off-topic matches | Fragments lose context; answers incomplete |
+| **Overlap** | Neighbouring chunks repeat each other → **duplicate** results in top-k (e.g., 400 of 1,200 tokens) | Sentences split at boundaries lose context (10–15% is a common start) |
+| **Similarity threshold** | Strict filter drops relevant but lower-scoring chunks | Admits weak matches (noise) |
+| **Top-k** | Irrelevant chunks dilute the prompt | Misses needed chunks |
+
+Fix dilution with **smaller chunks**, not a lower threshold. Keyword-only
+search removes semantic matching altogether.
+
+## Performance metrics: latency, throughput, response time
+
+From practice question [Q67](../../practice/genaiops/q067-latency-throughput-response-time.md).
+
+| Metric | Answers | Cue |
+|---|---|---|
+| **Latency** | How long before output comes back (time to first token for streaming) | "slow to return output" |
+| **Throughput** | Requests or tokens per minute the deployment sustains | "can't sustain request volume" |
+| **Response time** | End-to-end duration of one request | "duration of handling a request" |
+| **Concurrency** | Calls in flight at once | describes load, not a symptom |
+
+Provisioned (PTU) deployments trade cost for predictable latency and
+throughput; Standard can throttle (429) at peaks.
+
+## Choosing a foundation model
+
+From practice question [Q68](../../practice/genaiops/q068-foundation-model-selection.md).
+
+Match a **property to a workload need**: conversational reasoning ↔
+assistant; multimodal input ↔ text + image; enterprise governance ↔
+regulated data; then cost/latency. "Largest" or "smallest" model *by size
+alone* is always the distractor. Compare candidates with the **model
+leaderboard** and your own evaluation.
+
+## Optimization order: evaluate, prompt, RAG, fine-tune
+
+From practice questions [Q72](../../practice/genaiops/q072-finetuning-first-step-jsonl.md), [Q78](../../practice/genaiops/q078-fabrikam-optimization-strategy.md), [Q79](../../practice/genaiops/q079-fabrikam-evaluate-first.md).
+
+1. **Evaluate** against an evaluation set → a baseline (use real pairs if you
+   have them; synthetic only if you don't).
+2. **Prompt engineering** (system message, examples, structure): cheapest,
+   first fix, including for poor RAG answers.
+3. **RAG** when the model lacks knowledge (facts, private data).
+4. **Fine-tuning** when it lacks *behaviour*: domain/task specialization or
+   format (SFT); alignment with ranked preferences (DPO). Starts with a JSONL
+   training file, then a job, then a Developer-tier deployment to evaluate.
+
+Temperature and `max_tokens` change randomness and length, not accuracy or
+grounding.

@@ -81,3 +81,20 @@ From practice question [Q38](../../practice/mlops/q038-rai-dashboard-register-fi
   this; the constructor worked, and the tools were blocked by RBAC.
 - Not prerequisites: deploying to an endpoint, converting the model format,
   or precomputing explanations.
+
+## Choosing the constraint from the wording
+
+From practice question [Q71](../../practice/mlops/q071-fairlearn-gridsearch-demographic-parity.md).
+
+| The scenario wants… | Constraint |
+|---|---|
+| Equal **selection / approval / admission rates** across groups | **Demographic parity** |
+| Equal **error rates** (TPR and FPR) across groups | **Equalized odds** |
+| Equal true-positive rate only (equal opportunity) | **True positive rate parity** |
+| Equal false-positive rate only | **False positive rate parity** |
+| Equal error rate overall | **Error rate parity** |
+
+Retraining allowed → a reductions technique (`GridSearch` or
+`ExponentiatedGradient`) with that constraint. No retraining →
+`ThresholdOptimizer`. Outlier detection and dimensionality reduction aren't
+fairness techniques.

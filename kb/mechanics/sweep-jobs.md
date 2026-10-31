@@ -124,3 +124,13 @@ The parent job ran 01:50:36 → 01:57:10 (about 6.5 min in total).
   trust the CLI for a sweep's sampling method, for example in an audit
   script; Studio shows the real value. Exam answer unchanged: grid = every
   combination, discrete only.
+
+## Bandit slack factor arithmetic
+
+From practice question [Q62](../../practice/mlops/q062-bandit-slack-factor.md).
+
+For a maximised metric, Bandit cancels a run whose metric is below
+`best / (1 + slack_factor)` (or `best - slack_amount`). So
+`slack_factor=0.25` cuts runs below **80%** of the best (a 20% drop), and a
+true 25% drop would need ≈0.333. Exam questions still map "25%" →
+`slack_factor=0.25`; answer that, but know the formula.
