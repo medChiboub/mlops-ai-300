@@ -16,8 +16,8 @@ Pick the evaluator by the **requirement's wording**:
 |---|---|---|
 | "supported by the sources", "no fabrication", "grounded" | **Groundedness** | No (needs the context) |
 | "addresses the user's question", "on-topic" | **Relevance** | No |
-| "readable", "natural" | Fluency | No |
-| "logically consistent" | Coherence | No |
+| "readable", "natural", **"grammatically correct"** ([Q45](../../practice/q045-fluency-evaluator.md)) | **Fluency** | No |
+| "logically consistent", "ideas connect" (not grammar!) | Coherence | No |
 | "matches the expected answer" | Similarity, F1 | **Yes** (ground truth) |
 | "unsafe or harmful content" | Safety evaluators (violence, self-harm, hate, sexual) | No |
 
@@ -234,3 +234,44 @@ From practice questions [Q32 + Q34](../../practice/q032-q034-finetuning-data-for
 - Each output must be an `assistant`-role message.
 - Files are **JSONL** (one object per line), **UTF-8** encoded. Upload
   training (and optionally validation) files, then fine-tune.
+
+## Foundry resource vs. project
+
+From practice question [Q42](../../practice/q042-foundry-resource-vs-project.md).
+
+| Level | Holds | Use for |
+|---|---|---|
+| **Foundry resource** | Governance, security, networking, model deployments, **shared connections** | One shared resource = central control |
+| **Project** (under the resource) | A team's files, agents, evaluations, access | **One project per team** = isolation |
+
+It's the same shape as Azure ML **hub + projects**.
+
+## Evaluation in the release workflow
+
+From practice questions [Q43, Q46, Q48](../../practice/q043-q046-q048-genai-eval-workflow.md).
+
+| Question | Mechanism |
+|---|---|
+| "Is it healthy *now*?" (timeouts, latency, errors) | **Observability metrics** + diagnostic logs (production) |
+| "Is the *new version* good and safe?" | **Evaluation workflow** on a dataset, **before release** |
+| "Check **every PR** and **fail the build**" | A **GitHub Actions** workflow running Foundry evaluations with thresholds |
+
+Cloud safety evaluation with the SDK, using an **already registered**
+dataset:
+1. Install/create the Foundry **project client**.
+2. **Configure safety evaluators** (violence, sexual, self-harm, hate).
+3. **Submit the evaluation to the project in the cloud.**
+
+Don't re-upload a dataset that's already registered. A local test run is
+optional.
+
+## Promoting a fine-tuned model
+
+From practice question [Q44](../../practice/q044-promote-finetuned-model.md). 🟡
+
+Generic order: **version/register → evaluate and validate → production
+deployment** (for example Global Standard).
+- Foundry's **Developer tier** deployment exists to *evaluate* fine-tuned
+  models cheaply: no hosting fee, no SLA, not for production.
+- So "Developer tier → evaluate → Global Standard" is also defensible. Read
+  the stem carefully.

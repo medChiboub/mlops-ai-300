@@ -46,6 +46,22 @@ From practice question [Q30](../../practice/q030-hub-workspace-governance.md).
 - A **registry** complements this: hubs govern *where teams work*, and
   registries share *assets across workspaces*.
 
+## Archiving model versions
+
+From practice question [Q41](../../practice/q041-archive-model-versions.md).
+
+| Need | Do | Effect |
+|---|---|---|
+| Keep history for audit/rollback | **Keep versions** (never delete) | Versions are immutable, with lineage to their job |
+| Stop old versions being picked for deployment | **Archive** them | Hidden from default lists; still exists; can be **restored** |
+
+```bash
+az ml model archive --name diabetes-clf --version 1     # restore: az ml model restore
+```
+
+My production project archived `diabetes-clf:1` for real, in both the
+workspace and the registry.
+
 ## Why separate dev and prod workspaces
 
 From the docs, the drivers are **security and compliance** (isolate access,

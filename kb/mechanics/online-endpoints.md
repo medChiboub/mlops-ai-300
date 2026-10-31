@@ -40,3 +40,15 @@ def run(raw_data):   # once per request → score and return
 **Rollback** = shift traffic back to the previous deployment. That's the
 fastest fix after a bad release. Deleting and redeploying the endpoint is
 slow; changing auth or compute size doesn't address a bad release.
+
+## No outbound internet: package the model
+
+From practice question [Q49](../../practice/q049-package-model-no-egress.md).
+
+- A **no-code MLflow** deployment installs the model's conda/pip
+  dependencies **when the container starts**. That needs internet.
+- If the endpoint's outbound access is blocked, first create a **model
+  package**: an image with the model and all its dependencies built in. Then
+  deploy the package.
+- Neither a registry nor a private endpoint fixes it: the first shares
+  assets, the second secures inbound traffic.

@@ -40,6 +40,22 @@ How to read a question's URL:
 - If the dropdown only offers a scheme and the rest of the URL is fixed,
   **the URL's shape decides**, not the word "blob".
 
+## Loading an MLTable in code
+
+From practice question [Q47](../../practice/q047-load-mltable.md).
+
+```python
+import mltable
+tbl = mltable.load("./sample_data")      # the FOLDER that contains the file named MLTable
+df  = tbl.to_pandas_dataframe()
+```
+
+- `load()` takes the **folder**, not `./sample_data/MLTable`, and not a glob
+  of the raw files (that skips the recipe).
+- The folder can also be a datastore URI
+  (`azureml://datastores/<ds>/paths/sample_data`) or a data asset's path.
+- `mltable.load` reads; `save` writes a definition; `take(n)` samples rows.
+
 ## What `az ml data create` actually did (lab 01 §1)
 
 ```bash
