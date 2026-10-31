@@ -1,6 +1,6 @@
 # Bicep and `az deployment`: scopes and what a template does
 
-Started after practice question [Q35](../../practice/genaiops/q035-bicep-group-deployment.md).
+Started after practice question [Q35](../../../practice/genaiops/q035-bicep-group-deployment.md).
 My production project is all Bicep (`infra/main.bicep` + `.bicepparam`), so
 this mainly names what I already did.
 
@@ -31,7 +31,7 @@ role assignments.
 
 ## Practice cue
 
-[Q123](../../practice/mlops/q123-cli-deploy-bicep-declare.md): "define declaratively" → **Bicep**; "deploy from a pipeline" →
+[Q123](../../../practice/mlops/q123-cli-deploy-bicep-declare.md): "define declaratively" → **Bicep**; "deploy from a pipeline" →
 **Azure CLI** (`az deployment group create`) as the pipeline step.
 
-Workspace IaC series [Q150–Q152](../../practice/mlops/q150-iac-bicep-github-action.md): **Bicep + GitHub Actions = Yes**; cloning a workspace or creating it in the portal = No (not versioned, not repeatable).
+Workspace IaC series [Q150–Q152](../../../practice/mlops/q150-iac-bicep-github-action.md): **Bicep + GitHub Actions = Yes**; cloning a workspace or creating it in the portal = No (not versioned, not repeatable).

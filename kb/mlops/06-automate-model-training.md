@@ -1,6 +1,6 @@
 # Lab 06: Automate model training with GitHub Actions
 
-Source: [docs/06-automate-model-training.md](../docs/06-automate-model-training.md)
+Source: [docs/06-automate-model-training.md](../../docs/06-automate-model-training.md)
 
 Microsoft Learn module: [Automate model training with GitHub Actions](https://learn.microsoft.com/en-us/training/modules/trigger-azure-machine-learn-jobs-github-actions/)
 (module 6 of [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/), dated 2026-08-27).

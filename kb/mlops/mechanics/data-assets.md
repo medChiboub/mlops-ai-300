@@ -22,7 +22,7 @@ path." Jobs refer to `azureml:diabetes-data:1` instead of a storage URL, so:
 ## Path formats: recognize the scheme by its shape
 
 📘 From *Create data assets* and *Access data in a job* (read 2026-10-31).
-Added after practice question [Q1](../../practice/mlops/q001-data-asset-public-blob-uri.md),
+Added after practice question [Q1](../../../practice/mlops/q001-data-asset-public-blob-uri.md),
 where the site's answer got this wrong.
 
 | Where the data is | Path | Notes |
@@ -42,7 +42,7 @@ How to read a question's URL:
 
 ## Loading an MLTable in code
 
-From practice question [Q47](../../practice/mlops/q047-load-mltable.md).
+From practice question [Q47](../../../practice/mlops/q047-load-mltable.md).
 
 ```python
 import mltable
@@ -133,7 +133,7 @@ both types up front.
 
 ## Datastores and versions in SDK v2
 
-From practice questions [Q124](../../practice/mlops/q124-blob-datastore-account-key.md), [Q125](../../practice/mlops/q125-image-files-uri-folder-wasbs.md), [Q126](../../practice/mlops/q126-cluster-and-registered-data.md), [Q130](../../practice/mlops/q130-versioned-data-reproducibility.md).
+From practice questions [Q124](../../../practice/mlops/q124-blob-datastore-account-key.md), [Q125](../../../practice/mlops/q125-image-files-uri-folder-wasbs.md), [Q126](../../../practice/mlops/q126-cluster-and-registered-data.md), [Q130](../../../practice/mlops/q130-versioned-data-reproducibility.md).
 
 ```python
 from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration
@@ -153,7 +153,7 @@ ml_client.create_or_update(store)
   `azureml:<name>:<version>` records exactly what a run used. Write each data
   refresh to a new path, because a version points at a path, not a copy.
 
-More from practice questions [Q144](../../practice/mlops/q144-mltable-from-delimited-files.md), [Q146](../../practice/mlops/q146-blob-datastore-sas.md), [Q149](../../practice/mlops/q149-pandas-describe.md):
+More from practice questions [Q144](../../../practice/mlops/q144-mltable-from-delimited-files.md), [Q146](../../../practice/mlops/q146-blob-datastore-sas.md), [Q149](../../../practice/mlops/q149-pandas-describe.md):
 
 - CSV folder **without** an `MLTable` file → `mltable.from_delimited_files(paths=[...])`; with one → `mltable.load(folder)`. Parquet/Delta have their own `from_*`.
 - Datastore credentials: `AccountKeyConfiguration` (no expiry), **`SasTokenConfiguration`** (time-limited), or none (identity-based access).

@@ -1,6 +1,6 @@
 # Lab 01: Find the best classification model
 
-Source: [docs/01-experiment-evaluate-models.md](../docs/01-experiment-evaluate-models.md)
+Source: [docs/01-experiment-evaluate-models.md](../../docs/01-experiment-evaluate-models.md)
 
 Microsoft Learn module: [Experiment with Azure Machine Learning](https://learn.microsoft.com/en-us/training/modules/experiment-azure-machine-learning/)
 (module 2 of the learning path [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/),

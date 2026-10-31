@@ -1,6 +1,6 @@
 # Lab 05: Plan and prepare an MLOps solution
 
-Source: [docs/05-plan-and-prepare.md](../docs/05-plan-and-prepare.md)
+Source: [docs/05-plan-and-prepare.md](../../docs/05-plan-and-prepare.md)
 
 **No Microsoft Learn module:** the learning path *Operationalize machine
 learning models (MLOps)* has no module whose exercise is this lab. The

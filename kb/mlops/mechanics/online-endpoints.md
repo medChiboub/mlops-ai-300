@@ -1,6 +1,6 @@
 # Online endpoints: scoring scripts, rollout and rollback
 
-Started after practice questions [Q37 + Q39](../../practice/mlops/q037-rollback-failed-deployment.md).
+Started after practice questions [Q37 + Q39](../../../practice/mlops/q037-rollback-failed-deployment.md).
 My production project runs this for real (`ml/score/score.py`, `deploy.yml`,
 `shift-traffic.yml`); this note puts it in exam terms.
 
@@ -43,7 +43,7 @@ slow; changing auth or compute size doesn't address a bad release.
 
 ## No outbound internet: package the model
 
-From practice question [Q49](../../practice/mlops/q049-package-model-no-egress.md).
+From practice question [Q49](../../../practice/mlops/q049-package-model-no-egress.md).
 
 - A **no-code MLflow** deployment installs the model's conda/pip
   dependencies **when the container starts**. That needs internet.
@@ -55,7 +55,7 @@ From practice question [Q49](../../practice/mlops/q049-package-model-no-egress.m
 
 ## Online vs. batch endpoints
 
-From practice question [Q57](../../practice/mlops/q057-online-vs-batch-endpoints.md).
+From practice question [Q57](../../../practice/mlops/q057-online-vs-batch-endpoints.md).
 
 | | **Online (real-time)** | **Batch** |
 |---|---|---|
@@ -66,5 +66,5 @@ From practice question [Q57](../../practice/mlops/q057-online-vs-batch-endpoints
 | Typical cue | "during customer interactions" | "files", "nightly/scheduled", "large volume" |
 
 A safe test of a new version on live users = **traffic splitting** between
-deployments on the **same** endpoint ([Q54](../../practice/mlops/q057-online-vs-batch-endpoints.md)),
+deployments on the **same** endpoint ([Q54](../../../practice/mlops/q057-online-vs-batch-endpoints.md)),
 not a separate staging endpoint.

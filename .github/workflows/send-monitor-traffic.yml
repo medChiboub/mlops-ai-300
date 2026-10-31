@@ -2,7 +2,7 @@ name: Send monitor traffic (lab 07 helper)
 
 # Not part of the Microsoft lab. Sends the one-time "shifted" batch for the
 # drift demo, unattended: after monitor run 1 (2026-10-01 04:00 UTC) and
-# before run 2 (2026-10-02 04:00 UTC). See kb/mechanics/monitoring.md.
+# before run 2 (2026-10-02 04:00 UTC). See kb/mlops/mechanics/monitoring.md.
 # Uses the repo secret (not the prod environment): it only sends test traffic,
 # it doesn't train or deploy. Delete this file at cleanup.
 

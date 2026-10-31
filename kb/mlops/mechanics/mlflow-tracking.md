@@ -122,7 +122,7 @@ apart:
 ## Logging a table: file vs. Python object
 
 Added after practice question
-[Q169](../../practice/mlops/q169-mlflow-log-table-file.md). Choose the function by
+[Q169](../../../practice/mlops/q169-mlflow-log-table-file.md). Choose the function by
 **what you're holding**:
 
 | You have… | Use | Notes |
@@ -150,7 +150,7 @@ everything goes through MLflow.
 
 ## Reading a tracking script: experiment vs. artifact path vs. model name
 
-From practice question [Q20](../../practice/mlops/q020-mlflow-tracking-script.md).
+From practice question [Q20](../../../practice/mlops/q020-mlflow-tracking-script.md).
 
 ```python
 mlflow.set_experiment("classification-experiment")   # WHERE runs are grouped (creates it if missing)
@@ -188,7 +188,7 @@ import (for example `accuracy_score`) fails the run before it logs.
 
 ## Which log call for which value
 
-From practice questions [Q110](../../practice/mlops/q110-mlflow-log-figure-boolean.md), [Q115](../../practice/mlops/q115-mlflow-log-metrics-artifact-run-id.md). Source: Microsoft's *Log metrics, parameters and files with MLflow* page (checked 2026-10-31).
+From practice questions [Q110](../../../practice/mlops/q110-mlflow-log-figure-boolean.md), [Q115](../../../practice/mlops/q115-mlflow-log-metrics-artifact-run-id.md). Source: Microsoft's *Log metrics, parameters and files with MLflow* page (checked 2026-10-31).
 
 | Value | Call |
 |---|---|
@@ -204,7 +204,7 @@ From practice questions [Q110](../../practice/mlops/q110-mlflow-log-figure-boole
 | A string as a file | `mlflow.log_text(text, "note.txt")` |
 | Fetch a run later | `MlflowClient().get_run(run.info.run_id)` |
 
-Additions from [Q131](../../practice/mlops/q131-log-metric-log-artifact-plot.md) and [Q135](../../practice/mlops/q135-log-batch-list-of-metrics.md):
+Additions from [Q131](../../../practice/mlops/q131-log-metric-log-artifact-plot.md) and [Q135](../../../practice/mlops/q135-log-batch-list-of-metrics.md):
 
 | Value | Call |
 |---|---|
@@ -213,7 +213,7 @@ Additions from [Q131](../../practice/mlops/q131-log-metric-log-artifact-plot.md)
 
 ## Querying runs: search_runs and statuses
 
-From practice question [Q168](../../practice/mlops/q168-mlflow-search-runs-failed.md).
+From practice question [Q168](../../../practice/mlops/q168-mlflow-search-runs-failed.md).
 
 - `mlflow.search_runs(experiment_names=[...], filter_string=..., max_results=..., order_by=[...])` → a pandas DataFrame with `run_id`, `status`, `metrics.*`, `params.*`, `tags.*`.
 - Statuses: `RUNNING`, `SCHEDULED`, `FINISHED`, **`FAILED`** (ended with an error), **`KILLED`** (cancelled/aborted).

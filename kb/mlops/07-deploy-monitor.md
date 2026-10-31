@@ -1,6 +1,6 @@
 # Lab 07: Deploy and monitor a model
 
-Source: [docs/07-deploy-monitor.md](../docs/07-deploy-monitor.md)
+Source: [docs/07-deploy-monitor.md](../../docs/07-deploy-monitor.md)
 
 Microsoft Learn module: [Deploy and monitor a model in Azure Machine Learning](https://learn.microsoft.com/en-us/training/modules/deploy-model-github-actions/)
 (module 7 of [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/), dated 2026-08-27).

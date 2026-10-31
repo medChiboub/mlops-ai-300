@@ -322,7 +322,7 @@ Best practices Microsoft lists:
 
 ## Symptom to action: data vs. model vs. serving
 
-From practice questions [Q22, Q26, Q28](../../practice/mlops/q022-drift-signal-to-action.md).
+From practice questions [Q22, Q26, Q28](../../../practice/mlops/q022-drift-signal-to-action.md).
 First decide **which layer** is failing:
 
 | Symptom | Layer | First action |
@@ -440,7 +440,7 @@ Click a question to reveal its answer. Answer before opening.
 
 ## Practice cues: which metric or signal
 
-From practice questions [Q81](../../practice/mlops/q081-drift-monitoring-alerts.md), [Q86](../../practice/mlops/q086-regression-quality-concerns.md), [Q95](../../practice/mlops/q095-alert-rules-autoscaling.md), [Q98](../../practice/mlops/q098-endpoint-traffic-metrics.md).
+From practice questions [Q81](../../../practice/mlops/q081-drift-monitoring-alerts.md), [Q86](../../../practice/mlops/q086-regression-quality-concerns.md), [Q95](../../../practice/mlops/q095-alert-rules-autoscaling.md), [Q98](../../../practice/mlops/q098-endpoint-traffic-metrics.md).
 
 | Symptom or need | Look at / configure |
 |---|---|

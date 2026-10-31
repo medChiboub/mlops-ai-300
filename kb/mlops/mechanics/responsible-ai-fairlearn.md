@@ -1,6 +1,6 @@
 # Responsible AI: Fairlearn mitigation
 
-Started after practice question [Q7](../../practice/mlops/q007-fairlearn-without-retraining.md).
+Started after practice question [Q7](../../../practice/mlops/q007-fairlearn-without-retraining.md).
 My production project tried the Azure ML **Responsible AI dashboard**
 (`ml/experiments/responsible_ai/`, blocked on an RBAC grant). This note
 covers the **Fairlearn** side: *changing* a model's behavior, not just
@@ -47,7 +47,7 @@ Fairlearn has two jobs:
 
 ## Assessing: the RAI dashboard and cohorts
 
-From practice question [Q12](../../practice/mlops/q012-rai-cohort-errors-before-registration.md).
+From practice question [Q12](../../../practice/mlops/q012-rai-cohort-errors-before-registration.md).
 
 The Azure ML **Responsible AI dashboard** answers different questions with
 different tools:
@@ -70,7 +70,7 @@ different tools:
 
 ## Creating the dashboard
 
-From practice question [Q38](../../practice/mlops/q038-rai-dashboard-register-first.md).
+From practice question [Q38](../../../practice/mlops/q038-rai-dashboard-register-first.md).
 
 - **Studio (no-code):** the model must be **registered** first (MLflow
   format supported). Then Models → model → **Responsible AI** → create the
@@ -84,7 +84,7 @@ From practice question [Q38](../../practice/mlops/q038-rai-dashboard-register-fi
 
 ## Choosing the constraint from the wording
 
-From practice question [Q71](../../practice/mlops/q071-fairlearn-gridsearch-demographic-parity.md).
+From practice question [Q71](../../../practice/mlops/q071-fairlearn-gridsearch-demographic-parity.md).
 
 | The scenario wants… | Constraint |
 |---|---|
@@ -101,7 +101,7 @@ fairness techniques.
 
 ## RAI dashboard components: which question each answers
 
-From practice questions [Q117](../../practice/mlops/q117-rai-counterfactual-causal.md), [Q119](../../practice/mlops/q119-rai-counterfactual-pipeline.md).
+From practice questions [Q117](../../../practice/mlops/q117-rai-counterfactual-causal.md), [Q119](../../../practice/mlops/q119-rai-counterfactual-pipeline.md).
 
 | Question | Component |
 |---|---|
@@ -112,6 +112,6 @@ From practice questions [Q117](../../practice/mlops/q117-rai-counterfactual-caus
 | Performance gaps across groups | Fairness / model overview cohorts |
 
 Pipeline (SDK/CLI): **constructor** → tool components → **gather**. Studio:
-registered model → *Create Responsible AI dashboard* ([Q38](../../practice/mlops/q038-rai-dashboard-register-first.md)).
+registered model → *Create Responsible AI dashboard* ([Q38](../../../practice/mlops/q038-rai-dashboard-register-first.md)).
 
-Practice cues: [Q154](../../practice/mlops/q154-rai-causal-counterfactual.md) (treatment policy → causal; minimal change → counterfactual) and [Q155](../../practice/mlops/q155-fairlearn-dashboard-steps.md) (Fairlearn assessment supports **binary classification and regression** only; pick sensitive feature, model, metric).
+Practice cues: [Q154](../../../practice/mlops/q154-rai-causal-counterfactual.md) (treatment policy → causal; minimal change → counterfactual) and [Q155](../../../practice/mlops/q155-fairlearn-dashboard-steps.md) (Fairlearn assessment supports **binary classification and regression** only; pick sensitive feature, model, metric).

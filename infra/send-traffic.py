@@ -1,6 +1,6 @@
 """Send test traffic to the lab 07 endpoint so model monitoring has data.
 
-Not part of the Microsoft lab: a helper for kb/mechanics/monitoring.md.
+Not part of the Microsoft lab: a helper for kb/mlops/mechanics/monitoring.md.
 Rows come from data/test-data/diabetes-test.csv (held-out, same distribution
 as the training data). One request per row, so each is collected as a line.
 

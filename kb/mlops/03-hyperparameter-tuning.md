@@ -1,6 +1,6 @@
 # Lab 03: Hyperparameter tuning with a sweep job
 
-Source: [docs/03-hyperparameter-tuning.md](../docs/03-hyperparameter-tuning.md)
+Source: [docs/03-hyperparameter-tuning.md](../../docs/03-hyperparameter-tuning.md)
 
 Microsoft Learn module: [Perform hyperparameter tuning with Azure Machine Learning](https://learn.microsoft.com/en-us/training/modules/perform-hyperparameter-tuning-azure-machine-learning-pipelines/)
 (module 4 of [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/), dated 2026-08-27).

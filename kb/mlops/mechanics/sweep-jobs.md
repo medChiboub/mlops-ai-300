@@ -66,7 +66,7 @@ The lab: `max_total_trials=4, max_concurrent_trials=2, timeout=7200`.
 
 ## Exam cues for the termination policies
 
-From practice question [Q23](../../practice/mlops/q023-early-termination-relative-policies.md).
+From practice question [Q23](../../../practice/mlops/q023-early-termination-relative-policies.md).
 
 - "Compare against **all** runs" / "not only the best run" → **Median
   stopping** and **Truncation selection**.
@@ -127,7 +127,7 @@ The parent job ran 01:50:36 → 01:57:10 (about 6.5 min in total).
 
 ## Bandit slack factor arithmetic
 
-From practice question [Q62](../../practice/mlops/q062-bandit-slack-factor.md).
+From practice question [Q62](../../../practice/mlops/q062-bandit-slack-factor.md).
 
 For a maximised metric, Bandit cancels a run whose metric is below
 `best / (1 + slack_factor)` (or `best - slack_amount`). So
@@ -137,7 +137,7 @@ true 25% drop would need ≈0.333. Exam questions still map "25%" →
 
 ## Bayesian sampling and concurrency
 
-From practice question [Q138](../../practice/mlops/q138-bayesian-concurrency.md).
+From practice question [Q138](../../../practice/mlops/q138-bayesian-concurrency.md).
 
 - Bayesian picks the next trial from **completed** results, so **lower
   `max_concurrent_trials`** improves convergence (fewer blind trials).
@@ -147,7 +147,7 @@ From practice question [Q138](../../practice/mlops/q138-bayesian-concurrency.md)
 
 ## Distributions and which sampling supports them
 
-From practice questions [Q142](../../practice/mlops/q142-sweep-distributions-exhibit.md), [Q160](../../practice/mlops/q160-bayesian-distributions.md), [Q158](../../practice/mlops/q158-bandit-delay-interval.md).
+From practice questions [Q142](../../../practice/mlops/q142-sweep-distributions-exhibit.md), [Q160](../../../practice/mlops/q160-bayesian-distributions.md), [Q158](../../../practice/mlops/q158-bandit-delay-interval.md).
 
 | Distribution | Values | Grid | Random | Bayesian |
 |---|---|---|---|---|

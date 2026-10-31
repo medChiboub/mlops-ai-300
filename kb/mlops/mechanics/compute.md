@@ -86,7 +86,7 @@ problem, not a code problem.
 ## Adding a Jupyter kernel on a compute instance
 
 📘 From *Access a compute instance terminal* (read 2026-10-31). Added after
-practice questions [Q9–Q11](../../practice/mlops/q011-kernel-create-environment.md).
+practice questions [Q9–Q11](../../../practice/mlops/q011-kernel-create-environment.md).
 
 A Jupyter kernel = **a conda environment + `ipykernel` + a registered
 kernelspec**. From the compute instance terminal (Studio → Notebooks →
@@ -109,7 +109,7 @@ python -m ipykernel install --user --name newenv --display-name "Python (newenv)
 
 ## Which compute for which workload
 
-From practice question [Q17](../../practice/mlops/q017-compute-per-workload.md).
+From practice question [Q17](../../../practice/mlops/q017-compute-per-workload.md).
 
 | Workload | Compute | Cost control |
 |---|---|---|
@@ -121,7 +121,7 @@ From practice question [Q17](../../practice/mlops/q017-compute-per-workload.md).
 
 ## Notebook state: what resets it
 
-From practice question [Q29](../../practice/mlops/q029-reset-notebook-state.md). 📘 Microsoft's
+From practice question [Q29](../../../practice/mlops/q029-reset-notebook-state.md). 📘 Microsoft's
 *Run Jupyter notebooks* table:
 
 | Resets state (all variables lost) | Doesn't change state |
@@ -135,11 +135,11 @@ From practice question [Q29](../../practice/mlops/q029-reset-notebook-state.md).
 The trap: "stop the kernel" feels like it should clear state, but Microsoft
 lists it as **not** changing it.
 
-State-preserving action from [Q122](../../practice/mlops/q122-preserve-notebook-state.md): **stop the kernel** (cells stop, variables stay).
+State-preserving action from [Q122](../../../practice/mlops/q122-preserve-notebook-state.md): **stop the kernel** (cells stop, variables stay).
 
 ## Cloning a Git repo into the workspace
 
-From practice question [Q52](../../practice/mlops/q052-git-clone-ssh.md). From the Studio
+From practice question [Q52](../../../practice/mlops/q052-git-clone-ssh.md). From the Studio
 terminal (the files land in the shared workspace file system):
 
 ```bash
@@ -161,7 +161,7 @@ and jobs from notebooks run as me.
 
 ## Low-priority VMs: where they apply
 
-From practice question [Q83](../../practice/mlops/q083-low-priority-compute-cluster.md).
+From practice question [Q83](../../../practice/mlops/q083-low-priority-compute-cluster.md).
 
 - Set on a **compute cluster**: `AmlCompute(..., tier="low_priority")`.
   Cheaper, preemptible surplus capacity.
@@ -169,4 +169,4 @@ From practice question [Q83](../../practice/mlops/q083-low-priority-compute-clus
   retried). Not offered for managed online endpoints.
 - Needs low-priority quota (this subscription has 0, see above).
 
-Cost cue from [Q163](../../practice/mlops/q163-cluster-cost-tier-min-instances.md): interruptible workloads → `tier="low_priority"` (cheaper while active); `min_instances=0` (free while idle); leave `max_instances` and `size` alone to keep capacity.
+Cost cue from [Q163](../../../practice/mlops/q163-cluster-cost-tier-min-instances.md): interruptible workloads → `tier="low_priority"` (cheaper while active); `min_instances=0` (free while idle); leave `max_instances` and `size` alone to keep capacity.

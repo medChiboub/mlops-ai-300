@@ -1,6 +1,6 @@
 # Lab 04: Run pipelines
 
-Source: [docs/04-run-pipelines.md](../docs/04-run-pipelines.md)
+Source: [docs/04-run-pipelines.md](../../docs/04-run-pipelines.md)
 
 Microsoft Learn module: [Run pipelines in Azure Machine Learning](https://learn.microsoft.com/en-us/training/modules/run-pipelines-azure-machine-learning/)
 (module 5 of [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/), dated 2026-08-27).

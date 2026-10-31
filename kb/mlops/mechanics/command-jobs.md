@@ -133,7 +133,7 @@ the cell (job `epic_king_fhy758f6cn`):
 
 ## Passing inputs to the script: the three names that must match
 
-From practice questions [Q58–Q60](../../practice/mlops/q058-command-arg-literal-name.md).
+From practice questions [Q58–Q60](../../../practice/mlops/q058-command-arg-literal-name.md).
 
 ```python
 job = command(
@@ -186,5 +186,5 @@ A literal value (`--training_data training_data`) or a bare file name
 
 ## Practice cues: snapshot and packages
 
-- `.amlignore` beats `.gitignore`: when both exist, only `.amlignore` is read for the code snapshot ([Q112](../../practice/mlops/q112-amlignore-over-gitignore.md)).
-- In a notebook, `%pip install` targets the running kernel; `!pip` may not ([Q105](../../practice/mlops/q105-pip-magic-current-kernel.md)).
+- `.amlignore` beats `.gitignore`: when both exist, only `.amlignore` is read for the code snapshot ([Q112](../../../practice/mlops/q112-amlignore-over-gitignore.md)).
+- In a notebook, `%pip install` targets the running kernel; `!pip` may not ([Q105](../../../practice/mlops/q105-pip-magic-current-kernel.md)).

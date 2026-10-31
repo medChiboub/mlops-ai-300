@@ -1,6 +1,6 @@
 # Lab 02: Optimize model training
 
-Source: [docs/02-optimize-model-training.md](../docs/02-optimize-model-training.md)
+Source: [docs/02-optimize-model-training.md](../../docs/02-optimize-model-training.md)
 
 Microsoft Learn module: [Run training scripts and track models with MLflow in Azure Machine Learning](https://learn.microsoft.com/en-us/training/modules/run-training-scripts-track-models-mlflow/)
 (module 3 of [Operationalize machine learning models (MLOps)](https://learn.microsoft.com/en-us/training/paths/build-first-machine-operations-workflow/)).
