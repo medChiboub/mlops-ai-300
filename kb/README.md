@@ -1,19 +1,23 @@
-# AI-300 knowledge base
+# AI-300 knowledge base: MLOps half
 
-My own notes for the AI-300 exam, split by the exam's two halves.
+My own notes for the AI-300 exam. This repo holds the **MLOps half**
+(exam domains 1–2, about 45%):
 
-| Track | What's in it | Exam domains |
-|---|---|---|
-| [mlops/](mlops/README.md) | The 7 Microsoft Learn labs redone from scratch, a timeline, and [mechanics/](mlops/mechanics/README.md): what Azure ML actually does underneath (workspace, compute, data, AutoML, MLflow, jobs, sweeps, pipelines, registries, endpoints, monitoring, network isolation, Responsible AI, Bicep/CLI, GitHub Actions) | 1–2 (about 45%) |
-| [genaiops/](genaiops/README.md) | Microsoft Foundry concepts from practice questions: evaluation, RAG and search, models and deployments, fine-tuning, prompts and prompt flow, Foundry setup and identity, observability | 3–5 (about 55%) |
+- [mlops/](mlops/README.md): the 7 Microsoft Learn labs redone from scratch, a timeline, and
+  [mechanics/](mlops/mechanics/README.md): what Azure ML actually does underneath (workspace,
+  compute, data, AutoML, MLflow, jobs, sweeps, pipelines, registries, endpoints, monitoring,
+  network isolation, Responsible AI, Bicep/CLI, GitHub Actions).
 
-**[../practice/](../practice/README.md)** (local, git-ignored): 170 practice
-questions, split the same way (`practice/mlops/`, `practice/genaiops/`), each
-linked to the kb section it fed.
+The **GenAIOps half** (domains 3–5, about 55%) lives in
+[medChiboub/genaiops-ai-300](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/README.md):
+the Foundry labs, plus the concepts from practice questions in
+[kb/from-practice/](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/from-practice/README.md).
 
-Shared ground between the tracks: network isolation
-([Foundry section](mlops/mechanics/network-isolation.md#foundry-the-same-model)),
-Bicep deployments of a Foundry account
-([bicep-and-cli-deployments.md](mlops/mechanics/bicep-and-cli-deployments.md)),
-and GitHub Actions gates ([github-actions-azureml.md](mlops/mechanics/github-actions-azureml.md),
-[evaluation in CI](genaiops/evaluation.md#evaluation-in-the-release-workflow)).
+**[../practice/](../practice/README.md)** (local, git-ignored): the 100 MLOps practice
+questions, each linked to the kb section it fed. The 70 GenAIOps ones are in the GenAIOps
+repo's `practice/`.
+
+Shared ground: network isolation ([Foundry section](mlops/mechanics/network-isolation.md#foundry-the-same-model)),
+Bicep for a Foundry account ([bicep-and-cli-deployments.md](mlops/mechanics/bicep-and-cli-deployments.md)),
+GitHub Actions gates ([github-actions-azureml.md](mlops/mechanics/github-actions-azureml.md),
+[evaluation in CI](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/from-practice/evaluation.md#evaluation-in-the-release-workflow)).

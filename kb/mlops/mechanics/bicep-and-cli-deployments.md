@@ -1,6 +1,6 @@
 # Bicep and `az deployment`: scopes and what a template does
 
-Started after practice question [Q35](../../../practice/genaiops/q035-bicep-group-deployment.md).
+Started after practice question [Q35](../../../../GenAIOps-ai-300/practice/q035-bicep-group-deployment.md).
 My production project is all Bicep (`infra/main.bicep` + `.bicepparam`), so
 this mainly names what I already did.
 

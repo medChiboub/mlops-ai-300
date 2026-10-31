@@ -33,4 +33,4 @@ gets ticked or corrected once we see it.
 | [bicep-and-cli-deployments.md](bicep-and-cli-deployments.md) | `az deployment group/sub/mg/tenant` vs. `targetScope`; existing RG; other subscription via CLI; system-assigned identity isn't inherited | Practice questions |
 | [online-endpoints.md](online-endpoints.md) | Endpoint vs. deployment, `init()`/`run()` scoring script, safe rollout and rollback by traffic | Practice questions |
 
-GenAIOps (Microsoft Foundry) concepts live in their own track: [../../genaiops/](../../genaiops/README.md).
+GenAIOps (Microsoft Foundry) concepts live in the [GenAIOps repo](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/from-practice/README.md).

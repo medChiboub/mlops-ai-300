@@ -1,6 +1,6 @@
 # MLOps track: the AI-300 labs
 
-Part of the [knowledge base](../README.md). GenAIOps (Microsoft Foundry) is in [../genaiops/](../genaiops/README.md).
+Part of the [knowledge base](../README.md). GenAIOps (Microsoft Foundry) is in the [GenAIOps repo](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/from-practice/README.md).
 
 My personal gist of the [MicrosoftLearning/mslearn-mlops](https://github.com/MicrosoftLearning/mslearn-mlops)
 labs, redone from scratch in order, the Microsoft Learn way. Each file records
@@ -104,7 +104,7 @@ Skills measured from the [AI-300 study guide](https://learn.microsoft.com/en-us/
 (checked 2026-09-29). These labs only cover **Domain 1 (15–20%)** and
 **Domain 2 (25–30%)**. **Domains 3–5 (GenAIOps / Microsoft Foundry, about
 45–55% of the exam) aren't in any lab or in my production project**; they
-are covered from practice questions in [../genaiops/](../genaiops/README.md).
+are covered in the [GenAIOps repo](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/from-practice/README.md).
 
 Updated after each lab. **Labs** = the labs whose docs cover the skill.
 **Status** = what I've done so far in these labs.
