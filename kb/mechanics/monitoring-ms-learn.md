@@ -322,7 +322,7 @@ Best practices Microsoft lists:
 
 ## Symptom to action: data vs. model vs. serving
 
-From practice questions [Q22, Q26, Q28](../../practice/archive/q022-q026-q028-signal-to-action.md).
+From practice questions [Q22, Q26, Q28](../../practice/mlops/q022-drift-signal-to-action.md).
 First decide **which layer** is failing:
 
 | Symptom | Layer | First action |

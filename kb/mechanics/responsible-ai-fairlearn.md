@@ -70,7 +70,7 @@ different tools:
 
 ## Creating the dashboard
 
-From practice question [Q38](../../practice/archive/q038-rai-dashboard-register-first.md).
+From practice question [Q38](../../practice/mlops/q038-rai-dashboard-register-first.md).
 
 - **Studio (no-code):** the model must be **registered** first (MLflow
   format supported). Then Models → model → **Responsible AI** → create the

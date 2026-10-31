@@ -115,7 +115,7 @@ variants fairly, the **dataset must be fixed**.
 
 ### Synthetic data: for evaluation *and* fine-tuning
 
-From practice question [Q27](../../practice/archive/q027-synthetic-finetuning-data.md).
+From practice question [Q27](../../practice/genaiops/q027-synthetic-finetuning-data.md).
 Foundry's **simulator** generates task-matched conversations
 (prompt → response) without production data:
 - **Evaluation:** a fixed test set (Q15).
@@ -191,7 +191,7 @@ The name = **where data may be processed** + **how you pay**:
 
 ## Search modes in Azure AI Search
 
-From practice question [Q25](../../practice/archive/q025-search-keyword-vs-semantic.md).
+From practice question [Q25](../../practice/genaiops/q025-search-keyword-vs-semantic.md).
 
 | Mode | Good at | Weak at |
 |---|---|---|
@@ -206,7 +206,7 @@ relevance" → vector + semantic ranking. Usually configured together as
 
 ## Reading evaluation results: before vs. after
 
-From practice question [Q31](../../practice/archive/q031-finetune-eval-comparison.md).
+From practice question [Q31](../../practice/genaiops/q031-finetune-eval-comparison.md).
 
 - Compare runs on the **same dataset**, metric by metric, and check each
   metric's **direction**:
@@ -222,7 +222,7 @@ From practice question [Q31](../../practice/archive/q031-finetune-eval-compariso
 
 ## Fine-tuning data: SFT vs. DPO, and file format
 
-From practice questions [Q32 + Q34](../../practice/archive/q032-q034-finetuning-data-format.md).
+From practice questions [Q32 + Q34](../../practice/genaiops/q032-dpo-preference-records.md).
 
 | Method | Learns from | One JSONL line |
 |---|---|---|

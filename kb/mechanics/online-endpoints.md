@@ -1,6 +1,6 @@
 # Online endpoints: scoring scripts, rollout and rollback
 
-Started after practice questions [Q37 + Q39](../../practice/archive/q037-q039-online-endpoint-basics.md).
+Started after practice questions [Q37 + Q39](../../practice/mlops/q037-rollback-failed-deployment.md).
 My production project runs this for real (`ml/score/score.py`, `deploy.yml`,
 `shift-traffic.yml`); this note puts it in exam terms.
 

@@ -33,7 +33,7 @@ shared through a registry.
 
 ## Hub and project workspaces
 
-From practice question [Q30](../../practice/archive/q030-hub-workspace-governance.md).
+From practice question [Q30](../../practice/mlops/q030-hub-workspace-governance.md).
 
 - A **hub workspace** holds shared settings: security, connections, compute
   and quota.

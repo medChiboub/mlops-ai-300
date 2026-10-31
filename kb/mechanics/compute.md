@@ -121,7 +121,7 @@ From practice question [Q17](../../practice/mlops/q017-compute-per-workload.md).
 
 ## Notebook state: what resets it
 
-From practice question [Q29](../../practice/archive/q029-reset-notebook-state.md). 📘 Microsoft's
+From practice question [Q29](../../practice/mlops/q029-reset-notebook-state.md). 📘 Microsoft's
 *Run Jupyter notebooks* table:
 
 | Resets state (all variables lost) | Doesn't change state |
