@@ -206,6 +206,21 @@ Environment(name="env-c", build=BuildContext(path="docker-context/"))
 | `build` | **Build** an image from a Dockerfile context |
 | `properties`, `tags` | Metadata only |
 
+### Updating an environment means a new version
+
+From practice question [Q40](../../practice/q036-q040-assets-across-workspaces.md).
+Environments are **immutable, versioned** assets, so a new Docker image (or
+image tag) means a **new environment version**:
+
+```python
+env = Environment(name="train-env", image="myacr.azurecr.io/train:2.0")  # new tag
+ml_client.environments.create_or_update(env)   # registers the next version
+```
+
+- Re-registering the same name and version with different content fails.
+  My production project hit exactly that (`docs/SCENARIOS.md`).
+- `conda_file` changes packages, not the base image.
+
 ## 2. GitHub environment: the gate
 
 Full mechanics:

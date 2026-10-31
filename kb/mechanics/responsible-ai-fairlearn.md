@@ -67,3 +67,17 @@ different tools:
 - Before registration: cohort error/fairness analysis (fairness + segment
   errors), plus feature importance (transparency). Latency and schema checks
   are operational, not Responsible AI.
+
+## Creating the dashboard
+
+From practice question [Q38](../../practice/q038-rai-dashboard-register-first.md).
+
+- **Studio (no-code):** the model must be **registered** first (MLflow
+  format supported). Then Models → model → **Responsible AI** → create the
+  dashboard, choosing components (explanations, error analysis,
+  counterfactuals, causal) and the train/test **MLTable** data.
+- **SDK/CLI:** a pipeline. The *RAI insights constructor* → tool components
+  → *gather*. My production project's `ml/experiments/responsible_ai/` used
+  this; the constructor worked, and the tools were blocked by RBAC.
+- Not prerequisites: deploying to an endpoint, converting the model format,
+  or precomputing explanations.

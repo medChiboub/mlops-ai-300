@@ -365,6 +365,20 @@ and needs VPN or Bastion to even open Studio. That's real infrastructure
 cost for a learning project. This is my production project's open AI-300 gap
 (`docs/AI-300.md`), deliberately left as reading.
 
+## Foundry: the same model
+
+From practice question [Q33](../../practice/q033-foundry-private-network.md).
+Microsoft Foundry resources follow the same two halves:
+
+- **Inbound:** **disable public network access** + **private endpoints** for
+  clients.
+- **Outbound:** a **managed virtual network**, with managed private
+  endpoints to dependent resources (storage, AI Search, Key Vault…).
+
+"Disable all inbound access" is a distractor, because private-endpoint
+access is still inbound. Authentication method and subscription placement
+aren't network controls.
+
 ## Exam traps
 
 1. A **managed VNet = outbound** isolation. **Inbound** = PNA + private

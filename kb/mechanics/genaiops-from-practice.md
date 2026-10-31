@@ -203,3 +203,34 @@ From practice question [Q25](../../practice/q025-search-keyword-vs-semantic.md).
 Exam cue: "exact identifiers must match" → keyword. "Natural-language
 relevance" → vector + semantic ranking. Usually configured together as
 **hybrid + semantic ranker**.
+
+## Reading evaluation results: before vs. after
+
+From practice question [Q31](../../practice/q031-finetune-eval-comparison.md).
+
+- Compare runs on the **same dataset**, metric by metric, and check each
+  metric's **direction**:
+
+| Metric | Better is |
+|---|---|
+| Groundedness, relevance, coherence, fluency | **Higher** |
+| Hallucination rate, safety defect rate | **Lower** |
+| Latency, cost per call | **Lower** |
+
+- A **regression** = a metric moved the wrong way. A small latency change
+  (420 → 430 ms) is a trade-off to note, not a functional failure.
+
+## Fine-tuning data: SFT vs. DPO, and file format
+
+From practice questions [Q32 + Q34](../../practice/q032-q034-finetuning-data-format.md).
+
+| Method | Learns from | One JSONL line |
+|---|---|---|
+| **SFT** (supervised) | Correct examples | `{"messages":[{system},{user},{assistant}]}` |
+| **DPO** (direct preference optimization) | **Comparisons** | `{"input":[...], "preferred_output":[{assistant}], "non_preferred_output":[{assistant}]}` |
+
+- DPO needs **contrast**: identical preferred and non-preferred outputs give
+  no signal.
+- Each output must be an `assistant`-role message.
+- Files are **JSONL** (one object per line), **UTF-8** encoded. Upload
+  training (and optionally validation) files, then fine-tune.

@@ -31,3 +31,5 @@ gets ticked or corrected once we see it.
 | [genaiops-from-practice.md](genaiops-from-practice.md) | **GenAIOps concepts surfaced by practice questions** (not in the labs): GenAI evaluation metrics, key-less identity + RBAC, RAG retrieval levers, safe model-version upgrades | Practice questions |
 | [responsible-ai-fairlearn.md](responsible-ai-fairlearn.md) | Fairlearn assess vs. mitigate; pre-processing / reductions / post-processing, and which retrains; `ThresholdOptimizer` for no-retrain | Practice questions |
 | [feature-store.md](feature-store.md) | Managed feature store: entity, feature set spec vs. asset, materialization, **feature retrieval spec packaged with the model** | Practice questions |
+| [bicep-and-cli-deployments.md](bicep-and-cli-deployments.md) | `az deployment group/sub/mg/tenant` vs. `targetScope`; existing RG; other subscription via CLI; system-assigned identity isn't inherited | Practice questions |
+| [online-endpoints.md](online-endpoints.md) | Endpoint vs. deployment, `init()`/`run()` scoring script, safe rollout and rollback by traffic | Practice questions |
