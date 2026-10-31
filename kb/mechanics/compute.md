@@ -86,7 +86,7 @@ problem, not a code problem.
 ## Adding a Jupyter kernel on a compute instance
 
 📘 From *Access a compute instance terminal* (read 2026-10-31). Added after
-practice questions [Q9–Q11](../../practice/mlops/q009-kernel-delete-python36.md).
+practice questions [Q9–Q11](../../practice/mlops/q011-kernel-create-environment.md).
 
 A Jupyter kernel = **a conda environment + `ipykernel` + a registered
 kernelspec**. From the compute instance terminal (Studio → Notebooks →
@@ -109,7 +109,7 @@ python -m ipykernel install --user --name newenv --display-name "Python (newenv)
 
 ## Which compute for which workload
 
-From practice question [Q17](../../practice/archive/q017-compute-per-workload.md).
+From practice question [Q17](../../practice/mlops/q017-compute-per-workload.md).
 
 | Workload | Compute | Cost control |
 |---|---|---|

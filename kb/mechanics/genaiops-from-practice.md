@@ -82,7 +82,7 @@ My production project implements this with `deploy.yml`
 
 ## RAG evaluation: completeness vs. utilization
 
-From practice question [Q13](../../practice/archive/q013-rag-completeness-utilization.md).
+From practice question [Q13](../../practice/genaiops/q013-rag-completeness-utilization.md).
 📘 Microsoft's *RAG: LLM end-to-end evaluation phase* guide.
 
 - **Completeness:** does the response answer every part of the query?
@@ -101,7 +101,7 @@ For low completeness in general, the guide's order is:
 
 ## Evaluation datasets
 
-From practice question [Q15](../../practice/archive/q015-synthetic-eval-data.md).
+From practice question [Q15](../../practice/genaiops/q015-synthetic-eval-data.md).
 
 An evaluation = **dataset** (inputs, optionally expected outputs) +
 **target** (app, prompt variant, model) + **evaluators**. To compare
@@ -127,7 +127,7 @@ examples.
 
 ## Prompt design
 
-From practice question [Q16](../../practice/archive/q016-prompt-design-reusable.md).
+From practice question [Q16](../../practice/genaiops/q016-prompt-design-reusable.md).
 
 | Technique | Use for |
 |---|---|
@@ -143,7 +143,7 @@ clear system/user separation. Never fine-tuning or a higher temperature.
 
 ## Observability for a model deployment
 
-From practice question [Q14](../../practice/archive/q014-foundry-latency-observability.md). 🟡 Exact
+From practice question [Q14](../../practice/genaiops/q014-foundry-latency-observability.md). 🟡 Exact
 Foundry step order not verified.
 
 1. **Deploy** (the endpoint must exist).
@@ -158,7 +158,7 @@ and embeddings (retrieval) aren't observability.
 
 ## Safety evaluators vs. content filters
 
-From practice question [Q18](../../practice/archive/q018-hate-content-evaluator.md).
+From practice question [Q18](../../practice/genaiops/q018-hate-content-evaluator.md).
 
 | Risk | Evaluator (measure, pre-release) |
 |---|---|
@@ -174,7 +174,7 @@ From practice question [Q18](../../practice/archive/q018-hate-content-evaluator.
 
 ## Foundry deployment types
 
-From practice question [Q19](../../practice/archive/q019-foundry-deployment-types.md).
+From practice question [Q19](../../practice/genaiops/q019-foundry-deployment-types.md).
 
 The name = **where data may be processed** + **how you pay**:
 - **Where:** *Global* = any Azure region; *Data Zone* = within a geography

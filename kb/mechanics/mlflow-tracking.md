@@ -150,7 +150,7 @@ everything goes through MLflow.
 
 ## Reading a tracking script: experiment vs. artifact path vs. model name
 
-From practice question [Q20](../../practice/archive/q020-mlflow-tracking-script.md).
+From practice question [Q20](../../practice/mlops/q020-mlflow-tracking-script.md).
 
 ```python
 mlflow.set_experiment("classification-experiment")   # WHERE runs are grouped (creates it if missing)

@@ -47,7 +47,7 @@ Fairlearn has two jobs:
 
 ## Assessing: the RAI dashboard and cohorts
 
-From practice question [Q12](../../practice/archive/q012-rai-before-registration.md).
+From practice question [Q12](../../practice/mlops/q012-rai-cohort-errors-before-registration.md).
 
 The Azure ML **Responsible AI dashboard** answers different questions with
 different tools:
