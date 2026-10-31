@@ -258,3 +258,5 @@ cold start, then the two steps ran one after the other on **one node**.
 
 - Component from a Python function → `@command_component` (mldesigner); typed `Input`/`Output` parameters form the interface ([Q111](../../practice/mlops/q111-command-component-decorator.md)).
 - "Repeatable, auditable training instead of notebooks" → Azure ML **pipelines** ([Q114](../../practice/mlops/q114-fabrikam-training-pipelines.md)).
+
+- `load_component(source="train.yml")` then `ml_client.components.create_or_update(c)` to register ([Q147](../../practice/mlops/q147-load-and-register-component.md)).

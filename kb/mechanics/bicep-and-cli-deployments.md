@@ -33,3 +33,5 @@ role assignments.
 
 [Q123](../../practice/mlops/q123-cli-deploy-bicep-declare.md): "define declaratively" → **Bicep**; "deploy from a pipeline" →
 **Azure CLI** (`az deployment group create`) as the pipeline step.
+
+Workspace IaC series [Q150–Q152](../../practice/mlops/q150-iac-bicep-github-action.md): **Bicep + GitHub Actions = Yes**; cloning a workspace or creating it in the portal = No (not versioned, not repeatable).

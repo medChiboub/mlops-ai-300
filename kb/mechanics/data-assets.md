@@ -152,3 +152,9 @@ ml_client.create_or_update(store)
 - **Reproducibility:** each data asset version is immutable and a job input
   `azureml:<name>:<version>` records exactly what a run used. Write each data
   refresh to a new path, because a version points at a path, not a copy.
+
+More from practice questions [Q144](../../practice/mlops/q144-mltable-from-delimited-files.md), [Q146](../../practice/mlops/q146-blob-datastore-sas.md), [Q149](../../practice/mlops/q149-pandas-describe.md):
+
+- CSV folder **without** an `MLTable` file → `mltable.from_delimited_files(paths=[...])`; with one → `mltable.load(folder)`. Parquet/Delta have their own `from_*`.
+- Datastore credentials: `AccountKeyConfiguration` (no expiry), **`SasTokenConfiguration`** (time-limited), or none (identity-based access).
+- Quick stats for every numeric column: `pandas.read_csv(...).describe()` (count, mean, std, min, 25/50/75%, max).

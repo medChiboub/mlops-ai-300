@@ -144,3 +144,20 @@ From practice question [Q138](../../practice/mlops/q138-bayesian-concurrency.md)
 - Docs: `max_total_trials` ≥ 20 × the number of hyperparameters.
 - Bayesian sampling doesn't support early termination; a Bandit slack setting
   can't help convergence.
+
+## Distributions and which sampling supports them
+
+From practice questions [Q142](../../practice/mlops/q142-sweep-distributions-exhibit.md), [Q160](../../practice/mlops/q160-bayesian-distributions.md), [Q158](../../practice/mlops/q158-bandit-delay-interval.md).
+
+| Distribution | Values | Grid | Random | Bayesian |
+|---|---|---|---|---|
+| `Choice(values=[...])` / `Choice(range(3,5))` | Listed discrete values (`range` end exclusive → 3, 4) | ✅ | ✅ | ✅ |
+| `Uniform(min, max)` | Any value in the range | ❌ | ✅ | ✅ |
+| `QUniform(min, max, q)` | Uniform, rounded to steps of q | ❌ | ✅ | ✅ |
+| `LogUniform`, `QLogUniform` | Log-scale range | ❌ | ✅ | ❌ |
+| `Normal(mu, sigma)`, `QNormal`, `LogNormal`, `QLogNormal` | Gaussian (mean, SD) | ❌ | ✅ | ❌ |
+
+- "Every combination tested" only with **grid** (all `Choice`).
+- Bandit timing: `evaluation_interval=1` checks every report;
+  `delay_evaluation=5` skips the first 5. "Percentage of worst runs" is
+  **truncation selection**, not Bandit.

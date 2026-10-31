@@ -113,3 +113,5 @@ From practice questions [Q117](../../practice/mlops/q117-rai-counterfactual-caus
 
 Pipeline (SDK/CLI): **constructor** → tool components → **gather**. Studio:
 registered model → *Create Responsible AI dashboard* ([Q38](../../practice/mlops/q038-rai-dashboard-register-first.md)).
+
+Practice cues: [Q154](../../practice/mlops/q154-rai-causal-counterfactual.md) (treatment policy → causal; minimal change → counterfactual) and [Q155](../../practice/mlops/q155-fairlearn-dashboard-steps.md) (Fairlearn assessment supports **binary classification and regression** only; pick sensitive feature, model, metric).
