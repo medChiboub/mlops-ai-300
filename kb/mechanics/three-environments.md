@@ -181,6 +181,31 @@ Studio → Environments → Curated shows it.
 
 ---
 
+### Defining one in SDK v2: image vs. build vs. conda_file
+
+From practice question [Q21](../../practice/q021-environment-from-docker-image.md).
+
+```python
+from azure.ai.ml.entities import Environment, BuildContext
+
+# 1. An existing Docker image, as-is
+Environment(name="env-a", image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04")
+
+# 2. Image + conda packages on top (what the labs and my project use)
+Environment(name="env-b", image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04",
+            conda_file="conda.yml")
+
+# 3. Build from your own Dockerfile
+Environment(name="env-c", build=BuildContext(path="docker-context/"))
+```
+
+| Parameter | Means |
+|---|---|
+| `image` | **Use this Docker image** (URI) |
+| `conda_file` | Add conda/pip packages on top of `image` |
+| `build` | **Build** an image from a Dockerfile context |
+| `properties`, `tags` | Metadata only |
+
 ## 2. GitHub environment: the gate
 
 Full mechanics:

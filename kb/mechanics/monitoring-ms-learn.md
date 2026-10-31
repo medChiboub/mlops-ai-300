@@ -320,6 +320,23 @@ Best practices Microsoft lists:
 | Alerts | Email | Email only; retraining not wired | Event Grid for automated reactions |
 | Result | Never ran (Spark blocked) | Collection verified; no successful run | — |
 
+## Symptom to action: data vs. model vs. serving
+
+From practice questions [Q22, Q26, Q28](../../practice/q022-q026-q028-signal-to-action.md).
+First decide **which layer** is failing:
+
+| Symptom | Layer | First action |
+|---|---|---|
+| Input distributions differ from training | **Data** | Data drift signal / drift metrics |
+| Accuracy falls with nothing redeployed | **Model** (concept drift) | Predictions vs. ground truth → retrain on recent data |
+| Errors right after an update | **Deployment** | Deployment/container logs (`az ml online-deployment get-logs`, EventLog, ConsoleLog) |
+| Wrong answers, no errors | **Code / model version** | Check `score.py` and the deployed model version |
+| Slow or timing out under load | **Capacity** | Endpoint metrics → autoscale / more instances |
+
+Distractors in these questions: "restart the endpoint", "rebuild the
+container image", "increase traffic allocation". None of them diagnoses
+anything.
+
 ## Exam traps
 
 1. Out-of-box reference = **recent past production**, not training data.

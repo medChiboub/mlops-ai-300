@@ -64,6 +64,18 @@ metric once, like ours, gives nothing to compare mid-run. With a small grid
 **4. Limits**: `set_limits(max_total_trials, max_concurrent_trials, timeout)`.
 The lab: `max_total_trials=4, max_concurrent_trials=2, timeout=7200`.
 
+## Exam cues for the termination policies
+
+From practice question [Q23](../../practice/q023-early-termination-relative-policies.md).
+
+- "Compare against **all** runs" / "not only the best run" → **Median
+  stopping** and **Truncation selection**.
+- "Within X of the **best** run" (slack) → **Bandit**.
+- "Many runs perform similarly" → relative policies, because Bandit's
+  best-run reference stops few runs.
+- Old name **Hyperdrive** (SDK v1) = today's **sweep job** (SDK v2). Same
+  policies.
+
 ## What actually happened (sweep `quiet_parcel_r5zv90jjw2`)
 
 | Trial | `reg_rate` | Ran (UTC) | `training_accuracy_score` | AUC |

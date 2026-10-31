@@ -113,6 +113,18 @@ variants fairly, the **dataset must be fixed**.
 | **Synthetic data generation** | No live traffic yet (dev). Foundry can generate queries from your content |
 | Logged production traffic | After launch, for regression sets |
 
+### Synthetic data: for evaluation *and* fine-tuning
+
+From practice question [Q27](../../practice/q027-synthetic-finetuning-data.md).
+Foundry's **simulator** generates task-matched conversations
+(prompt → response) without production data:
+- **Evaluation:** a fixed test set (Q15).
+- **Fine-tuning:** training examples when compliance blocks real
+  conversations (Q27).
+
+Telemetry and traces describe *how* the app ran; they aren't training
+examples.
+
 ## Prompt design
 
 From practice question [Q16](../../practice/q016-prompt-design-reusable.md).
@@ -176,3 +188,18 @@ The name = **where data may be processed** + **how you pay**:
 | Steady, high-volume, latency-sensitive | **Global Provisioned** |
 | Must stay in the EU/US | **Data Zone** Standard/Provisioned |
 | Large offline jobs, results within 24h | **Global Batch** |
+
+## Search modes in Azure AI Search
+
+From practice question [Q25](../../practice/q025-search-keyword-vs-semantic.md).
+
+| Mode | Good at | Weak at |
+|---|---|---|
+| **Keyword / full-text (BM25)** | **Exact terms**: IDs, codes, names | Paraphrases and synonyms |
+| **Vector** | Meaning: paraphrased natural-language questions | Exact IDs and rare tokens |
+| **Hybrid** (keyword + vector, merged with RRF) | Both at once | — |
+| **Semantic ranker** (on top) | Re-ranking the top results by meaning | Doesn't retrieve, only re-orders |
+
+Exam cue: "exact identifiers must match" → keyword. "Natural-language
+relevance" → vector + semantic ranking. Usually configured together as
+**hybrid + semantic ranker**.

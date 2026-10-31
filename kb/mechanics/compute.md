@@ -119,6 +119,22 @@ From practice question [Q17](../../practice/q017-compute-per-workload.md).
 | Real-time inference | Managed online endpoint (or AKS / Arc Kubernetes) | Instance count and autoscale |
 | Existing Spark/Databricks estate | Attached compute | — |
 
+## Notebook state: what resets it
+
+From practice question [Q29](../../practice/q029-reset-notebook-state.md). 📘 Microsoft's
+*Run Jupyter notebooks* table:
+
+| Resets state (all variables lost) | Doesn't change state |
+|---|---|
+| **Change the kernel** | **Stop the kernel** (stops running cells; the next run restarts it) |
+| **Switch compute** | **Navigate to another workspace section** (stops running cells) |
+| **Reset compute** | |
+| Stop compute | |
+| Open the notebook in Jupyter/JupyterLab | |
+
+The trap: "stop the kernel" feels like it should clear state, but Microsoft
+lists it as **not** changing it.
+
 ## Lab vs. my project
 
 My project has **no compute instance** (notebooks run on my Mac) and one

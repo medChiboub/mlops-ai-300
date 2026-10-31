@@ -31,6 +31,21 @@ A pipeline **job** isn't a registered asset. You register its
 **pipeline component**. All four assets get immutable versions and can be
 shared through a registry.
 
+## Hub and project workspaces
+
+From practice question [Q30](../../practice/q030-hub-workspace-governance.md).
+
+- A **hub workspace** holds shared settings: security, connections, compute
+  and quota.
+- **Project workspaces** under it inherit those, but keep their own access,
+  data and **cost** boundaries.
+- Exam cue: "centrally governed **and** isolated per team (billing,
+  access)" → **hub + one project per team**. One shared workspace has no
+  per-team isolation; a resource group or storage account alone isn't
+  governance.
+- A **registry** complements this: hubs govern *where teams work*, and
+  registries share *assets across workspaces*.
+
 ## Why separate dev and prod workspaces
 
 From the docs, the drivers are **security and compliance** (isolate access,
