@@ -12,7 +12,10 @@ Sources, tagged per line where it matters:
 - 🛠 **My project** ([mlops-diabetes-project](https://github.com/medChiboub/mlops-diabetes-project/blob/main/README.md)): real code that ran; mostly YAML + CLI, with SDK v2 in `ml/experiments/`.
 - **Qn**: the practice question that tested it.
 
-When the three disagree, answer with 📘. The deep explanations live in the
+When the three disagree, answer with 📘. Sections added on 2026-10-31
+(identity, interactive data, distributed training, Spark, feature store, GitHub Actions,
+MLflow models, troubleshooting, registries) were checked that day against the current
+Microsoft Learn pages linked in them. The deep explanations live in the
 other mechanics notes; this page is the API surface.
 
 ## Contents
@@ -20,24 +23,28 @@ other mechanics notes; this page is the API surface.
 1. [The pattern behind every call](#1-the-pattern-behind-every-call)
 2. [Connect](#2-connect)
 3. [Workspace and network](#3-workspace-and-network)
-4. [Datastores](#4-datastores)
-5. [Data assets, paths, MLTable](#5-data-assets-paths-mltable)
-6. [Compute](#6-compute)
-7. [Environments](#7-environments)
-8. [Command jobs](#8-command-jobs)
-9. [Sweep jobs](#9-sweep-jobs)
-10. [AutoML](#10-automl)
-11. [Components, pipelines, schedules](#11-components-pipelines-schedules)
-12. [MLflow tracking](#12-mlflow-tracking)
-13. [Models: register, archive, share, package](#13-models-register-archive-share-package)
-14. [Online endpoints](#14-online-endpoints)
-15. [Batch endpoints](#15-batch-endpoints)
-16. [Monitoring](#16-monitoring)
-17. [Responsible AI and Fairlearn](#17-responsible-ai-and-fairlearn)
-18. [Notebook and terminal bits](#18-notebook-and-terminal-bits)
-19. [CLI ↔ SDK map](#19-cli--sdk-map)
-20. [Near-miss traps](#20-near-miss-traps)
-21. [Exam vs. lab vs. my project](#21-exam-vs-lab-vs-my-project)
+4. [Identity and access](#4-identity-and-access)
+5. [Datastores](#5-datastores)
+6. [Data assets, paths, MLTable](#6-data-assets-paths-mltable)
+7. [Compute](#7-compute)
+8. [Environments](#8-environments)
+9. [Command jobs](#9-command-jobs)
+10. [Distributed training and Spark](#10-distributed-training-and-spark)
+11. [Sweep jobs](#11-sweep-jobs)
+12. [AutoML](#12-automl)
+13. [Components, pipelines, schedules](#13-components-pipelines-schedules)
+14. [MLflow tracking](#14-mlflow-tracking)
+15. [Models: register, archive, share, package](#15-models-register-archive-share-package)
+16. [Feature store and the feature retrieval spec](#16-feature-store-and-the-feature-retrieval-spec)
+17. [Online endpoints](#17-online-endpoints)
+18. [Batch endpoints](#18-batch-endpoints)
+19. [Monitoring](#19-monitoring)
+20. [Responsible AI and Fairlearn](#20-responsible-ai-and-fairlearn)
+21. [Notebook and terminal bits](#21-notebook-and-terminal-bits)
+22. [GitHub Actions](#22-github-actions)
+23. [CLI ↔ SDK map](#23-cli--sdk-map)
+24. [Near-miss traps](#24-near-miss-traps)
+25. [Exam vs. lab vs. my project](#25-exam-vs-lab-vs-my-project)
 
 ## 1. The pattern behind every call
 
@@ -90,7 +97,50 @@ ml_client.workspaces.begin_provision_network(workspace_name="mlw-prod").result()
 - Inbound = public network access + **private endpoint** (`amlworkspace` sub-resource) [Q53](../../../practice/mlops/q053-workspace-private-endpoint.md). Outbound = managed VNet.
 - 🛠 My project: Bicep (`infra/main.bicep`), public access left on. Details: [network-isolation.md](network-isolation.md).
 
-## 4. Datastores
+## 4. Identity and access
+
+📘 [Identity-based service authentication](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-identity-based-service-authentication?view=azureml-api-2),
+[Manage roles](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-assign-roles?view=azureml-api-2).
+
+```python
+from azure.ai.ml.entities import AmlCompute, IdentityConfiguration, ManagedIdentityConfiguration, UserIdentityConfiguration
+from azure.ai.ml.constants import ManagedServiceIdentityType
+
+cluster = AmlCompute(name="train-cluster", size="STANDARD_DS3_v2", max_instances=4,
+    identity=IdentityConfiguration(type=ManagedServiceIdentityType.SYSTEM_ASSIGNED))   # or USER_ASSIGNED +
+    # user_assigned_identities=[ManagedIdentityConfiguration(resource_id="/subscriptions/.../userAssignedIdentities/uai")]
+
+job = command(..., identity=UserIdentityConfiguration())     # run as the submitting user (YAML: identity: type: user_identity)
+job = command(..., identity=ManagedIdentityConfiguration())  # run as the compute's managed identity (YAML: type: managed)
+```
+
+| Who | Needs | For |
+|---|---|---|
+| Compute identity | **Storage Blob Data Reader** (minimum) on the storage account | Credential-less (identity-based) datastores |
+| Compute identity | **AcrPull** on the container registry | Pulling environment images 🛠 (one of my real bugs) |
+| A user | Storage Blob Data Reader | Their own identity-based data access |
+| Whoever assigns a user-assigned identity to compute | Managed Identity Operator | |
+
+- A cluster has **one system-assigned *or* several user-assigned** identities, not both.
+- Default job identity with identity-based datastores = the compute's managed identity. A job can't mix user and compute identity. In pipelines, set identity **per step** (on the root it does nothing).
+- Workspace identity: system-assigned by default; you can go to system + user-assigned, never back.
+  New workspaces (since 2024-11-19) give it **Azure AI Administrator**, not Contributor.
+
+Built-in roles:
+
+| Role | Can | Can't |
+|---|---|---|
+| **AzureML Data Scientist** | Everything in the workspace: jobs, assets, deployments, endpoint keys/tokens | Create/delete compute, change the workspace |
+| **AzureML Compute Operator** | Create, manage, delete compute | |
+| **AzureML Registry User** (registry scope) | Read, write, delete assets in a registry | Create/delete the registry |
+| Reader | View (including datastore credentials) | Change anything |
+| Contributor | All of the above + create compute, deploy | Assign roles |
+| Owner | Everything, including role assignments | |
+
+Custom role = JSON (`Actions`, `NotActions`, `AssignableScopes`) → `az role definition create --role-definition role.json`
+(needs Owner; changes take 15–60 min). Details: [workspace-and-storage.md](workspace-and-storage.md), [github-actions-azureml.md](github-actions-azureml.md).
+
+## 5. Datastores
 
 ```python
 from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration, SasTokenConfiguration
@@ -118,7 +168,7 @@ Credential classes: `AccountKeyConfiguration`, `SasTokenConfiguration`,
 `workspaceblobstore` (default), `workspaceworkingdirectory`,
 `workspacefilestore`, `workspaceartifactstore`. Details: [data-assets.md](data-assets.md), [workspace-and-storage.md](workspace-and-storage.md).
 
-## 5. Data assets, paths, MLTable
+## 6. Data assets, paths, MLTable
 
 ```python
 from azure.ai.ml.entities import Data
@@ -158,11 +208,30 @@ tbl.save("./folder")                                   # writes the MLTable file
 df = tbl.to_pandas_dataframe()                         # materialize
 ```
 
+Interactive access without downloading (📘 [interactive data access](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-access-data-interactive?view=azureml-api-2); `pip install azureml-fsspec mltable`):
+
+```python
+import pandas as pd
+df = pd.read_csv("azureml://subscriptions/<sub>/resourcegroups/<rg>/workspaces/<ws>/datastores/<store>/paths/<folder>/file.csv")
+
+from azureml.fsspec import AzureMachineLearningFileSystem
+fs = AzureMachineLearningFileSystem("azureml://subscriptions/<sub>/resourcegroups/<rg>/workspaces/<ws>/datastores/<store>")
+fs.ls(); fs.glob("/<folder>/*.csv"); fs.exists(...); fs.upload(lpath=..., rpath=..., recursive=True); fs.download(rpath=..., lpath=...)
+with fs.open("./folder1/file1.csv") as f:
+    df = pd.read_csv(f)
+
+asset = ml_client.data.get(name="titanic", version="1")
+mltable.load(f"azureml:/{asset.id}")                          # an MLTable asset
+mltable.from_delimited_files(paths=[{"file": asset.path}])    # a uri_file asset   ({"folder": ...} for uri_folder)
+```
+
+Pandas only for data that fits in memory; bigger → Spark (below).
+
 Quick stats on a CSV: `pandas.read_csv(...).describe()` (count, mean, std, min, 25/50/75%, max) [Q149](../../../practice/mlops/q149-pandas-describe.md).
 Reproducibility: versions are immutable, but a version points at a **path**;
 write each refresh to a new folder [Q130](../../../practice/mlops/q130-versioned-data-reproducibility.md).
 
-## 6. Compute
+## 7. Compute
 
 ```python
 from azure.ai.ml.entities import AmlCompute, ComputeInstance
@@ -180,12 +249,28 @@ ci = ComputeInstance(name="ci-me", size="STANDARD_DS11_V2")    # interactive dev
 ml_client.compute.begin_create_or_update(ci).result()
 ```
 
+Serverless (📘 [serverless compute](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-use-serverless-compute?view=azureml-api-2)): omit `compute`, then optionally
+
+```python
+from azure.ai.ml.entities import JobResourceConfiguration
+job.resources = JobResourceConfiguration(instance_type="Standard_E4s_v3", instance_count=1)
+job.queue_settings = {"job_tier": "Spot"}          # "Spot" (low priority) | "Standard" (default)
+pipeline_job.settings.default_compute = "serverless"
+```
+
+Works for command (incl. distributed), sweep, AutoML (uses `ResourceConfiguration`) and parallel jobs. Identity: user
+(`UserIdentityConfiguration`) or the workspace's **user-assigned** identity; system-assigned isn't supported.
+
+Compute instance options (📘 [create a compute instance](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-compute-instance?view=azureml-api-2)):
+`ComputeInstance(name=..., size=..., idle_time_before_shutdown_minutes=30, schedules=ComputeSchedules(compute_start_stop=[ComputeStartStopSchedule(action="stop", trigger=CronTrigger(...))]))`.
+Idle shutdown 15 min–3 days; up to 4 schedules; **size and SSH can't be changed after creation**; assigning it to another user is "create on behalf of" (studio or ARM template).
+
 - Instance = interactive (notebooks, terminal). Cluster = jobs, autoscaling. **Serverless** = omit `compute` in a job.
 - Low priority: fine for training and **batch** endpoints; not for managed online endpoints.
 - Cut cost without cutting capacity: change `tier` and `min_instances`, **not** `max_instances` or `size` [Q163](../../../practice/mlops/q163-cluster-cost-tier-min-instances.md).
 - 🛠 My project: `compute.bicep` (`train-cluster`); 🧪 the lab creates both from the CLI.
 
-## 7. Environments
+## 8. Environments
 
 ```python
 from azure.ai.ml.entities import Environment, BuildContext
@@ -201,7 +286,7 @@ ml_client.environments.create_or_update(env)                                    
 - Reference: `"azureml:diabetes-train-env:1"` 🛠, a curated one from the `azureml` registry (`"azureml://registries/azureml/environments/<name>/labels/latest"`), or `"<name>@latest"` for the latest version of a workspace environment ([Q159](../../../practice/mlops/q159-mlclient-command-job.md) uses `aml-scikit-learn@latest`).
 - "Identical dependencies in every job" → define an **environment** (not job config) [Q109](../../../practice/mlops/q109-environment-for-consistent-deps.md).
 
-## 8. Command jobs
+## 9. Command jobs
 
 ```python
 from azure.ai.ml import command, Input, Output
@@ -234,7 +319,50 @@ ml_client.jobs.download(returned.name, output_name="model_output")
 - **`.amlignore` beats `.gitignore`**: if both exist, only `.amlignore` filters the snapshot [Q112](../../../practice/mlops/q112-amlignore-over-gitignore.md).
 - 🧪 YAML twin: `src/job.yml` + `az ml job create -f job.yml`. Details: [command-jobs.md](command-jobs.md).
 
-## 9. Sweep jobs
+## 10. Distributed training and Spark
+
+📘 [Distributed GPU training](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-train-distributed-gpu?view=azureml-api-2) (`azure-ai-ml` ≥ 1.5.0). Not done in the labs or my project: docs only.
+
+```python
+job = command(
+    code="./src", command="python train.py --epochs ${{inputs.epochs}}", inputs={"epochs": 1},
+    environment="azureml:AzureML-acpt-pytorch-2.8-cuda12.6@latest",
+    compute="gpu-cluster",
+    instance_count=2,                                                       # nodes
+    distribution={"type": "PyTorch", "process_count_per_instance": 1},       # = GPUs per node
+)
+# MPI (Horovod, DeepSpeed):  {"type": "mpi", "process_count_per_instance": 1}
+# TensorFlow:                {"type": "tensorflow", "worker_count": 2, "parameter_server_count": 1}   # PS = TF 1.x only
+# Typed classes also exist: PyTorchDistribution, MpiDistribution, TensorFlowDistribution
+```
+
+| Framework | Azure ML sets | Script does |
+|---|---|---|
+| PyTorch | `MASTER_ADDR`, `MASTER_PORT`, `WORLD_SIZE`, `NODE_RANK` (per node); `RANK`, `LOCAL_RANK` (per process) | `torch.distributed.init_process_group(backend="nccl", init_method="env://")`; no launcher needed |
+| TensorFlow | `TF_CONFIG` per worker | `tf.distribute` strategy |
+
+- If `process_count_per_instance` is omitted, Azure ML starts **one process per node**.
+- **InfiniBand** = SKUs with an **"r"** (RDMA), e.g. `Standard_NC24rs_v3`, not `Standard_NC24s_v3`; drivers preinstalled on AmlCompute.
+- **DeepSpeed** runs through the PyTorch or MPI distribution; a curated ACPT environment ships it.
+- AutoML classification/regression distributed: trials run one after another, `max_concurrent_trials` ignored.
+
+Spark (📘 [Spark jobs](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-submit-spark-jobs?view=azureml-api-2)): data too big for pandas.
+
+```python
+from azure.ai.ml import spark, Input, Output
+spark_job = spark(
+    code="./src", entry={"file": "titanic.py"},
+    driver_cores=1, driver_memory="2g", executor_cores=2, executor_memory="2g", executor_instances=2,
+    resources={"instance_type": "Standard_E8S_V3", "runtime_version": "3.4.0"},   # serverless Spark
+    # compute="<attached Synapse pool>"                                          # instead of resources
+    inputs={"titanic_data": Input(type="uri_file", path="azureml://datastores/workspaceblobstore/paths/data/titanic.csv", mode="direct")},
+)
+ml_client.jobs.create_or_update(spark_job)
+```
+
+The job's identity needs Contributor + **Storage Blob Data Contributor** on the storage. Monitoring jobs also run on serverless Spark.
+
+## 11. Sweep jobs
 
 ```python
 from azure.ai.ml.sweep import Choice, Uniform, BanditPolicy
@@ -268,7 +396,7 @@ ml_client.jobs.create_or_update(sweep_job)
 `Uniform(0.05, 0.1)` = any value in between; `Choice(range(3,5))` = 3 or 4 [Q142](../../../practice/mlops/q142-sweep-distributions-exhibit.md).
 Details: [sweep-jobs.md](sweep-jobs.md).
 
-## 10. AutoML
+## 12. AutoML
 
 ```python
 from azure.ai.ml import automl, Input
@@ -305,7 +433,7 @@ Primary metrics: classification `accuracy`, `AUC_weighted`, `average_precision_s
 Vision data = **JSONL** wrapped in an MLTable [Q156](../../../practice/mlops/q156-automl-vision-jsonl.md). Steps: compute → configure → submit → review [Q65](../../../practice/mlops/q065-automl-job-steps.md).
 Details: [automl.md](automl.md).
 
-## 11. Components, pipelines, schedules
+## 13. Components, pipelines, schedules
 
 ```python
 from azure.ai.ml import load_component, Input
@@ -351,7 +479,7 @@ ml_client.schedules.begin_create_or_update(JobSchedule(name="weekly", trigger=tr
 "Repeatable and auditable training instead of notebooks" → **pipelines** [Q114](../../../practice/mlops/q114-fabrikam-training-pipelines.md).
 Details: [components-and-pipelines.md](components-and-pipelines.md).
 
-## 12. MLflow tracking
+## 14. MLflow tracking
 
 ```python
 import mlflow
@@ -398,7 +526,31 @@ MlflowClient().get_run(run.info.run_id)     # [Q115](../../../practice/mlops/q11
 - Autolog vs. custom: autolog adds params, `training_*` metrics and the `model/` folder 🧪 lab 02.
 - Details: [mlflow-tracking.md](mlflow-tracking.md).
 
-## 13. Models: register, archive, share, package
+MLflow **models** (📘 [log MLflow models](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-log-mlflow-models?view=azureml-api-2),
+[deploy MLflow models](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-deploy-mlflow-models?view=azureml-api-2)):
+
+```python
+from mlflow.models import infer_signature
+signature = infer_signature(X_test, y_pred)                 # input + output schema
+mlflow.sklearn.log_model(model, artifact_path="classifier", signature=signature,
+                         input_example=X_train.sample(n=1), pip_requirements=["scikit-learn==1.5.1"])
+
+from mlflow.pyfunc import PythonModel, PythonModelContext
+class ModelWrapper(PythonModel):                            # custom model: implement predict (load_context optional)
+    def load_context(self, context: PythonModelContext): self.enc = load(context.artifacts["encoder"])
+    def predict(self, context: PythonModelContext, data, params=None): return self.model.predict_proba(data)
+mlflow.pyfunc.log_model(artifact_path="classifier", python_model=ModelWrapper(model),
+                        artifacts={"encoder": "encoder.pkl"}, signature=signature)
+
+mlflow.sklearn.load_model(uri)    # original object      mlflow.pyfunc.load_model(uri)   # generic .predict()
+```
+
+- The **`MLmodel`** file is the model's source of truth: `flavors` (e.g. `python_function`, `sklearn`), `signature`,
+  `run_id`, `mlflow_version`, and `conda.yaml` / `python_env.yaml` beside it.
+- **Signature**: recommended, not required. With it, Azure ML validates inputs and generates the swagger and the studio **Test** tab.
+- **Versions**: the `azureml-mlflow` plugin supports MLflow ≤ 2.16.2 (2.17+ unsupported, per the docs on 2026-10-31).
+
+## 15. Models: register, archive, share, package
 
 ```python
 from azure.ai.ml.entities import Model
@@ -416,10 +568,46 @@ ml_client.models.share(name="diabetes-clf", version="2",      # workspace → re
 ```
 
 - Use a registry model: `"azureml://registries/mlreg-diabetes/models/diabetes-clf/versions/2"` [Q36](../../../practice/mlops/q036-registry-assets-across-workspaces.md).
+- Create a registry (CLI only in the docs; 🧪 lab 05): `az ml registry create --file registry.yml -g <rg>` with
+  `name` (2–32 chars, fixed forever), `location`, `replication_locations: [{location: ...}]` (the primary listed again; can't change).
+  Holds models, environments, components, data; not compute, jobs or endpoints. Access: Reader to use, **AzureML Registry User** to read/write assets, Contributor/Owner to create.
 - **Endpoint with no outbound internet** → `ml_client.models.package(...)` (a `ModelPackage`: model + dependencies baked into an image), then deploy the package [Q49](../../../practice/mlops/q049-package-model-no-egress.md).
 - Archive ≠ delete ≠ unregister: only archive keeps it [Q63](../../../practice/mlops/q063-archive-model-version.md).
 
-## 14. Online endpoints
+## 16. Feature store and the feature retrieval spec
+
+📘 [Feature retrieval specification](https://learn.microsoft.com/en-us/azure/machine-learning/feature-retrieval-concepts?view=azureml-api-2)
+(package `azureml-featurestore`; ≥ 1.2.1 for online lookup). Docs only. Concepts: [feature-store.md](feature-store.md).
+
+```python
+from azureml.featurestore import FeatureStoreClient
+from azure.ai.ml.identity import AzureMLOnBehalfOfCredential
+
+fs = FeatureStoreClient(credential=AzureMLOnBehalfOfCredential(), subscription_id=..., resource_group_name=..., name="my-fs")
+features = fs.resolve_feature_uri(["accounts:1:numPaymentRejects1dPerUser"])     # feature_set:version:feature
+fs.generate_feature_retrieval_spec("./model_folder", features)                  # writes feature_retrieval_spec.yaml
+
+# training: point-in-time join on observation data (Spark)
+from azureml.featurestore import get_offline_features
+training_df = get_offline_features(features=features, observation_data=obs_df, timestamp_column="timestamp")
+```
+
+```python
+# score.py init(): online lookup with the spec packaged inside the model
+from azure.identity import ManagedIdentityCredential
+from azureml.featurestore import FeatureStoreClient, init_online_lookup, get_online_features
+def init():
+    global features
+    cred = ManagedIdentityCredential()
+    features = FeatureStoreClient(credential=cred).resolve_feature_retrieval_spec(model_dir)
+    init_online_lookup(features, cred)
+```
+
+- File name **`feature_retrieval_spec.yaml`** (can't be renamed), packaged **with the model artifact** → lineage + no per-environment config [Q24](../../../practice/mlops/q024-feature-store-entities.md).
+- Pipeline route: the built-in `feature_retrieval` component (inputs `input_model` *or* `feature_retrieval_spec`, `observation_data`, `timestamp_column`; output `output_data` with the spec inside) → copy the spec into the model output.
+- Entities: **feature store** · **entity** (index columns, reused) · **feature set specification** (source, PySpark transform, index + timestamp columns, materialization settings) · **feature set asset** (the registered, versioned spec) · **materialization** (offline ADLS Gen2, online Redis).
+
+## 17. Online endpoints
 
 ```python
 from azure.ai.ml.entities import ManagedOnlineEndpoint, ManagedOnlineDeployment, CodeConfiguration
@@ -445,6 +633,38 @@ ml_client.online_endpoints.invoke(endpoint_name="diabetes-ep", request_file="sam
 ml_client.online_deployments.get_logs(name="blue", endpoint_name="diabetes-ep", lines=50)   # container_type="storage-initializer" for model download
 ```
 
+Auth and testing (📘 [endpoint auth](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-authenticate-online-endpoint?view=azureml-api-2)):
+
+| `auth_mode` | Expires? | Get it |
+|---|---|---|
+| `key` | **No** (rotate) | `ml_client.online_endpoints.get_keys(name).primary_key` |
+| `aml_token` | Yes (`expiry_time_utc`, `refresh_after_time_utc`) | `get_keys(name).access_token` |
+| `aad_token` | Yes (Entra lifetime, ~60–90 min) | Entra token; **managed online endpoints only**; RBAC `score/action` |
+
+CLI: `az ml online-endpoint get-credentials -n ep`. AzureML Data Scientist can list keys and tokens.
+
+- **Debug locally first** (Docker): `ml_client.online_deployments.begin_create_or_update(dep, local=True)` / `az ml online-deployment create --local`.
+- MLflow model payload: `{"input_data": {"columns": [...], "index": [0], "data": [[...]]}}` (not MLflow's own `dataframe_split`); no CSV on online endpoints.
+- No-code MLflow deployment: Azure ML builds the environment from the model's conda deps (+ `azureml-inference-server-http`, `azureml-ai-monitoring`); provide a script only to customise, and then an environment too.
+
+| Deployment error | Usually means |
+|---|---|
+| `ImageBuildFailure` | Environment build failed (registry auth, timeout); read the build log |
+| `OutOfQuota` | CPU/cluster/disk/memory/role-assignment/endpoint/region quota |
+| `BadArgument` | Can't download the image or model, auth problem, MLflow model + private network |
+| `ResourceNotReady` | Container crashes: `score.py` error, missing dependency, probes too tight, `init()` too slow |
+| `ResourceNotFound` | Missing resource, or a private container registry |
+| `OperationCanceled` | Pre-empted by a higher-priority operation; retry |
+
+| Scoring HTTP | Meaning |
+|---|---|
+| 401 | Bad/expired key or token, no permission |
+| 404 | No deployment with traffic > 0 |
+| 408 | `request_timeout_ms` exceeded |
+| 424 | Model container returned non-200 (see `ms-azureml-model-error-*` headers) |
+| 429 | Too many concurrent requests / rate limit |
+| 500 | Azure ML infrastructure |
+
 Scoring script [Q39](../../../practice/mlops/q039-scoring-script-init-run.md) [Q153](../../../practice/mlops/q153-scoring-script-purpose.md) (🛠 `ml/score/score.py`, trimmed):
 
 ```python
@@ -461,7 +681,7 @@ def run(raw_data):                            # per request
 - Autoscale = Azure Monitor autoscale on the deployment [Q116](../../../practice/mlops/q116-managed-online-autoscale.md). Not `score()`/`predict()`/`main()` in the script.
 - 🛠 My project does all of this in YAML + `az ml online-endpoint update --traffic` (`deploy.yml`, `shift-traffic.yml`). Details: [online-endpoints.md](online-endpoints.md).
 
-## 15. Batch endpoints
+## 18. Batch endpoints
 
 ```python
 from azure.ai.ml.entities import BatchEndpoint, BatchDeployment
@@ -479,7 +699,7 @@ job = ml_client.batch_endpoints.invoke(endpoint_name="diabetes-batch",
 Batch script: `init()` + `run(mini_batch)` (a list of file paths) returning rows.
 "Millions of records, scheduled, files" → batch; "synchronous, low latency" → online [Q57](../../../practice/mlops/q057-online-vs-batch-endpoints.md).
 
-## 16. Monitoring
+## 19. Monitoring
 
 Collect production data from a **custom** `score.py` (🛠 the root cause of my "No data found"):
 
@@ -512,7 +732,7 @@ Act on thresholds → alerts → Event Grid → retraining pipeline [Q81](../../
 Endpoint metrics: request latency, requests per minute, connections active [Q98](../../../practice/mlops/q098-endpoint-traffic-metrics.md).
 Details: [monitoring-ms-learn.md](monitoring-ms-learn.md).
 
-## 17. Responsible AI and Fairlearn
+## 20. Responsible AI and Fairlearn
 
 RAI dashboard as a pipeline of `azureml` registry components (🛠 `ml/experiments/responsible_ai/submit_rai_pipeline.py`) [Q119](../../../practice/mlops/q119-rai-counterfactual-pipeline.md):
 
@@ -545,7 +765,7 @@ GridSearch(estimator, constraints=DemographicParity())                          
 
 Details: [responsible-ai-fairlearn.md](responsible-ai-fairlearn.md).
 
-## 18. Notebook and terminal bits
+## 21. Notebook and terminal bits
 
 | Need | Answer |
 |---|---|
@@ -554,7 +774,40 @@ Details: [responsible-ai-fairlearn.md](responsible-ai-fairlearn.md).
 | Keep variables | **Stop the kernel** [Q122](../../../practice/mlops/q122-preserve-notebook-state.md); change kernel/compute or reset compute wipes state [Q29](../../../practice/mlops/q029-reset-notebook-state.md) |
 | Clone a private repo | compute instance → terminal → `ssh-keygen` → `cat ~/.ssh/id_rsa.pub` → add the **public** key to GitHub → `git clone` [Q52](../../../practice/mlops/q052-git-clone-ssh.md) [Q148](../../../practice/mlops/q148-clone-private-repo-steps.md) |
 
-## 19. CLI ↔ SDK map
+## 22. GitHub Actions
+
+📘 [GitHub Actions with Azure ML](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-github-actions-machine-learning?view=azureml-api-2): **OIDC is recommended**; a service-principal secret is "less secure and not recommended".
+🧪 The labs use the secret (`AZURE_CREDENTIALS`); 🛠 my project uses OIDC.
+
+```yaml
+on:
+  pull_request:            # 🧪 train-dev.yml: PR = the gate (with branch protection)
+  workflow_dispatch:
+permissions:
+  id-token: write          # REQUIRED for OIDC
+  contents: read
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    environment: prod      # GitHub environment: required reviewers, env-scoped secrets
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}          # OIDC: app registration or user-assigned MI
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}          #   with a federated credential for this repo/branch/environment
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # creds: ${{ secrets.AZURE_CREDENTIALS }}         # the secret way (lab), instead of the three above
+      - run: az extension add -n ml -y
+      - run: az ml job create -f src/job.yml -g $RG -w $WS --stream
+```
+
+- Federated credential **subject** must match: `repo:<org>/<repo>:ref:refs/heads/main`, `:pull_request`, or `:environment:prod` 🛠 (a real bug).
+- Provisioning on change: `on: push: paths: ["infra/**"]` + `az deployment group create -f main.bicep` [Q80](../../../practice/mlops/q080-iac-github-actions-service-principal.md) [Q150](../../../practice/mlops/q150-iac-bicep-github-action.md).
+- Comment-triggered (`issue_comment`) workflows run from the default branch; check the commenter's permission 🧪 lab 07.
+- Details: [github-actions-azureml.md](github-actions-azureml.md).
+
+## 23. CLI ↔ SDK map
 
 | Task | CLI v2 (🛠 my project, 🧪 labs) | SDK v2 |
 |---|---|---|
@@ -569,7 +822,7 @@ Details: [responsible-ai-fairlearn.md](responsible-ai-fairlearn.md).
 | Invoke | `az ml online-endpoint invoke -n ep --request-file s.json` | `ml_client.online_endpoints.invoke(...)` |
 | Infrastructure | `az deployment group create -g rg -f main.bicep` [Q35](../../../../GenAIOps-ai-300/practice/q035-bicep-group-deployment.md) [Q123](../../../practice/mlops/q123-cli-deploy-bicep-declare.md) | — (Bicep/ARM) |
 
-## 20. Near-miss traps
+## 24. Near-miss traps
 
 | Right | Wrong but tempting | Q |
 |---|---|---|
@@ -599,8 +852,14 @@ Details: [responsible-ai-fairlearn.md](responsible-ai-fairlearn.md).
 | `models.package` for no egress | registry, private endpoint | [Q49](../../../practice/mlops/q049-package-model-no-egress.md) |
 | `%pip` | `!pip` | [Q105](../../../practice/mlops/q105-pip-magic-current-kernel.md) |
 | `tier="low_priority"`, `min_instances=0` | lower `max_instances` | [Q163](../../../practice/mlops/q163-cluster-cost-tier-min-instances.md) |
-
-## 21. Exam vs. lab vs. my project
+| `distribution={"type": "PyTorch", "process_count_per_instance": <GPUs per node>}` + `instance_count=<nodes>` | `process_count_per_instance` = nodes | — |
+| InfiniBand = "r" SKU (`NC24rs_v3`) | `NC24s_v3` | — |
+| `generate_feature_retrieval_spec` → `feature_retrieval_spec.yaml` in the model folder | separate config per environment | [Q24](../../../practice/mlops/q024-feature-store-entities.md) |
+| `permissions: id-token: write` for OIDC | secrets only | — |
+| `key` auth never expires; `aml_token`/`aad_token` do | swapped | — |
+| `local=True` to debug a deployment | redeploy to Azure each time | — |
+| Serverless spot: `queue_settings={"job_tier": "Spot"}` | `tier="low_priority"` (that's a cluster) | — |
+## 25. Exam vs. lab vs. my project
 
 | Topic | 📘 Exam answer | 🧪 Lab | 🛠 My project |
 |---|---|---|---|

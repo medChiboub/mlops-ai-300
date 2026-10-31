@@ -11,7 +11,7 @@ gets ticked or corrected once we see it.
 
 | File | Covers | First used in |
 |---|---|---|
-| [sdk-v2-cheatsheet.md](sdk-v2-cheatsheet.md) | **Master cheat sheet: the code side of the exam.** SDK v2 + MLflow by task (connect, workspace/network, datastores, data/MLTable, compute, environments, command/sweep/AutoML jobs, components/pipelines/schedules, MLflow logging and queries, models, online/batch endpoints, monitoring, RAI/Fairlearn), a CLI ↔ SDK map, near-miss traps, and exam vs. lab vs. my project | All labs + practice questions |
+| [sdk-v2-cheatsheet.md](sdk-v2-cheatsheet.md) | **Master cheat sheet: the code side of the exam.** SDK v2 + MLflow by task, covering every domain 1–2 skill (connect, workspace/network, identity and roles, datastores, data/MLTable/fsspec, compute incl. serverless, environments, command/distributed/Spark/sweep/AutoML jobs, components/pipelines/schedules, MLflow logging, queries and models, registries, feature retrieval spec, online/batch endpoints incl. auth and troubleshooting, monitoring, RAI/Fairlearn, GitHub Actions OIDC), a CLI ↔ SDK map, near-miss traps, and exam vs. lab vs. my project | All labs + practice questions |
 | [workspace-and-storage.md](workspace-and-storage.md) | What a workspace is, its dependent resources, the 4 datastores, what lives in which container | Lab 01 §1–2 |
 | [compute.md](compute.md) | Compute instance vs. compute cluster, lifecycle, billing, identity | Lab 01 §1–2 |
 | [data-assets.md](data-assets.md) | `uri_file` vs. `uri_folder` vs. `mltable`, what `az ml data create` uploads, versioning | Lab 01 §1 |
