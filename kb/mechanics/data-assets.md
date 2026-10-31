@@ -22,7 +22,7 @@ path." Jobs refer to `azureml:diabetes-data:1` instead of a storage URL, so:
 ## Path formats: recognize the scheme by its shape
 
 📘 From *Create data assets* and *Access data in a job* (read 2026-10-31).
-Added after practice question [Q1](../../practice/q001-data-asset-public-blob-uri.md),
+Added after practice question [Q1](../../practice/mlops/q001-data-asset-public-blob-uri.md),
 where the site's answer got this wrong.
 
 | Where the data is | Path | Notes |

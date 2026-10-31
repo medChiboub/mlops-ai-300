@@ -1,6 +1,6 @@
 # Responsible AI: Fairlearn mitigation
 
-Started after practice question [Q7](../../practice/q007-fairlearn-without-retraining.md).
+Started after practice question [Q7](../../practice/mlops/q007-fairlearn-without-retraining.md).
 My production project tried the Azure ML **Responsible AI dashboard**
 (`ml/experiments/responsible_ai/`, blocked on an RBAC grant). This note
 covers the **Fairlearn** side: *changing* a model's behavior, not just
