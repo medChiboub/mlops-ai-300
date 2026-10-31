@@ -367,7 +367,7 @@ cost for a learning project. This is my production project's open AI-300 gap
 
 ## Foundry: the same model
 
-From practice question [Q33](../../practice/q033-foundry-private-network.md).
+From practice question [Q33](../../practice/archive/q033-foundry-private-network.md).
 Microsoft Foundry resources follow the same two halves:
 
 - **Inbound:** **disable public network access** + **private endpoints** for

@@ -1,6 +1,6 @@
 # Responsible AI: Fairlearn mitigation
 
-Started after practice question [Q7](../../practice/q007-fairlearn-without-retraining.md).
+Started after practice question [Q7](../../practice/archive/q007-fairlearn-without-retraining.md).
 My production project tried the Azure ML **Responsible AI dashboard**
 (`ml/experiments/responsible_ai/`, blocked on an RBAC grant). This note
 covers the **Fairlearn** side: *changing* a model's behavior, not just
@@ -47,7 +47,7 @@ Fairlearn has two jobs:
 
 ## Assessing: the RAI dashboard and cohorts
 
-From practice question [Q12](../../practice/q012-rai-before-registration.md).
+From practice question [Q12](../../practice/archive/q012-rai-before-registration.md).
 
 The Azure ML **Responsible AI dashboard** answers different questions with
 different tools:
@@ -70,7 +70,7 @@ different tools:
 
 ## Creating the dashboard
 
-From practice question [Q38](../../practice/q038-rai-dashboard-register-first.md).
+From practice question [Q38](../../practice/archive/q038-rai-dashboard-register-first.md).
 
 - **Studio (no-code):** the model must be **registered** first (MLflow
   format supported). Then Models → model → **Responsible AI** → create the

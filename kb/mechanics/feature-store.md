@@ -1,6 +1,6 @@
 # Managed feature store
 
-Started after practice question [Q24](../../practice/q024-feature-store-entities.md).
+Started after practice question [Q24](../../practice/archive/q024-feature-store-entities.md).
 My production project deliberately skipped the feature store (`docs/AI-300.md`:
 "Package a feature retrieval specification with the model artifact" is
 unchecked), so this is docs-only knowledge.

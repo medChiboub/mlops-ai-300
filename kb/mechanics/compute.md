@@ -86,7 +86,7 @@ problem, not a code problem.
 ## Adding a Jupyter kernel on a compute instance
 
 📘 From *Access a compute instance terminal* (read 2026-10-31). Added after
-practice questions [Q9–Q11](../../practice/q009-q011-jupyter-kernel-prereq.md).
+practice questions [Q9–Q11](../../practice/archive/q009-q011-jupyter-kernel-prereq.md).
 
 A Jupyter kernel = **a conda environment + `ipykernel` + a registered
 kernelspec**. From the compute instance terminal (Studio → Notebooks →
@@ -109,7 +109,7 @@ python -m ipykernel install --user --name newenv --display-name "Python (newenv)
 
 ## Which compute for which workload
 
-From practice question [Q17](../../practice/q017-compute-per-workload.md).
+From practice question [Q17](../../practice/archive/q017-compute-per-workload.md).
 
 | Workload | Compute | Cost control |
 |---|---|---|
@@ -121,7 +121,7 @@ From practice question [Q17](../../practice/q017-compute-per-workload.md).
 
 ## Notebook state: what resets it
 
-From practice question [Q29](../../practice/q029-reset-notebook-state.md). 📘 Microsoft's
+From practice question [Q29](../../practice/archive/q029-reset-notebook-state.md). 📘 Microsoft's
 *Run Jupyter notebooks* table:
 
 | Resets state (all variables lost) | Doesn't change state |
@@ -137,7 +137,7 @@ lists it as **not** changing it.
 
 ## Cloning a Git repo into the workspace
 
-From practice question [Q52](../../practice/q052-git-clone-ssh.md). From the Studio
+From practice question [Q52](../../practice/archive/q052-git-clone-ssh.md). From the Studio
 terminal (the files land in the shared workspace file system):
 
 ```bash

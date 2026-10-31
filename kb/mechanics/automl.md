@@ -338,7 +338,7 @@ exam, "imbalanced classes" + "which primary metric" → `AUC_weighted`.
 
 📘 From the SDK v2 `set_limits` reference and the AutoML how-to (read
 2026-10-31). Added after practice question
-[Q170](../../practice/q170-automl-set-limits.md).
+[Q170](../../practice/archive/q170-automl-set-limits.md).
 
 Limits work at **two levels**: the whole job, and each trial. The exam likes
 to blur them.

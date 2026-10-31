@@ -122,7 +122,7 @@ apart:
 ## Logging a table: file vs. Python object
 
 Added after practice question
-[Q169](../../practice/q169-mlflow-log-table-file.md). Choose the function by
+[Q169](../../practice/archive/q169-mlflow-log-table-file.md). Choose the function by
 **what you're holding**:
 
 | You have… | Use | Notes |
@@ -150,7 +150,7 @@ everything goes through MLflow.
 
 ## Reading a tracking script: experiment vs. artifact path vs. model name
 
-From practice question [Q20](../../practice/q020-mlflow-tracking-script.md).
+From practice question [Q20](../../practice/archive/q020-mlflow-tracking-script.md).
 
 ```python
 mlflow.set_experiment("classification-experiment")   # WHERE runs are grouped (creates it if missing)

@@ -17,7 +17,7 @@ outside any workspace. Dev publishes an asset; test and prod use it.
 
 ## Which asset holds what
 
-Added after practice question [Q4](../../practice/q004-register-model-for-reuse.md).
+Added after practice question [Q4](../../practice/archive/q004-register-model-for-reuse.md).
 
 | Asset | Holds | Question cue |
 |---|---|---|
@@ -33,7 +33,7 @@ shared through a registry.
 
 ## Hub and project workspaces
 
-From practice question [Q30](../../practice/q030-hub-workspace-governance.md).
+From practice question [Q30](../../practice/archive/q030-hub-workspace-governance.md).
 
 - A **hub workspace** holds shared settings: security, connections, compute
   and quota.
@@ -48,7 +48,7 @@ From practice question [Q30](../../practice/q030-hub-workspace-governance.md).
 
 ## Archiving model versions
 
-From practice question [Q41](../../practice/q041-archive-model-versions.md).
+From practice question [Q41](../../practice/archive/q041-archive-model-versions.md).
 
 | Need | Do | Effect |
 |---|---|---|

@@ -133,7 +133,7 @@ the cell (job `epic_king_fhy758f6cn`):
 
 ## Passing inputs to the script: the three names that must match
 
-From practice questions [Q58–Q60](../../practice/q058-q060-command-job-input-arg.md).
+From practice questions [Q58–Q60](../../practice/archive/q058-q060-command-job-input-arg.md).
 
 ```python
 job = command(

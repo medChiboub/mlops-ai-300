@@ -183,7 +183,7 @@ Studio → Environments → Curated shows it.
 
 ### Defining one in SDK v2: image vs. build vs. conda_file
 
-From practice question [Q21](../../practice/q021-environment-from-docker-image.md).
+From practice question [Q21](../../practice/archive/q021-environment-from-docker-image.md).
 
 ```python
 from azure.ai.ml.entities import Environment, BuildContext
@@ -208,7 +208,7 @@ Environment(name="env-c", build=BuildContext(path="docker-context/"))
 
 ### Updating an environment means a new version
 
-From practice question [Q40](../../practice/q036-q040-assets-across-workspaces.md).
+From practice question [Q40](../../practice/archive/q036-q040-assets-across-workspaces.md).
 Environments are **immutable, versioned** assets, so a new Docker image (or
 image tag) means a **new environment version**:
 

@@ -8,7 +8,7 @@ in.
 
 ## Evaluation metrics
 
-From practice question [Q2](../../practice/q002-genai-quality-metrics.md).
+From practice question [Q2](../../practice/archive/q002-genai-quality-metrics.md).
 
 Pick the evaluator by the **requirement's wording**:
 
@@ -16,7 +16,7 @@ Pick the evaluator by the **requirement's wording**:
 |---|---|---|
 | "supported by the sources", "no fabrication", "grounded" | **Groundedness** | No (needs the context) |
 | "addresses the user's question", "on-topic" | **Relevance** | No |
-| "readable", "natural", **"grammatically correct"** ([Q45](../../practice/q045-fluency-evaluator.md)) | **Fluency** | No |
+| "readable", "natural", **"grammatically correct"** ([Q45](../../practice/archive/q045-fluency-evaluator.md)) | **Fluency** | No |
 | "logically consistent", "ideas connect" (not grammar!) | Coherence | No |
 | "matches the expected answer" | Similarity, F1 | **Yes** (ground truth) |
 | "unsafe or harmful content" | Safety evaluators (violence, self-harm, hate, sexual) | No |
@@ -28,7 +28,7 @@ Pick the evaluator by the **requirement's wording**:
 
 ## Identity: key-less access and least privilege
 
-From practice question [Q3](../../practice/q003-foundry-keyless-identity-rbac.md).
+From practice question [Q3](../../practice/archive/q003-foundry-keyless-identity-rbac.md).
 
 | Need | Mechanism |
 |---|---|
@@ -45,7 +45,7 @@ From practice question [Q3](../../practice/q003-foundry-keyless-identity-rbac.md
 
 ## RAG retrieval quality
 
-From practice question [Q5](../../practice/q005-rag-retrieval-accuracy.md).
+From practice question [Q5](../../practice/archive/q005-rag-retrieval-accuracy.md).
 
 When answers are incomplete because the **right content isn't retrieved
 consistently**, fix retrieval, not generation:
@@ -64,7 +64,7 @@ consistently**, fix retrieval, not generation:
 
 ## Safe model-version upgrades
 
-From practice question [Q8](../../practice/q008-foundry-safe-model-upgrade.md). 🟡 The
+From practice question [Q8](../../practice/archive/q008-foundry-safe-model-upgrade.md). 🟡 The
 Foundry-specific steps aren't verified yet.
 
 Pattern: **deploy alongside → validate → shift traffic** (keep the old
@@ -82,7 +82,7 @@ My production project implements this with `deploy.yml`
 
 ## RAG evaluation: completeness vs. utilization
 
-From practice question [Q13](../../practice/q013-rag-completeness-utilization.md).
+From practice question [Q13](../../practice/archive/q013-rag-completeness-utilization.md).
 📘 Microsoft's *RAG: LLM end-to-end evaluation phase* guide.
 
 - **Completeness:** does the response answer every part of the query?
@@ -101,7 +101,7 @@ For low completeness in general, the guide's order is:
 
 ## Evaluation datasets
 
-From practice question [Q15](../../practice/q015-synthetic-eval-data.md).
+From practice question [Q15](../../practice/archive/q015-synthetic-eval-data.md).
 
 An evaluation = **dataset** (inputs, optionally expected outputs) +
 **target** (app, prompt variant, model) + **evaluators**. To compare
@@ -115,7 +115,7 @@ variants fairly, the **dataset must be fixed**.
 
 ### Synthetic data: for evaluation *and* fine-tuning
 
-From practice question [Q27](../../practice/q027-synthetic-finetuning-data.md).
+From practice question [Q27](../../practice/archive/q027-synthetic-finetuning-data.md).
 Foundry's **simulator** generates task-matched conversations
 (prompt → response) without production data:
 - **Evaluation:** a fixed test set (Q15).
@@ -127,7 +127,7 @@ examples.
 
 ## Prompt design
 
-From practice question [Q16](../../practice/q016-prompt-design-reusable.md).
+From practice question [Q16](../../practice/archive/q016-prompt-design-reusable.md).
 
 | Technique | Use for |
 |---|---|
@@ -143,7 +143,7 @@ clear system/user separation. Never fine-tuning or a higher temperature.
 
 ## Observability for a model deployment
 
-From practice question [Q14](../../practice/q014-foundry-latency-observability.md). 🟡 Exact
+From practice question [Q14](../../practice/archive/q014-foundry-latency-observability.md). 🟡 Exact
 Foundry step order not verified.
 
 1. **Deploy** (the endpoint must exist).
@@ -158,7 +158,7 @@ and embeddings (retrieval) aren't observability.
 
 ## Safety evaluators vs. content filters
 
-From practice question [Q18](../../practice/q018-hate-content-evaluator.md).
+From practice question [Q18](../../practice/archive/q018-hate-content-evaluator.md).
 
 | Risk | Evaluator (measure, pre-release) |
 |---|---|
@@ -174,7 +174,7 @@ From practice question [Q18](../../practice/q018-hate-content-evaluator.md).
 
 ## Foundry deployment types
 
-From practice question [Q19](../../practice/q019-foundry-deployment-types.md).
+From practice question [Q19](../../practice/archive/q019-foundry-deployment-types.md).
 
 The name = **where data may be processed** + **how you pay**:
 - **Where:** *Global* = any Azure region; *Data Zone* = within a geography
@@ -191,7 +191,7 @@ The name = **where data may be processed** + **how you pay**:
 
 ## Search modes in Azure AI Search
 
-From practice question [Q25](../../practice/q025-search-keyword-vs-semantic.md).
+From practice question [Q25](../../practice/archive/q025-search-keyword-vs-semantic.md).
 
 | Mode | Good at | Weak at |
 |---|---|---|
@@ -206,7 +206,7 @@ relevance" → vector + semantic ranking. Usually configured together as
 
 ## Reading evaluation results: before vs. after
 
-From practice question [Q31](../../practice/q031-finetune-eval-comparison.md).
+From practice question [Q31](../../practice/archive/q031-finetune-eval-comparison.md).
 
 - Compare runs on the **same dataset**, metric by metric, and check each
   metric's **direction**:
@@ -222,7 +222,7 @@ From practice question [Q31](../../practice/q031-finetune-eval-comparison.md).
 
 ## Fine-tuning data: SFT vs. DPO, and file format
 
-From practice questions [Q32 + Q34](../../practice/q032-q034-finetuning-data-format.md).
+From practice questions [Q32 + Q34](../../practice/archive/q032-q034-finetuning-data-format.md).
 
 | Method | Learns from | One JSONL line |
 |---|---|---|
@@ -235,7 +235,7 @@ From practice questions [Q32 + Q34](../../practice/q032-q034-finetuning-data-for
 - Files are **JSONL** (one object per line), **UTF-8** encoded. Upload
   training (and optionally validation) files, then fine-tune.
 
-**Vision fine-tuning** ([Q55](../../practice/q055-vision-finetuning-model.md)): to fine-tune
+**Vision fine-tuning** ([Q55](../../practice/archive/q055-vision-finetuning-model.md)): to fine-tune
 on **text + images**, pick a base model whose fine-tuning supports vision.
 At the time of the question that's **`gpt-4o`**; `gpt-35-turbo` and
 `davinci-002` are text-only. Model lineups change, so check the current
@@ -243,7 +243,7 @@ table.
 
 ## Foundry resource vs. project
 
-From practice question [Q42](../../practice/q042-foundry-resource-vs-project.md).
+From practice question [Q42](../../practice/archive/q042-foundry-resource-vs-project.md).
 
 | Level | Holds | Use for |
 |---|---|---|
@@ -254,7 +254,7 @@ It's the same shape as Azure ML **hub + projects**.
 
 ## Evaluation in the release workflow
 
-From practice questions [Q43, Q46, Q48](../../practice/q043-q046-q048-genai-eval-workflow.md).
+From practice questions [Q43, Q46, Q48](../../practice/archive/q043-q046-q048-genai-eval-workflow.md).
 
 | Question | Mechanism |
 |---|---|
@@ -273,7 +273,7 @@ optional.
 
 ## Promoting a fine-tuned model
 
-From practice question [Q44](../../practice/q044-promote-finetuned-model.md). 🟡
+From practice question [Q44](../../practice/archive/q044-promote-finetuned-model.md). 🟡
 
 Generic order: **version/register → evaluate and validate → production
 deployment** (for example Global Standard).
@@ -284,7 +284,7 @@ deployment** (for example Global Standard).
 
 ## Prompt governance: prompts are code
 
-From practice question [Q51](../../practice/q051-prompt-governance.md).
+From practice question [Q51](../../practice/archive/q051-prompt-governance.md).
 
 | Need | Mechanism |
 |---|---|
