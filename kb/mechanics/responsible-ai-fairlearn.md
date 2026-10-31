@@ -44,3 +44,26 @@ Fairlearn has two jobs:
 - Azure ML's **Responsible AI dashboard** (error analysis, explanations,
   fairness assessment, counterfactuals) is for *assessment*. Fairlearn's
   mitigators are what *change* the model's outcomes.
+
+## Assessing: the RAI dashboard and cohorts
+
+From practice question [Q12](../../practice/q012-rai-before-registration.md).
+
+The Azure ML **Responsible AI dashboard** answers different questions with
+different tools:
+
+| Tool | Answers |
+|---|---|
+| **Error analysis** | *Where* does the model fail? Finds cohorts with high error rates |
+| **Fairness / model overview by cohort** | Do metrics differ across **sensitive groups**? |
+| **Feature importance (explanations)** | *Why* does it predict this? Global and per-prediction (transparency) |
+| Counterfactuals (what-if) | What minimal change flips the prediction? |
+| Causal analysis | What happens to the outcome if we intervene on a feature? |
+| Data analysis | Is the data balanced and representative? |
+
+- A **cohort** is a defined subgroup (for example `gender = F`, or
+  `age < 25`). Metrics on the **global cohort** (everyone) **hide** subgroup
+  disparities.
+- Before registration: cohort error/fairness analysis (fairness + segment
+  errors), plus feature importance (transparency). Latency and schema checks
+  are operational, not Responsible AI.

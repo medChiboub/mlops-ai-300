@@ -148,6 +148,28 @@ mlflow.log_artifact("table.json")   # not log_table: that wants the data, not a 
 SDK v1 used `run.log_table(...)`. In SDK v2 there's no `run` object, and
 everything goes through MLflow.
 
+## Reading a tracking script: experiment vs. artifact path vs. model name
+
+From practice question [Q20](../../practice/q020-mlflow-tracking-script.md).
+
+```python
+mlflow.set_experiment("classification-experiment")   # WHERE runs are grouped (creates it if missing)
+with mlflow.start_run():                             # THE run
+    mlflow.log_param("max_iter", 200)                # value on the run
+    mlflow.log_metric("accuracy", acc)               # value on the run
+    mlflow.sklearn.log_model(model, "model")         # files at <run artifacts>/model
+#   add registered_model_name="clf" to ALSO register it as a model version
+```
+
+| Name | Set by | Means |
+|---|---|---|
+| Experiment name | `set_experiment` | A group of runs |
+| Artifact path | `log_model(model, "<path>")` | A folder inside *this run's* artifacts |
+| Registered model name | `registered_model_name=` or `mlflow.register_model` | A versioned workspace model |
+
+When judging "does the code ensure X", also scan the **imports**: a missing
+import (for example `accuracy_score`) fails the run before it logs.
+
 ## Exam cheat-sheet
 
 - `mlflow.set_experiment`, `mlflow.start_run` (a context manager, so the run

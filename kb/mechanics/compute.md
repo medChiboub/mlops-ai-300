@@ -86,7 +86,7 @@ problem, not a code problem.
 ## Adding a Jupyter kernel on a compute instance
 
 📘 From *Access a compute instance terminal* (read 2026-10-31). Added after
-practice questions [Q9/Q10](../../practice/q009-q010-jupyter-kernel-prereq.md).
+practice questions [Q9–Q11](../../practice/q009-q011-jupyter-kernel-prereq.md).
 
 A Jupyter kernel = **a conda environment + `ipykernel` + a registered
 kernelspec**. From the compute instance terminal (Studio → Notebooks →
@@ -106,6 +106,18 @@ python -m ipykernel install --user --name newenv --display-name "Python (newenv)
 - The new kernel shows up in the notebook's kernel picker.
 - Exam series pattern: "Solution: delete the Python 3.x - AzureML kernel" →
   **No**. "Solution: create a new environment" → **Yes**.
+
+## Which compute for which workload
+
+From practice question [Q17](../../practice/q017-compute-per-workload.md).
+
+| Workload | Compute | Cost control |
+|---|---|---|
+| Interactive notebooks and dev | **Compute instance** (one user) | Idle shutdown and schedules |
+| Training jobs, sweeps, pipelines | **Compute cluster** | Autoscale; **min nodes = 0** |
+| No cluster management at all | **Serverless compute** | Pay per job |
+| Real-time inference | Managed online endpoint (or AKS / Arc Kubernetes) | Instance count and autoscale |
+| Existing Spark/Databricks estate | Attached compute | — |
 
 ## Lab vs. my project
 

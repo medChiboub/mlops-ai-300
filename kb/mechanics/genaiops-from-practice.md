@@ -79,3 +79,100 @@ It's the same idea as Azure ML managed online endpoints:
 
 My production project implements this with `deploy.yml`
 (`route_traffic=no`) + `shift-traffic.yml`.
+
+## RAG evaluation: completeness vs. utilization
+
+From practice question [Q13](../../practice/q013-rag-completeness-utilization.md).
+📘 Microsoft's *RAG: LLM end-to-end evaluation phase* guide.
+
+- **Completeness:** does the response answer every part of the query?
+- **Utilization:** how much of the response comes from the provided
+  chunks? Low = the retrieved chunks were mostly irrelevant.
+
+| | High utilization | Low utilization |
+|---|---|---|
+| **High completeness** | No action | Irrelevant chunks come along → **reduce top-k** |
+| **Low completeness** | Chunks used but not enough → **increase top-k**, **find relevant chunks that weren't returned and why**, richer chunks | Chunks insufficient *and* unused → **increase chunk size**, tune the prompt |
+
+For low completeness in general, the guide's order is:
+1. Check the embedding model's vocabulary fit.
+2. Then check the chunking strategy (bigger fixed-size chunks).
+3. Then check whether the data even contains the answer.
+
+## Evaluation datasets
+
+From practice question [Q15](../../practice/q015-synthetic-eval-data.md).
+
+An evaluation = **dataset** (inputs, optionally expected outputs) +
+**target** (app, prompt variant, model) + **evaluators**. To compare
+variants fairly, the **dataset must be fixed**.
+
+| Source | When |
+|---|---|
+| Curated real examples | You have them, and they're representative |
+| **Synthetic data generation** | No live traffic yet (dev). Foundry can generate queries from your content |
+| Logged production traffic | After launch, for regression sets |
+
+## Prompt design
+
+From practice question [Q16](../../practice/q016-prompt-design-reusable.md).
+
+| Technique | Use for |
+|---|---|
+| **System message** | Persistent role, tone, style, rules |
+| **Separate/delimit system instructions from user input** | Robustness, reuse, prompt-injection resistance |
+| Few-shot examples | Showing the format or style |
+| Repeat key instructions at the end | Compliance on long prompts (recency bias) |
+| Lower temperature | Consistency (higher = more variety) |
+| Fine-tuning | Only when prompting can't get there. It *is* retraining |
+
+Exam cue: "dependable, reusable, **without retraining**" → system message +
+clear system/user separation. Never fine-tuning or a higher temperature.
+
+## Observability for a model deployment
+
+From practice question [Q14](../../practice/q014-foundry-latency-observability.md). 🟡 Exact
+Foundry step order not verified.
+
+1. **Deploy** (the endpoint must exist).
+2. **Metrics:** Azure Monitor time series for latency, requests, tokens and
+   errors. They're on by default; you build charts and alerts.
+3. **Logs:** per-request telemetry. Turn it on with a **diagnostic
+   setting** that sends it to Log Analytics.
+
+It's the same metrics-vs-logs split as Azure ML online endpoints (see
+[monitoring-ms-learn.md](monitoring-ms-learn.md)). Blocklists (content safety)
+and embeddings (retrieval) aren't observability.
+
+## Safety evaluators vs. content filters
+
+From practice question [Q18](../../practice/q018-hate-content-evaluator.md).
+
+| Risk | Evaluator (measure, pre-release) |
+|---|---|
+| Hate/unfairness, violence, sexual, self-harm | **Content safety** evaluators |
+| Copyrighted text or code reproduced | Protected material |
+| Instructions injected via documents/data (XPIA) | Indirect attack |
+| Jailbreak in the user prompt | Direct attack |
+| Unsupported claims | Groundedness (*quality*, not safety) |
+
+- **Evaluators** measure, on a dataset, before release, repeatably.
+- **Content filters** and **blocklists** *block* at runtime.
+- Production uses both.
+
+## Foundry deployment types
+
+From practice question [Q19](../../practice/q019-foundry-deployment-types.md).
+
+The name = **where data may be processed** + **how you pay**:
+- **Where:** *Global* = any Azure region; *Data Zone* = within a geography
+  (US/EU); regional = one region.
+- **How you pay:** *Standard* = pay-per-token; *Provisioned* = reserved
+  throughput units (PTUs); *Batch* = async, discounted.
+
+| Workload | Pick |
+|---|---|
+| Variable or bursty, cost-sensitive (the default) | **Global Standard** |
+| Steady, high-volume, latency-sensitive | **Global Provisioned** |
+| Must stay in the EU/US | **Data Zone** Standard/Provisioned |
+| Large offline jobs, results within 24h | **Global Batch** |
