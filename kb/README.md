@@ -7,6 +7,7 @@ My own notes for the AI-300 exam. This repo holds the **MLOps half**
   [mechanics/](mlops/mechanics/README.md): what Azure ML actually does underneath (workspace,
   compute, data, AutoML, MLflow, jobs, sweeps, pipelines, registries, endpoints, monitoring,
   network isolation, Responsible AI, Bicep/CLI, GitHub Actions).
+- **[SDK v2 + MLflow cheat sheet](mlops/mechanics/sdk-v2-cheatsheet.md)**: the code side of the exam on one page; review it the night before.
 
 The **GenAIOps half** (domains 3–5, about 55%) lives in
 [medChiboub/genaiops-ai-300](https://github.com/medChiboub/genaiops-ai-300/blob/main/kb/README.md):
