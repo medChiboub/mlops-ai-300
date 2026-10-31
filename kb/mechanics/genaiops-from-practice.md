@@ -235,6 +235,12 @@ From practice questions [Q32 + Q34](../../practice/q032-q034-finetuning-data-for
 - Files are **JSONL** (one object per line), **UTF-8** encoded. Upload
   training (and optionally validation) files, then fine-tune.
 
+**Vision fine-tuning** ([Q55](../../practice/q055-vision-finetuning-model.md)): to fine-tune
+on **text + images**, pick a base model whose fine-tuning supports vision.
+At the time of the question that's **`gpt-4o`**; `gpt-35-turbo` and
+`davinci-002` are text-only. Model lineups change, so check the current
+table.
+
 ## Foundry resource vs. project
 
 From practice question [Q42](../../practice/q042-foundry-resource-vs-project.md).
@@ -275,3 +281,15 @@ deployment** (for example Global Standard).
   models cheaply: no hosting fee, no SLA, not for production.
 - So "Developer tier → evaluate → Global Standard" is also defensible. Read
   the stem carefully.
+
+## Prompt governance: prompts are code
+
+From practice question [Q51](../../practice/q051-prompt-governance.md).
+
+| Need | Mechanism |
+|---|---|
+| History and audit | Prompts in a **Git repository** |
+| Review before production | **Gated pull requests** (required reviewers / checks, for example the evaluation gate from Q48) |
+| Roll back | Redeploy a **prior agent/prompt version** (or revert and redeploy) |
+
+Never edit prompts directly in production; that bypasses all three.

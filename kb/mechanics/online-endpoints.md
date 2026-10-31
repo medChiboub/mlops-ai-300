@@ -52,3 +52,19 @@ From practice question [Q49](../../practice/q049-package-model-no-egress.md).
   deploy the package.
 - Neither a registry nor a private endpoint fixes it: the first shares
   assets, the second secures inbound traffic.
+
+## Online vs. batch endpoints
+
+From practice question [Q57](../../practice/q053-q054-q056-q057-quick-ones.md).
+
+| | **Online (real-time)** | **Batch** |
+|---|---|---|
+| Call pattern | Synchronous request → response | Asynchronous **job** over files/folders |
+| Latency | Milliseconds | Minutes to hours |
+| Volume | One or a few records per call | Millions of records |
+| Compute | Always-on instances (managed) | A compute **cluster**, only while the job runs |
+| Typical cue | "during customer interactions" | "files", "nightly/scheduled", "large volume" |
+
+A safe test of a new version on live users = **traffic splitting** between
+deployments on the **same** endpoint ([Q54](../../practice/q053-q054-q056-q057-quick-ones.md)),
+not a separate staging endpoint.

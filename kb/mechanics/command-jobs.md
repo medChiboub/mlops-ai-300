@@ -131,6 +131,30 @@ the cell (job `epic_king_fhy758f6cn`):
 - Timing: queued 01:35:46 → started 01:37:52 → done 01:40:14. The nodes had
   already scaled back to 0 (120 s idle), so another cold start of about 2 min.
 
+## Passing inputs to the script: the three names that must match
+
+From practice questions [Q58–Q60](../../practice/q058-q060-command-job-input-arg.md).
+
+```python
+job = command(
+    code="./src",
+    command="python script.py --training_data ${{inputs.training_data}}",
+    #               ①                ②                       ③
+    inputs={"training_data": Input(type="uri_file", path="azureml:dataset1:1")},
+    environment="azureml:my-env@latest", compute="aml-cluster",
+)
+```
+
+1. **Script file** in the command = the real file (`script.py`, not
+   `train.py`).
+2. **CLI flag** = exactly what `argparse` defines (`--training_data`, not
+   `--trainingdata`).
+3. **`${{inputs.<name>}}`** = a key declared under `inputs`. Azure ML
+   replaces it with the mounted/downloaded path at runtime.
+
+A literal value (`--training_data training_data`) or a bare file name
+(`dataset1.csv`) passes a string, not the job's input data.
+
 ## Job vs. terminal run
 
 | | Terminal (section 2) | Command job (section 3) |

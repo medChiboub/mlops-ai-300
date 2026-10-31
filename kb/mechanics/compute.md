@@ -135,6 +135,21 @@ From practice question [Q29](../../practice/q029-reset-notebook-state.md). 📘 
 The trap: "stop the kernel" feels like it should clear state, but Microsoft
 lists it as **not** changing it.
 
+## Cloning a Git repo into the workspace
+
+From practice question [Q52](../../practice/q052-git-clone-ssh.md). From the Studio
+terminal (the files land in the shared workspace file system):
+
+```bash
+ssh-keygen -t rsa -b 4096          # 1. create a key pair on the compute instance
+cat ~/.ssh/id_rsa.pub              # 2. show the PUBLIC key
+# 3. paste it into GitHub → Settings → SSH keys
+git clone git@github.com:org/repo.git   # 4. clone
+```
+
+The **private** key never leaves the instance. "Add the private key to
+GitHub" is always the wrong tile.
+
 ## Lab vs. my project
 
 My project has **no compute instance** (notebooks run on my Mac) and one

@@ -24,6 +24,17 @@ the storage account" means they can read your data even without workspace
 permissions. That's why network and RBAC questions on the exam always cover
 the dependent resources too.
 
+## The four associated resources
+
+From practice question [Q56](../../practice/q053-q054-q056-q057-quick-ones.md).
+
+| Requirement | Associated resource |
+|---|---|
+| Store **secrets** (keys, connection strings) | **Azure Key Vault** |
+| **Monitoring**: logs, metrics, endpoint diagnostics | **Application Insights** (+ Log Analytics) |
+| Default data, job outputs, notebooks | **Storage account** |
+| Docker images for environments | **Container registry** (created on first image build if not set) |
+
 ## Datastores: named connections into storage
 
 A **datastore** is not storage. It's a *registered pointer plus credentials*
