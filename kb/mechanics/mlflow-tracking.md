@@ -122,7 +122,7 @@ apart:
 ## Logging a table: file vs. Python object
 
 Added after practice question
-[Q169](../../practice/archive/q169-mlflow-log-table-file.md). Choose the function by
+[Q169](../../practice/mlops/q169-mlflow-log-table-file.md). Choose the function by
 **what you're holding**:
 
 | You have… | Use | Notes |
@@ -210,3 +210,11 @@ Additions from [Q131](../../practice/mlops/q131-log-metric-log-artifact-plot.md)
 |---|---|
 | A **list** of metric values | `MlflowClient().log_batch(run_id, metrics=[Metric(...)...])` (the v1 `run.log_list` replacement) |
 | A plot already saved to disk | `mlflow.log_artifact("plot.png")` |
+
+## Querying runs: search_runs and statuses
+
+From practice question [Q168](../../practice/mlops/q168-mlflow-search-runs-failed.md).
+
+- `mlflow.search_runs(experiment_names=[...], filter_string=..., max_results=..., order_by=[...])` → a pandas DataFrame with `run_id`, `status`, `metrics.*`, `params.*`, `tags.*`.
+- Statuses: `RUNNING`, `SCHEDULED`, `FINISHED`, **`FAILED`** (ended with an error), **`KILLED`** (cancelled/aborted).
+- `max_results` + `order_by` are applied **before** any pandas filtering you do afterwards.

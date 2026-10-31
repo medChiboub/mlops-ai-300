@@ -168,3 +168,5 @@ From practice question [Q83](../../practice/mlops/q083-low-priority-compute-clus
 - Good for **training jobs** and **batch endpoints** (preempted work is
   retried). Not offered for managed online endpoints.
 - Needs low-priority quota (this subscription has 0, see above).
+
+Cost cue from [Q163](../../practice/mlops/q163-cluster-cost-tier-min-instances.md): interruptible workloads → `tier="low_priority"` (cheaper while active); `min_instances=0` (free while idle); leave `max_instances` and `size` alone to keep capacity.

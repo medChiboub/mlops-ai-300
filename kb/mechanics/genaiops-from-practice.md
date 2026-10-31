@@ -424,3 +424,25 @@ From practice question [Q137](../../practice/genaiops/q137-manual-evaluation-ste
   comparable runs), **ground truth** where metrics need it, and **column
   mapping** from dataset/app fields to evaluator inputs (`query`, `response`,
   `context`, `ground_truth`).
+
+## Benchmark metrics by model type
+
+From practice questions [Q88](../../practice/genaiops/q088-benchmark-coherence-f1.md), [Q161](../../practice/genaiops/q161-benchmark-vmeasure-gptsimilarity.md).
+
+| Model / task | Benchmark cue |
+|---|---|
+| Embeddings for **clustering / categorising** | **V measure** |
+| Embeddings for **retrieval** (find relevant, avoid irrelevant) | NDCG, MAP, **F1** (precision + recall) |
+| Generation compared with a reference answer | **GPTSimilarity** (semantic similarity to ground truth) |
+| Generation readability | Coherence, fluency |
+
+## Provisioned throughput and spillover
+
+From practice question [Q167](../../practice/genaiops/q167-provisioned-spillover.md).
+
+- Predictable, sustained volume with strict latency SLAs → **Provisioned
+  (PTU)** deployment: reserved capacity, stable latency.
+- Peaks above the PTU → **spillover** to a Standard deployment instead of
+  throttling (429).
+- Search side: semantic ranking needs a `SemanticConfiguration` with
+  `SemanticField` entries in `prioritized_fields` ([Q166](../../practice/genaiops/q166-semantic-configuration-code.md)).

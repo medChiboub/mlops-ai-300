@@ -338,7 +338,7 @@ exam, "imbalanced classes" + "which primary metric" → `AUC_weighted`.
 
 📘 From the SDK v2 `set_limits` reference and the AutoML how-to (read
 2026-10-31). Added after practice question
-[Q170](../../practice/archive/q170-automl-set-limits.md).
+[Q170](../../practice/mlops/q170-automl-set-limits.md).
 
 Limits work at **two levels**: the whole job, and each trial. The exam likes
 to blur them.
@@ -382,3 +382,5 @@ to blur them.
 - **Guardrail statuses:** Passed / Done / Alerted.
 - **Output:** a best model in MLflow format, ready to register and deploy.
   AutoML doesn't register or deploy for you.
+
+Practice notes: [Q162](../../practice/mlops/q162-automl-parquet-compute.md): Parquet data → **MLTable** (`from_parquet_files`); AutoML v2 compute is an Azure ML **cluster** or serverless (Databricks was v1). [Q156](../../practice/mlops/q156-automl-vision-jsonl.md): vision tasks take JSONL wrapped in an MLTable.
