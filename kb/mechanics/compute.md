@@ -156,3 +156,13 @@ My project has **no compute instance** (notebooks run on my Mac) and one
 cluster, `train-cluster`, where the *compute's* managed identity needed
 explicit grants such as `AcrPull`. Here both computes have `identity: null`,
 and jobs from notebooks run as me.
+
+## Low-priority VMs: where they apply
+
+From practice question [Q83](../../practice/mlops/q083-low-priority-compute-cluster.md).
+
+- Set on a **compute cluster**: `AmlCompute(..., tier="low_priority")`.
+  Cheaper, preemptible surplus capacity.
+- Good for **training jobs** and **batch endpoints** (preempted work is
+  retried). Not offered for managed online endpoints.
+- Needs low-priority quota (this subscription has 0, see above).

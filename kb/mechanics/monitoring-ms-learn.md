@@ -437,3 +437,16 @@ Click a question to reveal its answer. Answer before opening.
 ---
 
 [← mechanics index](README.md) · [How monitoring worked in my lab run](monitoring.md) · [Network isolation](network-isolation.md)
+
+## Practice cues: which metric or signal
+
+From practice questions [Q81](../../practice/mlops/q081-drift-monitoring-alerts.md), [Q86](../../practice/mlops/q086-regression-quality-concerns.md), [Q95](../../practice/mlops/q095-alert-rules-autoscaling.md), [Q98](../../practice/mlops/q098-endpoint-traffic-metrics.md).
+
+| Symptom or need | Look at / configure |
+|---|---|
+| Inputs differ from training | **Data drift** signal (reference = training data) |
+| Outputs shift; accuracy fine but business results worse | **Prediction drift** (output distribution) |
+| Regression accuracy falling | Model performance: **MAE, MSE, RMSE** (needs ground truth) |
+| Slow or inconsistent responses under load | **Request latency, requests per minute, connections active** (+ CPU/memory per deployment) |
+| Act when a threshold is crossed | **Alert rules** → action group (or Event Grid) |
+| Capacity tracks demand | **Autoscale** the deployment |
