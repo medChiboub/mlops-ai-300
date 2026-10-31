@@ -26,7 +26,7 @@ the dependent resources too.
 
 ## The four associated resources
 
-From practice question [Q56](../../practice/archive/q053-q054-q056-q057-quick-ones.md).
+From practice question [Q56](../../practice/mlops/q056-workspace-key-vault-app-insights.md).
 
 | Requirement | Associated resource |
 |---|---|

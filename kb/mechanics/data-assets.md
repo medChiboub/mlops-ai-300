@@ -42,7 +42,7 @@ How to read a question's URL:
 
 ## Loading an MLTable in code
 
-From practice question [Q47](../../practice/archive/q047-load-mltable.md).
+From practice question [Q47](../../practice/mlops/q047-load-mltable.md).
 
 ```python
 import mltable

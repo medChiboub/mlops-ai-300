@@ -43,7 +43,7 @@ slow; changing auth or compute size doesn't address a bad release.
 
 ## No outbound internet: package the model
 
-From practice question [Q49](../../practice/archive/q049-package-model-no-egress.md).
+From practice question [Q49](../../practice/mlops/q049-package-model-no-egress.md).
 
 - A **no-code MLflow** deployment installs the model's conda/pip
   dependencies **when the container starts**. That needs internet.
@@ -55,7 +55,7 @@ From practice question [Q49](../../practice/archive/q049-package-model-no-egress
 
 ## Online vs. batch endpoints
 
-From practice question [Q57](../../practice/archive/q053-q054-q056-q057-quick-ones.md).
+From practice question [Q57](../../practice/mlops/q057-online-vs-batch-endpoints.md).
 
 | | **Online (real-time)** | **Batch** |
 |---|---|---|
@@ -66,5 +66,5 @@ From practice question [Q57](../../practice/archive/q053-q054-q056-q057-quick-on
 | Typical cue | "during customer interactions" | "files", "nightly/scheduled", "large volume" |
 
 A safe test of a new version on live users = **traffic splitting** between
-deployments on the **same** endpoint ([Q54](../../practice/archive/q053-q054-q056-q057-quick-ones.md)),
+deployments on the **same** endpoint ([Q54](../../practice/mlops/q057-online-vs-batch-endpoints.md)),
 not a separate staging endpoint.

@@ -48,7 +48,7 @@ From practice question [Q30](../../practice/mlops/q030-hub-workspace-governance.
 
 ## Archiving model versions
 
-From practice question [Q41](../../practice/archive/q041-archive-model-versions.md).
+From practice question [Q41](../../practice/mlops/q041-archive-model-versions.md).
 
 | Need | Do | Effect |
 |---|---|---|

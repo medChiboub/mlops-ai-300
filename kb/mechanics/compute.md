@@ -137,7 +137,7 @@ lists it as **not** changing it.
 
 ## Cloning a Git repo into the workspace
 
-From practice question [Q52](../../practice/archive/q052-git-clone-ssh.md). From the Studio
+From practice question [Q52](../../practice/mlops/q052-git-clone-ssh.md). From the Studio
 terminal (the files land in the shared workspace file system):
 
 ```bash

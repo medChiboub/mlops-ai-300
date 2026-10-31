@@ -16,7 +16,7 @@ Pick the evaluator by the **requirement's wording**:
 |---|---|---|
 | "supported by the sources", "no fabrication", "grounded" | **Groundedness** | No (needs the context) |
 | "addresses the user's question", "on-topic" | **Relevance** | No |
-| "readable", "natural", **"grammatically correct"** ([Q45](../../practice/archive/q045-fluency-evaluator.md)) | **Fluency** | No |
+| "readable", "natural", **"grammatically correct"** ([Q45](../../practice/genaiops/q045-fluency-evaluator.md)) | **Fluency** | No |
 | "logically consistent", "ideas connect" (not grammar!) | Coherence | No |
 | "matches the expected answer" | Similarity, F1 | **Yes** (ground truth) |
 | "unsafe or harmful content" | Safety evaluators (violence, self-harm, hate, sexual) | No |
@@ -235,7 +235,7 @@ From practice questions [Q32 + Q34](../../practice/genaiops/q032-dpo-preference-
 - Files are **JSONL** (one object per line), **UTF-8** encoded. Upload
   training (and optionally validation) files, then fine-tune.
 
-**Vision fine-tuning** ([Q55](../../practice/archive/q055-vision-finetuning-model.md)): to fine-tune
+**Vision fine-tuning** ([Q55](../../practice/genaiops/q055-vision-finetuning-model.md)): to fine-tune
 on **text + images**, pick a base model whose fine-tuning supports vision.
 At the time of the question that's **`gpt-4o`**; `gpt-35-turbo` and
 `davinci-002` are text-only. Model lineups change, so check the current
@@ -243,7 +243,7 @@ table.
 
 ## Foundry resource vs. project
 
-From practice question [Q42](../../practice/archive/q042-foundry-resource-vs-project.md).
+From practice question [Q42](../../practice/genaiops/q042-foundry-resource-vs-project.md).
 
 | Level | Holds | Use for |
 |---|---|---|
@@ -254,7 +254,7 @@ It's the same shape as Azure ML **hub + projects**.
 
 ## Evaluation in the release workflow
 
-From practice questions [Q43, Q46, Q48](../../practice/archive/q043-q046-q048-genai-eval-workflow.md).
+From practice questions [Q43, Q46, Q48](../../practice/genaiops/q048-eval-github-action-gate.md).
 
 | Question | Mechanism |
 |---|---|
@@ -273,7 +273,7 @@ optional.
 
 ## Promoting a fine-tuned model
 
-From practice question [Q44](../../practice/archive/q044-promote-finetuned-model.md). 🟡
+From practice question [Q44](../../practice/genaiops/q044-promote-finetuned-model.md). 🟡
 
 Generic order: **version/register → evaluate and validate → production
 deployment** (for example Global Standard).
@@ -284,7 +284,7 @@ deployment** (for example Global Standard).
 
 ## Prompt governance: prompts are code
 
-From practice question [Q51](../../practice/archive/q051-prompt-governance.md).
+From practice question [Q51](../../practice/genaiops/q051-prompt-governance.md).
 
 | Need | Mechanism |
 |---|---|
