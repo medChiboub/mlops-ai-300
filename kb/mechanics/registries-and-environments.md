@@ -17,7 +17,7 @@ outside any workspace. Dev publishes an asset; test and prod use it.
 
 ## Which asset holds what
 
-Added after practice question [Q4](../../practice/archive/q004-register-model-for-reuse.md).
+Added after practice question [Q4](../../practice/q004-register-model-for-reuse.md).
 
 | Asset | Holds | Question cue |
 |---|---|---|

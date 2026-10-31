@@ -8,7 +8,7 @@ in.
 
 ## Evaluation metrics
 
-From practice question [Q2](../../practice/archive/q002-genai-quality-metrics.md).
+From practice question [Q2](../../practice/q002-genai-quality-metrics.md).
 
 Pick the evaluator by the **requirement's wording**:
 
@@ -28,7 +28,7 @@ Pick the evaluator by the **requirement's wording**:
 
 ## Identity: key-less access and least privilege
 
-From practice question [Q3](../../practice/archive/q003-foundry-keyless-identity-rbac.md).
+From practice question [Q3](../../practice/q003-foundry-keyless-identity-rbac.md).
 
 | Need | Mechanism |
 |---|---|
@@ -45,7 +45,7 @@ From practice question [Q3](../../practice/archive/q003-foundry-keyless-identity
 
 ## RAG retrieval quality
 
-From practice question [Q5](../../practice/archive/q005-rag-retrieval-accuracy.md).
+From practice question [Q5](../../practice/q005-rag-retrieval-accuracy.md).
 
 When answers are incomplete because the **right content isn't retrieved
 consistently**, fix retrieval, not generation:
@@ -64,7 +64,7 @@ consistently**, fix retrieval, not generation:
 
 ## Safe model-version upgrades
 
-From practice question [Q8](../../practice/archive/q008-foundry-safe-model-upgrade.md). 🟡 The
+From practice question [Q8](../../practice/q008-foundry-safe-model-upgrade.md). 🟡 The
 Foundry-specific steps aren't verified yet.
 
 Pattern: **deploy alongside → validate → shift traffic** (keep the old

@@ -86,7 +86,7 @@ problem, not a code problem.
 ## Adding a Jupyter kernel on a compute instance
 
 📘 From *Access a compute instance terminal* (read 2026-10-31). Added after
-practice questions [Q9–Q11](../../practice/archive/q009-q011-jupyter-kernel-prereq.md).
+practice questions [Q9–Q11](../../practice/q009-kernel-delete-python36.md).
 
 A Jupyter kernel = **a conda environment + `ipykernel` + a registered
 kernelspec**. From the compute instance terminal (Studio → Notebooks →
