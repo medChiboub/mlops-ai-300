@@ -25,6 +25,8 @@ did it and why.
 
 **[Diagrams: end-to-end flow](mechanics/end-to-end-flow.md):** architecture, the whole dev → prod → monitor loop, and a sequence diagram per workflow (labs 06–07).
 
+**[Renamed and legacy names](renamed-and-legacy-names.md):** the v1 and pre-rename names AIs still use (SDK/CLI v1 support dates, Datasets → data assets, web services → endpoints, Azure AI Studio → Microsoft Foundry). Paste it into any AI study session.
+
 **[mechanics/](mechanics/README.md):** what Azure actually does underneath, one
 file per concept (workspace and storage, compute, data assets, AutoML, …).
 
