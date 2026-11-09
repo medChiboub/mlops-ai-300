@@ -80,6 +80,8 @@ def main():
         except urllib.error.HTTPError as e:
             codes[e.code] += 1
     print(f"{a.mode} x{a.n} → {endpoint}: status {dict(codes)}, predictions {dict(preds)}")
+    if codes[200] == 0:
+        raise SystemExit("no request succeeded")   # don't report green when every call failed (Oct 1: 300 × 404)
 
 
 if __name__ == "__main__":

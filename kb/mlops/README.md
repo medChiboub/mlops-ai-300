@@ -18,7 +18,7 @@ thing differently.
   page these docs build. Re-check before each lab.
 
 **Environment:** one workspace provisioned in lab 01 (canadaeast, `rg-ai300-l*` /
-`mlw-ai300-l*`), reused for every lab, deleted after lab 07.
+`mlw-ai300-l*`), reused for every lab, deleted after lab 07 (with the service principal and GitHub secrets, 2026-11-09).
 
 **[TIMELINE.md](TIMELINE.md):** every step across all labs, in order, with who
 did it and why.
@@ -40,7 +40,7 @@ each one teaches is added to the mechanics notes here.
 | 04 | [Run pipelines](04-run-pipelines.md) | Component = metadata + interface + command/code/environment; the pipeline wires output → input, so order comes from the data dependency (train didn't exist until prep finished). Loaded components stay anonymous (`az ml component list` was empty). Outputs land in `workspaceblobstore/azureml/<run>/<output>/`. The lab never schedules, although the module does |
 | 05 | [Plan and prepare](05-plan-and-prepare.md) | Dev and prod workspaces + a shared registry. The lab's literal design script would have created a second `rg-ai300-l*` group (breaking labs 06–07), and Microsoft's reference script can't create its registry (a 35-character name, over the limit) yet reports success (no `set -e`). A registry's Premium ACR costs $1.67/day. It carries models (pattern A) or components + environments (pattern B, retrain in prod) |
 | 06 | [Automate model training](06-automate-model-training.md) | `create-for-rbac` = app registration + service principal + role; its JSON → `AZURE_CREDENTIALS`, and the job's `created_by` is the SP. A `pull_request` trigger + branch protection make the PR the gate. The workflow went red while training succeeded: an unpinned `ml` 2.45.0 `--stream` bug, reproduced twice, fixed by pinning 2.44.1. OIDC is the recommended answer over the lab's client secret |
-| 07 | [Deploy and monitor](07-deploy-monitor.md) | _in progress_ |
+| 07 | [Deploy and monitor](07-deploy-monitor.md) | `/train-prod` and `/deploy-prod` behind a `prod` reviewer, but the lab deploys the **committed 2023 model**, never the one it trained (our AUC-gated alternative worked, then was reverted). No-code MLflow deployment, with data collection verified in blob JSONL. Monitor configured (advanced, training-data reference), but **serverless Spark is blocked for this subscription**, so it never ran (isolated: minimal Spark job, a second region, quota). Drift-retrain PR and rollback not run. Cleaned up 2026-11-09 |
 
 ## Deviations from the canonical labs
 
@@ -143,15 +143,15 @@ Status: ✅ done · 👀 seen but not done · ⚠ partial or failed · ⏳ plann
 | Implement training pipelines | 04 | ✅ 04 (no schedule; the module covers `JobSchedule`) | ✅ |
 | Compare model performance across jobs | 01, 02, 03, 07 (dev vs. prod metrics) | ✅ 01, 02, 03 | ✅ |
 | Package a feature retrieval specification with the model | ❌ | ❌ | ❌ |
-| Register an MLflow model | 07 (only *implicitly*, through deployment) | ⏳ | ✅ |
+| Register an MLflow model | 07 (only *implicitly*, through deployment) | ✅ 07: implicit hash-named registration; our PR #4 registered `diabetes-model:1` explicitly | ✅ |
 | Evaluate a model with responsible AI principles | 01 (module text only); optional notebook `Create Responsible AI dashboard.ipynb` | ⚠ 01: automatic `_RAI` run failed | ⚠ |
-| Manage model lifecycle, including archiving | 07 (optional rollback step) | ⏳ | ✅ |
-| Deploy real-time or batch endpoints | 07 (real-time only) | ⏳ | ✅ both |
-| Test and troubleshoot endpoints | 07 | ⏳ | ✅ |
-| Progressive rollout and safe rollback | 07 (optional) | ⏳ | ✅ |
-| Detect and analyze data drift | 07 (needs about a day of traffic) | ⏳ | ⚠ |
-| Monitor performance metrics in production | 07 (partly) | ⏳ | ❌ |
-| Configure retraining or alert triggers | 07 (simulated by hand) | ⏳ | ❌ |
+| Manage model lifecycle, including archiving | 07 (optional rollback step) | 👀 07: not run (theory in the exam mapping) | ✅ |
+| Deploy real-time or batch endpoints | 07 (real-time only) | ✅ 07: managed online endpoint, no-code MLflow | ✅ both |
+| Test and troubleshoot endpoints | 07 | ✅ 07: CLI invoke, container logs (the Test tab request never arrived) | ✅ |
+| Progressive rollout and safe rollback | 07 (optional) | 👀 07: not run (theory in the exam mapping) | ✅ |
+| Detect and analyze data drift | 07 (needs about a day of traffic) | ⚠ 07: monitor configured, never ran (serverless Spark blocked) | ⚠ |
+| Monitor performance metrics in production | 07 (partly) | ⚠ 07: data collection verified; no monitor run | ❌ |
+| Configure retraining or alert triggers | 07 (simulated by hand) | 👀 07: alert email configured; the retrain PR not run | ❌ |
 
 **Gaps no lab and no prod work covers:** distributed training, feature
 retrieval specifications, restricting network access (beyond a read-only

@@ -1190,3 +1190,18 @@ HTTP errors but always exits 0 (it should fail when nothing returns 200).
 the 203 baseline requests (expected: no drift). Workflow
 `send-monitor-traffic.yml` → **disabled_manually**; the file gets deleted at
 cleanup.
+
+**Nov 9 · me → Claude · "Do the corrections": final cleanup and closing lab 07**
+- **Security:** app registration `sp-mslearn-mlops-github` deleted, then
+  **purged** from Entra's deleted items (otherwise it's restorable with its
+  secrets for 30 days; both secrets were valid until 2027-09). No role
+  assignments were left: they went with the RG. GitHub: repo + `dev`/`prod`
+  `AZURE_CREDENTIALS`, variables `AZURE_RESOURCE_GROUP`/`AZURE_WORKSPACE_NAME`,
+  and both environments deleted (0 secrets, 0 variables, 0 environments).
+- **CI:** all 4 lab workflows disabled (they'd fail with no workspace);
+  `send-monitor-traffic.yml` deleted. `infra/send-traffic.py` now exits
+  non-zero when no request returns 200.
+- **kb/07 closed:** steps 2.7–2.10 (deploy, test, monitoring, cleanup),
+  what broke, exam mapping + the module's 5 assessment answers, the lab vs.
+  production table, a 7-question self-check. README: lab 07 line + coverage
+  statuses. "In my words" is left for me.

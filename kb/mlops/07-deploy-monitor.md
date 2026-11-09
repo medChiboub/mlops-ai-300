@@ -7,7 +7,7 @@ Microsoft Learn module: [Deploy and monitor a model in Azure Machine Learning](h
 Its exercise (`go.microsoft.com/fwlink/?LinkId=2378100`) links to this lab.
 Units 2–5 and the 5-question assessment were read before starting.
 
-Mechanics: **[end-to-end flow: architecture, flowchart, sequence diagrams](mechanics/end-to-end-flow.md)** · [GitHub Actions ↔ Azure ML](mechanics/github-actions-azureml.md) · [registries and environments](mechanics/registries-and-environments.md) · [job types](mechanics/job-types.md)
+Mechanics: **[end-to-end flow: architecture, flowchart, sequence diagrams](mechanics/end-to-end-flow.md)** · [monitoring](mechanics/monitoring.md) · [three environments](mechanics/three-environments.md) · [GitHub Actions ↔ Azure ML](mechanics/github-actions-azureml.md) · [registries and environments](mechanics/registries-and-environments.md) · [job types](mechanics/job-types.md)
 
 ## 1. What this lab does
 
@@ -335,17 +335,222 @@ to promote models or components. A possible optional extra after lab 07.
   the model is at least as good" = **an evaluation gate + a required status
   check**.
 
+### 2.7 `/deploy-prod` the lab's way (PR #3, 2026-09-30)
+
+After PR #4 (our own model behind an AUC gate) was reverted by PR #5, I
+commented `/deploy-prod` on PR #3 and approved the `prod` gate. Run
+`36692329751` succeeded in **about 8.5 min** (08:51 → 08:59 UTC):
+endpoint `diabetes-endpoint-0533925c` (key auth), deployment **`blue`**
+(Standard_D2as_v4 × 1, `DataCollector(model_inputs, model_outputs)`) with
+the **committed 2023 `model/` folder**, traffic **`{"blue": 100}`**. The
+bot commented the endpoint and deployment names on the PR. The 2023 model
+(Python 3.8, MLflow 1.30, scikit-learn 0.24.1) built fine. Azure created
+its Azure ML environment from the model's `conda.yaml` and built the image
+once (see [three environments](mechanics/three-environments.md)).
+
+### 2.8 Test the endpoint and check data collection
+
+- My **Studio Test tab** request never reached the deployment: its logs
+  showed only health probes, with no `POST /score`.
+- The same 8-feature payload through `az ml online-endpoint invoke`
+  returned **`[1]`** (0/1, even though the signature says boolean) in
+  12.9 ms.
+- About 2 s later, the collector had written
+  `modelDataCollector/diabetes-endpoint-0533925c/blue/{model_inputs,model_outputs}/2026/09/30/09/<id>.jsonl`:
+  CloudEvents lines with the **8 feature columns** (no PatientID or
+  Diabetic), an output column named `"0"`, and a shared `correlationid`.
+- 200 more requests from the held-out test CSV (`infra/send-traffic.py
+  baseline`): 200 × HTTP 200, appended to the same hourly file (201 lines).
+
+### 2.9 Configure model monitoring (Studio) and why it never ran
+
+- **Created in Studio → Monitoring → Add:** schedule `blue-fkfvn`, data
+  drift only (the 3 pre-added signals deleted; the red feature-attribution
+  one blocked **Next**), production `…-blue-model_inputs:1` with a
+  7-day lookback, reference `diabetes-training:1` (MLTable) with target
+  `Diabetic`, Top N 10, NWD/JSD at 0.1, daily at **04:00 UTC**, E4s_v3.
+  Studio's "Next run" said a day later than the stored trigger (unexplained).
+- **3 manual runs (`az ml schedule trigger`) all failed:** every Spark step
+  sat "NotStarted" for about 4 min, then `UserError: The long operation status
+  is Failed` (`commonjobprovider`), with no logs.
+- **Ruled out, one test at a time:** the data and config (nothing ran far
+  enough to read them), a transient issue (retry failed), `Microsoft.Synapse`
+  registration (registered, still failed), size and regional quota (a
+  **minimal standalone Spark job** failed too, with 14 vCPUs free), the
+  region (**the same job failed in a temporary Canada Central workspace**),
+  and visible quota (no Spark entry among 64 Azure ML quotas).
+- **Conclusion:** serverless Spark is blocked for this **subscription**. Most
+  likely a hidden serverless quota that only Azure Support can see. On Basic
+  support, there's no form for it. I stopped there.
+- Full trace: [monitoring mechanics](mechanics/monitoring.md#traps-why-completed-or-failed-can-mislead)
+  and [TIMELINE](TIMELINE.md).
+
+### 2.10 Stop and clean up
+
+- **2026-10-01:** I ended monitoring: monitor deleted, traffic → 0,
+  deployment `blue` deleted. The scheduled "shifted traffic" workflow then
+  hit 300 × 404 (and reported green: a script bug, since fixed). The
+  workflow was disabled.
+- **Not done:** the lab's "simulate drift → retrain PR" and the optional
+  rollback deployment. Both need the endpoint and a working monitor. The
+  rollback mechanics are in the exam mapping below.
+- **Resource group** `rg-ai300-l0533925c724d4c839e` deleted (by 2026-11-01).
+- **2026-11-09:** app registration `sp-mslearn-mlops-github` deleted, then
+  purged from Entra's 30-day recycle bin (its 2 secrets were valid until
+  2027-09). GitHub: the 3 `AZURE_CREDENTIALS` copies, both variables, and the
+  `dev`/`prod` environments deleted. All lab workflows disabled; the
+  traffic workflow file removed. The repo stays.
+
 ## 3. What broke and how we fixed it
 
+- **The lab deploys a model that training never produced.**
+  `deploy_to_online_endpoint.py` registers the committed 2023 `model/`
+  folder, so `/train-prod` changes the PR comment, not the endpoint. We
+  proved our own design (register `diabetes-model:1` behind AUC ≥ 0.80,
+  deploy that version) in PR #4, then reverted to the lab's flow (PR #5).
+  See 2.6.
+- **The Studio Test tab didn't send anything.** The deployment logs
+  (`POST /score` missing) show it; the CLI request worked. **Lesson:** "I
+  clicked Test" isn't evidence. The deployment log is.
+- **Azure ML monitoring never ran: serverless Spark is blocked for this
+  subscription** (2.9). Not fixable on Basic support. Monitoring's
+  configuration was completed as the lab asks; its first-run review wasn't.
+- **The local CLI can't read Studio-made monitors:** `az ml schedule
+  show/list` fails on `ModelInputs` casing. `az rest` on the schedule worked,
+  and `trigger`, `disable` and `delete` work despite the warning.
+- **My helper reported success on total failure:** 300 × 404 → green.
+  Fixed: the script now exits non-zero when no request returns 200.
+- **The PR for a helper workflow triggered training:** lab 06's
+  `manual-trigger-job.yml` runs on every PR into `main`.
+
 ## 4. Exam mapping
+
+Domain 2: *Deploy real-time or batch endpoints* (real-time), *Test and
+troubleshoot endpoints*, *Implement progressive rollout and safe rollback*,
+*Detect and analyze data drift*, *Monitor performance metrics in
+production*, *Configure retraining or alert triggers*, *Register an MLflow
+model* (implicitly). Domain 1: *Configure GitHub integration* (environments,
+required reviewers), *Manage source control* (PR flow).
+
+- **Managed online endpoint = endpoint + deployments.** The endpoint holds
+  the URI, auth (key or token) and the **traffic split**. Each deployment
+  holds a model, environment, VM size and instance count. Quota is
+  `ceil(1.2 × instances) × cores` (a 20% upgrade reserve): our 1 × D2as_v4
+  reserved 4 vCPUs.
+- **No-code MLflow deployment:** the MLflow model's metadata (`MLmodel`,
+  `conda.yaml`, signature) lets Azure generate the scoring script and the
+  environment. A custom model needs `score.py` (`init()`/`run()`) and an
+  environment. Module assessment: what enables deploying without a scoring
+  script → **the MLflow model's metadata**.
+- **Safe rollout and rollback:** a new deployment beside the old one → a
+  small traffic share (or `mirror_traffic`, a shadow copy with no responses
+  returned) → shift traffic → delete the old one. **Rollback = send traffic
+  back to the previous deployment first**, then investigate. Changing
+  traffic is instant, with no downtime. Module assessment: a new model
+  misbehaves → **route traffic back to the previous deployment, then
+  investigate**.
+- **Gates:** a `prod` **GitHub environment with a required reviewer**
+  holds the deploy job and its secrets until someone approves. Module
+  assessment: who approves production deployment → **a protected
+  environment with required reviewers**.
+- **Data collection** is set **on the deployment**. Automatic for a
+  no-code MLflow model; a custom `score.py` needs the `Collector` SDK
+  (`azureml-ai-monitoring`). Data lands as hourly JSONL in the default
+  datastore. The collected inputs are what the model *receives*.
+- **Model monitoring:** a **schedule** running signals on **serverless
+  Spark**. **Out-of-box** (reference = recent past production; data drift,
+  prediction drift, data quality; smart defaults) vs. **advanced**
+  (reference = **training data** for drift and quality, validation data for
+  prediction drift; feature importance needs a **target column**). Alerts
+  email the monitor's creator by default. Module assessment: drift detected
+  → **investigate and consider retraining** (a human decision, not
+  automatic).
+- **Troubleshooting a deployment:** `az ml online-deployment get-logs`
+  (the container log), the provisioning state, and the Test tab vs. a
+  CLI/REST call.
+
+**Module assessment**, five questions:
+1. A real-time prediction service → **a (managed) online endpoint**.
+2. What lets you deploy without a scoring script → **the MLflow model's metadata (signature and environment)**.
+3. A new deployment misbehaves → **route traffic back to the previous deployment, then investigate**.
+4. Require approval before production → **a protected `prod` environment with a required reviewer**.
+5. The monitor detects drift → **investigate, then consider retraining**.
 
 ## 5. Lab way vs. my production project
 
 Tags (legend in [README](README.md#tags)): 🧪 lab shortcut · 📘 Microsoft docs
 recommendation (**the exam answer**) · 🛠 my project's own choice.
 
+| Topic | Lab 07 | 📘 Microsoft recommendation | 🛠 My production project |
+|---|---|---|---|
+| What gets deployed | 🧪 The committed 2023 `model/` folder, never the model training just produced | Deploy the **registered** model version that passed evaluation | The registered model version promoted through the registry |
+| Promotion | Git only: the same `job.yml` reruns on "prod" data | A registry: promote the model (A) or the pipeline (B) | Pattern A: dev → `mlreg-diabetes` → staging/prod |
+| Dev vs. prod | 🧪 One workspace; a data asset + a GitHub environment | Separate workspaces (and subscriptions) per stage | Separate RGs per stage (Bicep) |
+| Identity | 🧪 One service principal with a client secret for repo, dev and prod | OIDC, one identity per stage, scoped to the stage | OIDC |
+| Prod gate | `prod` environment with a required reviewer (on PR code, before merge) | Required reviewer **plus** deploy from `main` only (deployment branch policy) | Gates on `main` |
+| Rollout | 🧪 Traffic straight to 100% | Blue/green: a small share or mirror first, then shift | Staged rollout |
+| Data collection | 📘 Automatic (no-code MLflow) | Automatic for MLflow; `Collector` SDK for a custom `score.py` | `Collector` SDK in `score.py` |
+| Monitor | 🧪 Studio clicks, nothing in Git; advanced reference = training data | Versioned YAML (`az ml schedule create`); training data as the drift reference | YAML in Git; out-of-box reference (a known gap) |
+| Retraining | Simulated: change `--reg_rate` in a PR | A human decision on a drift signal; optionally an automated trigger | Manual |
+
 ## 6. In my words
 
 <!-- Mine to write. -->
 
 ## 7. Self-check
+
+Click a question to reveal its answer. Answer before opening.
+
+<details>
+<summary><strong>1.</strong> In lab 07, after <code>/train-prod</code> trains on prod data, which model does <code>/deploy-prod</code> deploy?<br><br>A) The model trained by <code>/train-prod</code><br>B) The latest registered version of <code>diabetes-model</code><br>C) The committed 2023 <code>model/</code> folder, registered implicitly with a hash name<br>D) The best AutoML model from lab 01</summary>
+
+> **✅ Answer: C.** The deploy script builds <code>Model(path="./model")</code>. Training changes the PR comment, not the endpoint. 📘 Deploy the registered version that passed evaluation.
+</details>
+
+---
+
+<details>
+<summary><strong>2.</strong> What lets you deploy an MLflow model to a managed online endpoint without a scoring script or environment?<br><br>A) The <code>DataCollector</code><br>B) The MLflow model's metadata: <code>MLmodel</code>, signature and <code>conda.yaml</code><br>C) A curated environment<br>D) The endpoint's key auth</summary>
+
+> **✅ Answer: B.** Azure generated <code>mlflow_score_script.py</code> and built an environment from <code>conda.yaml</code>, adding <code>azureml-inference-server-http</code>.
+</details>
+
+---
+
+<details>
+<summary><strong>3.</strong> A new deployment <code>green</code> starts returning bad predictions. What's the first step?<br><br>A) Delete the endpoint<br>B) Retrain immediately<br>C) Update the endpoint's traffic back to the previous deployment (<code>blue=100, green=0</code>), then investigate<br>D) Scale <code>green</code> to more instances</summary>
+
+> **✅ Answer: C.** Traffic changes are instant and need no redeploy. Keep <code>green</code> for investigation; delete it later to stop its cost.
+</details>
+
+---
+
+<details>
+<summary><strong>4.</strong> Data collection is enabled on an MLflow no-code deployment. Where does a request's input end up?<br><br>A) Application Insights only<br>B) The workspace's default blob datastore, under <code>modelDataCollector/&lt;endpoint&gt;/&lt;deployment&gt;/model_inputs/YYYY/MM/DD/HH/*.jsonl</code><br>C) A registered data asset you must create first<br>D) Nowhere until a monitor exists</summary>
+
+> **✅ Answer: B.** Seen 2 s after our request. Azure also auto-registered <code>…-model_inputs</code>/<code>…-model_outputs</code> data assets. Collection doesn't need a monitor.
+</details>
+
+---
+
+<details>
+<summary><strong>5.</strong> You want drift measured against what the model was trained on, with feature importance. What do you configure?<br><br>A) Out-of-box monitoring<br>B) Advanced monitoring: reference data = the training data asset, plus its target column<br>C) A prediction drift signal on model outputs<br>D) A shorter lookback window</summary>
+
+> **✅ Answer: B.** Out-of-box compares with recent past production, so it can't see slow drift away from training.
+</details>
+
+---
+
+<details>
+<summary><strong>6.</strong> Every model monitoring step fails after about 4 minutes in "NotStarted" with <code>The long operation status is Failed</code>, and a minimal standalone Spark job fails the same way. Where's the problem?<br><br>A) The monitor's reference data<br>B) The lookback window<br>C) Serverless Spark itself (capacity or a quota for the subscription), not the monitor<br>D) The endpoint's traffic split</summary>
+
+> **✅ Answer: C.** Monitoring runs only on serverless Spark (or an attached Synapse pool). Isolate the layer: if a trivial Spark job fails too, the monitor configuration isn't the cause.
+</details>
+
+---
+
+<details>
+<summary><strong>7.</strong> How do you make sure nobody deploys to production without approval in a GitHub Actions flow?<br><br>A) Branch protection on <code>main</code> only<br>B) A <code>prod</code> GitHub environment with required reviewers on the deploy job<br>C) A repository secret<br>D) A <code>workflow_dispatch</code> trigger</summary>
+
+> **✅ Answer: B.** The job waits and gets no environment secrets until approved. 📘 Add a deployment branch policy (<code>main</code> only) and OIDC scoped to the environment.
+</details>
